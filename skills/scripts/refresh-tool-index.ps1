@@ -41,6 +41,7 @@ $scriptRefs = @{
     'jshookmcp' = @('js-reverse/SKILL.md')
     'agent-browser' = @('browser-automation/SKILL.md')
     'playwright' = @('browser-automation/SKILL.md', 'browser-automation/scripts/setup.ps1')
+    'analyzeHeadless' = @('reverse-engineering/SKILL.md')
 }
 
 $reports = Get-ReverseToolReport

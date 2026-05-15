@@ -130,14 +130,22 @@
     },
     {
       "name": "ghidra-mcp",
-      "bootstrapKind": "local-http-mcp",
+      "bootstrapKind": "github-release-zip",
+      "repo": "NationalSecurityAgency/ghidra",
+      "assetRegex": "^ghidra_.*_PUBLIC_.*\\.zip$",
+      "installDir": "%USERPROFILE%\\Tools\\ghidra",
+      "docsUrl": "https://ghidra-sre.org/",
+      "canAutoInstall": true,
+      "verifyCommand": "analyzeHeadless",
+      "postInstallSteps": [
+        "下载 GhidraMCP 插件: https://github.com/LaurieWired/GhidraMCP/releases",
+        "将插件 zip 安装到 Ghidra: File → Install Extensions → 选择下载的 zip",
+        "MCP server 在 Ghidra 项目打开后自动监听 localhost:8765"
+      ],
       "mcpNames": ["ghidra"],
       "mcpUrl": "http://localhost:8765/mcp",
       "servicePort": 8765,
-      "docsUrl": "https://github.com/LaurieWired/GhidraMCP",
-      "canAutoInstall": false,
-      "verificationMode": "service-or-registration",
-      "manualInstallHint": "需要 Ghidra 本体 + GhidraMCP 插件。1) 下载 Ghidra: https://ghidra-sre.org/ 2) 下载 GhidraMCP 插件: https://github.com/LaurieWired/GhidraMCP/releases 3) 安装插件到 Ghidra Extensions 4) 启动 Ghidra 项目后 MCP server 自动监听 localhost:8765"
+      "verificationMode": "service-or-registration"
     },
     {
       "name": "seclists",

@@ -212,6 +212,17 @@ function Get-ReverseToolCatalog {
             )
         }
         [pscustomobject]@{
+            Name = 'analyzeHeadless'
+            Skill = 'reverse-engineering'
+            Purpose = 'Ghidra 无头分析（免费 IDA 替代）'
+            VersionArgs = @()
+            Fallbacks = @(
+                [pscustomobject]@{ Type = 'command'; Value = 'analyzeHeadless' },
+                [pscustomobject]@{ Type = 'path'; Value = (Join-Path $env:USERPROFILE 'Tools\ghidra\support\analyzeHeadless.bat') },
+                [pscustomobject]@{ Type = 'path'; Value = (Join-Path $env:USERPROFILE 'Tools\ghidra\ghidra_11.3_PUBLIC\support\analyzeHeadless.bat') }
+            )
+        }
+        [pscustomobject]@{
             Name = 'playwright'
             Skill = 'browser-automation'
             Purpose = 'Playwright 浏览器引擎'
