@@ -181,7 +181,7 @@ if (-not $spec.Available) {
 完成上述步骤后，运行：
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "F:\Cybersecurity skills router\skills\scripts\refresh-tool-index.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -File "<SKILL_ROOT>\scripts\refresh-tool-index.ps1"
 ```
 
 确认新工具出现在 `tool-index.md` 和 `tool-index.json` 中。
