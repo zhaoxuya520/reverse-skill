@@ -29,53 +29,115 @@ jobs:
           echo "Changed files:"
           echo "$CHANGED_FILES"
           
+          # 严格白名单：只允许 field-journal 下的 .md 文件
           INVALID_FILES=$(echo "$CHANGED_FILES" | grep -v '^skills/field-journal/.*\.md$' || true)
           if [ -n "$INVALID_FILES" ]; then
-            echo "❌ PR 包含非 field-journal 文件："
+            echo "❌ BLOCKED: PR 修改了非 field-journal 文件"
             echo "$INVALID_FILES"
             echo "valid=false" >> $GITHUB_OUTPUT
             exit 1
           fi
           
-          # 2. 检查文件内容安全性
+          # 不允许修改 CONTRIBUTE-BACK.md 和 _template.md（系统文件）
+          SYSTEM_FILES=$(echo "$CHANGED_FILES" | grep -E '(CONTRIBUTE-BACK\.md|_template\.md)' || true)
+          if [ -n "$SYSTEM_FILES" ]; then
+            echo "❌ BLOCKED: 不允许修改系统文件"
+            echo "$SYSTEM_FILES"
+            echo "valid=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          
+          # 2. 文件数量限制（单次 PR 最多 5 个文件）
+          FILE_COUNT=$(echo "$CHANGED_FILES" | wc -l)
+          if [ "$FILE_COUNT" -gt 5 ]; then
+            echo "❌ BLOCKED: 单次 PR 文件数超过 5 个（实际 $FILE_COUNT）"
+            echo "valid=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          
+          # 3. 逐文件安全扫描
           for file in $CHANGED_FILES; do
-            if [ -f "$file" ]; then
-              # 检查 prompt injection 特征
-              if grep -iE "(ignore previous|you are now|forget all|system prompt|<script|javascript:|onerror=|onload=)" "$file"; then
-                echo "❌ 文件 $file 包含可疑内容（可能是 prompt injection）"
-                echo "valid=false" >> $GITHUB_OUTPUT
-                exit 1
-              fi
-              
-              # 检查是否包含可执行代码伪装
-              if grep -E "^(#!/|import |require\(|from .* import|exec\(|eval\(|os\.system)" "$file"; then
-                echo "❌ 文件 $file 包含可执行代码特征"
-                echo "valid=false" >> $GITHUB_OUTPUT
-                exit 1
-              fi
-              
-              # 检查是否包含未脱敏的真实 token/key
-              if grep -iE "(AKIA[0-9A-Z]{16}|sk-[a-zA-Z0-9]{48}|ghp_[a-zA-Z0-9]{36}|npm_[a-zA-Z0-9]{36})" "$file"; then
-                echo "❌ 文件 $file 包含疑似真实 API key/token"
+            if [ ! -f "$file" ]; then
+              continue
+            fi
+            
+            echo "--- Scanning: $file ---"
+            
+            # 3a. Prompt injection 检测（宽模式）
+            if grep -iE "(ignore previous|ignore all|you are now|forget (all|everything)|disregard|new instructions|system prompt|override|jailbreak|DAN mode|bypass safety)" "$file"; then
+              echo "❌ BLOCKED: $file 包含 prompt injection 特征"
+              echo "valid=false" >> $GITHUB_OUTPUT
+              exit 1
+            fi
+            
+            # 3b. HTML/JS 注入检测
+            if grep -iE "(<script|<iframe|<object|<embed|<form|<input|javascript:|onerror=|onload=|onclick=|onmouseover=|onfocus=|data:text/html)" "$file"; then
+              echo "❌ BLOCKED: $file 包含 HTML/JS 注入代码"
+              echo "valid=false" >> $GITHUB_OUTPUT
+              exit 1
+            fi
+            
+            # 3c. 可执行代码/shell 命令伪装检测
+            if grep -E "^(#!/|import os|import subprocess|require\('child_process|from os import|exec\(|eval\(|os\.system|subprocess\.|Runtime\.getRuntime|ProcessBuilder|powershell -e|cmd /c|curl .* \| (bash|sh)|wget .* -O- \| (bash|sh))" "$file"; then
+              echo "❌ BLOCKED: $file 包含可执行代码/恶意命令"
+              echo "valid=false" >> $GITHUB_OUTPUT
+              exit 1
+            fi
+            
+            # 3d. 编码绕过检测（base64 编码的命令）
+            if grep -iE "(base64 -d|base64 --decode|atob\(|Buffer\.from\(.*base64|echo .* \| base64)" "$file"; then
+              echo "❌ BLOCKED: $file 包含 base64 编码绕过特征"
+              echo "valid=false" >> $GITHUB_OUTPUT
+              exit 1
+            fi
+            
+            # 3e. 未脱敏 token/key 检测（扩展模式）
+            if grep -iE "(AKIA[0-9A-Z]{16}|sk-[a-zA-Z0-9]{20,}|ghp_[a-zA-Z0-9]{36}|gho_[a-zA-Z0-9]{36}|npm_[a-zA-Z0-9]{36}|xox[baprs]-[a-zA-Z0-9-]+|ya29\.[a-zA-Z0-9_-]+|AIza[a-zA-Z0-9_-]{35}|[0-9]+-[a-zA-Z0-9_]{32}\.apps\.googleusercontent\.com|sk_live_[a-zA-Z0-9]{24,}|rk_live_[a-zA-Z0-9]{24,}|sq0atp-[a-zA-Z0-9_-]{22})" "$file"; then
+              echo "❌ BLOCKED: $file 包含疑似真实 API key/token"
+              echo "valid=false" >> $GITHUB_OUTPUT
+              exit 1
+            fi
+            
+            # 3f. 真实 IP 地址检测（非 RFC1918 私有地址、非示例地址）
+            # 允许: 10.x.x.x, 172.16-31.x.x, 192.168.x.x, 127.x.x.x, 0.0.0.0
+            if grep -oE '\b([0-9]{1,3}\.){3}[0-9]{1,3}\b' "$file" | grep -vE '^(10\.|172\.(1[6-9]|2[0-9]|3[01])\.|192\.168\.|127\.|0\.0\.0\.0|255\.|224\.)' | grep -vE '^(198\.51\.100\.|203\.0\.113\.|192\.0\.2\.)' | head -5 > /tmp/real_ips; then
+              if [ -s /tmp/real_ips ]; then
+                echo "⚠️ WARNING: $file 可能包含未脱敏的真实 IP："
+                cat /tmp/real_ips
+                echo "❌ BLOCKED: 请将真实 IP 替换为 10.x.x.x 或 192.168.x.x"
                 echo "valid=false" >> $GITHUB_OUTPUT
                 exit 1
               fi
             fi
-          done
-          
-          # 3. 检查文件大小（单个文件不超过 50KB，防止垃圾数据）
-          for file in $CHANGED_FILES; do
-            if [ -f "$file" ]; then
-              SIZE=$(wc -c < "$file")
-              if [ "$SIZE" -gt 51200 ]; then
-                echo "❌ 文件 $file 超过 50KB（$SIZE bytes）"
-                echo "valid=false" >> $GITHUB_OUTPUT
-                exit 1
-              fi
+            
+            # 3g. 文件大小检查（单文件 30KB 上限）
+            SIZE=$(wc -c < "$file")
+            if [ "$SIZE" -gt 30720 ]; then
+              echo "❌ BLOCKED: $file 超过 30KB（$SIZE bytes）"
+              echo "valid=false" >> $GITHUB_OUTPUT
+              exit 1
             fi
+            
+            # 3h. Markdown 结构验证（必须以 # 开头，证明是正常 journal）
+            FIRST_CONTENT_LINE=$(grep -m1 -v '^$' "$file" || echo "")
+            if [[ ! "$FIRST_CONTENT_LINE" =~ ^#\  ]]; then
+              echo "❌ BLOCKED: $file 不是有效的 field-journal 格式（必须以 # 标题开头）"
+              echo "valid=false" >> $GITHUB_OUTPUT
+              exit 1
+            fi
+            
+            # 3i. 链接/URL 安全检测（不允许外部可执行链接）
+            if grep -iE "(https?://.*\.(exe|msi|bat|cmd|ps1|sh|py|rb|pl|vbs|js)(\?|$|[\"' ]))" "$file"; then
+              echo "❌ BLOCKED: $file 包含指向可执行文件的外部链接"
+              echo "valid=false" >> $GITHUB_OUTPUT
+              exit 1
+            fi
+            
+            echo "✅ $file 通过安全检查"
           done
           
-          echo "✅ 所有检查通过"
+          echo ""
+          echo "✅ 所有文件通过安全审核"
           echo "valid=true" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
