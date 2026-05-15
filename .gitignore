@@ -16,3 +16,6 @@ Thumbs.db
 # Temp files
 *.tmp
 *.bak
+
+# User-specific config (不应该随仓库分发)
+.claude/

@@ -109,7 +109,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "<本包根目录>/skills/sc
 ```
 
 如果 AI 在任务完成后没有执行以上清单，用户可以提醒："你忘了写报告和回写经验"，AI 必须立即补上。
-```
 
 ## Bootstrap 命令
 
