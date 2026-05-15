@@ -1,8 +1,8 @@
 ﻿{
-    "generated_at":  "2026-05-15 13:37:28 +08:00",
+    "generated_at":  "2026-05-15 18:35:26 +08:00",
     "routing_entry":  [
                           "SKILL.md",
-                          "路由矩阵.md"
+                          "routing.md"
                       ],
     "tools":  [
                   {
@@ -236,7 +236,7 @@
                   },
                   {
                       "name":  "agent-browser",
-                      "skill":  "agent-browser",
+                      "skill":  "browser-automation",
                       "purpose":  "浏览器自动化（Playwright）：打开页面、点击、填表、爬取、截图",
                       "available":  true,
                       "resolved_path":  "C:\\Users\\24781\\AppData\\Roaming\\npm\\agent-browser.ps1",
@@ -247,8 +247,20 @@
                                       ]
                   },
                   {
+                      "name":  "analyzeHeadless",
+                      "skill":  "reverse-engineering",
+                      "purpose":  "Ghidra 无头分析（免费 IDA 替代）",
+                      "available":  false,
+                      "resolved_path":  "",
+                      "version":  "",
+                      "source":  "Missing",
+                      "script_refs":  [
+                                          "reverse-engineering/SKILL.md"
+                                      ]
+                  },
+                  {
                       "name":  "playwright",
-                      "skill":  "agent-browser",
+                      "skill":  "browser-automation",
                       "purpose":  "Playwright 浏览器引擎",
                       "available":  true,
                       "resolved_path":  "C:\\Users\\24781\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\playwright.exe",
@@ -296,7 +308,7 @@
                          {
                              "name":  "jshookmcp",
                              "tool_available":  true,
-                             "mcp_registered":  false,
+                             "mcp_registered":  true,
                              "service_online":  false,
                              "can_auto_install":  true,
                              "bootstrap_kind":  "npm-mcp"
@@ -305,14 +317,14 @@
                              "name":  "anything-analyzer",
                              "tool_available":  false,
                              "mcp_registered":  true,
-                             "service_online":  true,
+                             "service_online":  false,
                              "can_auto_install":  true,
                              "bootstrap_kind":  "local-http-mcp"
                          },
                          {
                              "name":  "idapro",
                              "tool_available":  false,
-                             "mcp_registered":  false,
+                             "mcp_registered":  true,
                              "service_online":  false,
                              "can_auto_install":  true,
                              "bootstrap_kind":  "local-http-mcp"

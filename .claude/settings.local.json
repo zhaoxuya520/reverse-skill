@@ -3,7 +3,8 @@
     "allow": [
       "Skill(update-config)",
       "PowerShell(Test-NetConnection *)",
-      "PowerShell(npx -v)"
+      "PowerShell(npx -v)",
+      "PowerShell(& \"F:\\\\Cybersecurity skills router\\\\skills\\\\scripts\\\\refresh-tool-index.ps1\")"
     ]
   }
 }

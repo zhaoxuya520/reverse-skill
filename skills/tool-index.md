@@ -1,7 +1,7 @@
 ﻿# 逆向工具索引
 
-- 扫描时间: 2026-05-15 13:37:28 +08:00
-- 路由入口: `SKILL.md` → `路由矩阵.md` → 对应子 skill
+- 扫描时间: 2026-05-15 18:35:26 +08:00
+- 路由入口: `SKILL.md` → `routing.md` → 对应子 skill
 - 说明: 本表由 `scripts/refresh-tool-index.ps1` 自动生成，优先用于 Claude 路由和工具路径确认。
 - 注意: 对于 jshookmcp 这类 MCP server，`yes` 只表示本机具备通过 node/npx 拉起它的条件，不表示它已经在 Claude MCP 配置里注册并启用。
 
@@ -26,8 +26,9 @@
 | node | js-reverse | 运行 Node 侧 JS 复现与 MCP 客户端 | yes | C:\Program Files\nodejs\node.exe | v24.14.0 | Get-Command | js-reverse/SKILL.md |
 | npx | js-reverse | 运行临时 npm 包与 MCP 入口 | yes | C:\Program Files\nodejs\npx.ps1 | 11.9.0 | Get-Command | js-reverse/SKILL.md |
 | jshookmcp | js-reverse | 通过 npx 启动 @jshookmcp/jshook MCP（仍需先配置并启用 MCP server） | yes | C:\Program Files\nodejs\npx.ps1 | @jshookmcp/jshook@latest | Get-Command | js-reverse/SKILL.md |
-| agent-browser | agent-browser | 浏览器自动化（Playwright）：打开页面、点击、填表、爬取、截图 | yes | C:\Users\24781\AppData\Roaming\npm\agent-browser.ps1 | agent-browser 0.27.0 | Get-Command | browser-automation/SKILL.md |
-| playwright | agent-browser | Playwright 浏览器引擎 | yes | C:\Users\24781\AppData\Local\Programs\Python\Python313\Scripts\playwright.exe | Version 1.53.0 | Get-Command | browser-automation/SKILL.md<br>browser-automation/scripts/setup.ps1 |
+| agent-browser | browser-automation | 浏览器自动化（Playwright）：打开页面、点击、填表、爬取、截图 | yes | C:\Users\24781\AppData\Roaming\npm\agent-browser.ps1 | agent-browser 0.27.0 | Get-Command | browser-automation/SKILL.md |
+| analyzeHeadless | reverse-engineering | Ghidra 无头分析（免费 IDA 替代） | no | — | — | Missing | reverse-engineering/SKILL.md |
+| playwright | browser-automation | Playwright 浏览器引擎 | yes | C:\Users\24781\AppData\Local\Programs\Python\Python313\Scripts\playwright.exe | Version 1.53.0 | Get-Command | browser-automation/SKILL.md<br>browser-automation/scripts/setup.ps1 |
 
 
 ---
@@ -40,9 +41,9 @@
 | apktool | ✓ | — | — | ✓ | github-release-jar-wrapper |
 | frida | ✓ | — | — | ✓ | pip-package |
 | idalib-mcp | ✗ | — | — | ✓ | pip-package |
-| jshookmcp | ✓ | — | — | ✓ | npm-mcp |
-| anything-analyzer | ✗ | ✓ | ✓ | ✓ | local-http-mcp |
-| idapro | ✗ | — | — | ✓ | local-http-mcp |
+| jshookmcp | ✓ | ✓ | — | ✓ | npm-mcp |
+| anything-analyzer | ✗ | ✓ | — | ✓ | local-http-mcp |
+| idapro | ✗ | ✓ | — | ✓ | local-http-mcp |
 | r2 | ✗ | — | — | ✓ | github-release-zip |
 | adb | ✓ | — | — | ✓ | winget-package |
 | agent-browser | ✓ | — | — | ✓ | npm-global |

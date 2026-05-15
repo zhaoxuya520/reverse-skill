@@ -36,7 +36,7 @@
 | "APK 解包/重打包/改 smali" | `apk-reverse/SKILL.md` — decode→rebuild-sign-install |
 | "过反调试/反检测" | `reverse-engineering/anti-analysis.md` |
 | "这是什么混淆/VM" | `reverse-engineering/patterns*.md` — 按模式查 |
-| "Go/Rust/Swift 逆向" | `reverse-engineering/languages-compiled.md` |
+| "Go/Rust/Swift 逆向" | `reverse-engineering/languages-compiled.md` + `reverse-engineering/go-reverse.md`（Go 专项） |
 | "Python 字节码/pyc" | `reverse-engineering/languages.md` — Python 章节 |
 | "符号执行/angr" | `reverse-engineering/tools-dynamic.md` — angr 章节 |
 | "模拟执行/Unicorn" | `reverse-engineering/tools.md` — Unicorn 章节 |
