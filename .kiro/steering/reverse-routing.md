@@ -68,9 +68,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "<本包根目录>/skills/sc
 9. 如果自动补齐失败 → 输出结构化引导（含手动步骤），等用户确认后继续
 10. 进入对应 skill 的工作流 → 执行任务
 11. 任务完成 → 调用 docs-generator skill 生成报告（含 diagram-generator 生成的攻击路径图/数据流图等可视化图表）
-12. 自动回写 field-journal/
-13. 更新 _index.md → 检查是否需要更新路由/索引/manifest → 执行更新
-14. 输出最终结果
+12. 自动回写 field-journal/（已脱敏）
+13. 询问用户："是否将本次经验贡献到社区主仓库？数据已脱敏，只提交 field-journal 文件。"
+14. 更新 _index.md → 检查是否需要更新路由/索引/manifest → 执行更新
+15. 输出最终结果
 ```
 
 ## Bootstrap 命令
