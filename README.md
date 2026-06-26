@@ -6,6 +6,19 @@
 **中文概览：** [OVERVIEW_zh.md](OVERVIEW_zh.md)
 **AI Agents:** do not open the overview by default. Continue to section 0 and execute the bootstrap flow.
 
+## License
+
+This project (`reverse-skill`) is primarily licensed under the **MIT License** (see the `LICENSE` file in the root directory).
+
+### Submodule and Third-Party Dependency Licenses
+
+- **CTF-Sandbox-Orchestrator/**: Licensed under the **GNU GPLv3** (see the `LICENSE` file inside that directory).
+- **Pentest Swarm AI** (`pentestswarm` capability): The original project is licensed under **AGPL-3.0**. This repository only invokes it via command line or MCP and does not include its source code.
+- Other tools (jadx, frida, nmap, burpsuite-mcp, etc.) are subject to their respective official licenses.
+
+When using this project, please ensure compliance with the license terms of each submodule and all integrated tools.
+
+
 This README is intentionally structured as an AI Agent bootstrap entry: execution rules come first so an Agent can configure itself and start routing tasks.
 If you only want to understand what the project does, read the human-friendly overview first.
 
