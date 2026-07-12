@@ -1,4 +1,9 @@
-﻿# Attack Chain Orchestration Skill
+---
+name: attack-chain
+description: Use for authorized multi-stage attack-path planning and orchestration when a task spans reconnaissance, initial access, privilege escalation, lateral movement, or impact assessment. Route single-stage tasks directly to their specialist skill.
+---
+
+# Attack Chain Orchestration Skill
 
 > 多阶段攻击路径规划与执行的总指挥。当任务需要"从 A 打到 B"的完整链路时，本 Skill 负责编排各阶段、协调子 Skill、规划攻击路径。
 > 不是"红队专属"——任何需要跨阶段组合的渗透场景都从这里开始。

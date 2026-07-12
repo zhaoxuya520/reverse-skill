@@ -1,4 +1,9 @@
-﻿# Supply Chain Security Testing
+---
+name: supply-chain-security
+description: Use for software supply-chain security assessment covering SBOM, SCA, CI/CD pipelines, container images, build integrity, dependency provenance, and vulnerability reachability.
+---
+
+# Supply Chain Security Testing
 
 > SBOM / SCA / CI/CD 管道 / 依赖溯源
 > 法规驱动：美国行政令 SBOM、中国国标、EU CRA

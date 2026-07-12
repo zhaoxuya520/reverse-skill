@@ -1,4 +1,9 @@
-﻿# Mobile Reverse Engineering
+---
+name: mobile-reverse
+description: Use for authorized Android or iOS application reverse engineering and security testing, including APK or IPA analysis, runtime instrumentation, SSL pinning, and platform protection checks.
+---
+
+# Mobile Reverse Engineering
 
 > Android + iOS 统一逆向方法论
 > Frida / Objection / OWASP MSTG / SSL Pinning Bypass

@@ -1,4 +1,4 @@
-﻿---
+---
 name: browser-automation
 description: |
   统一自动化入口。覆盖浏览器自动化（Playwright）和 Windows 桌面应用自动化（OpenReverse）。
