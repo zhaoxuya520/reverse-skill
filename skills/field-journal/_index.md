@@ -6,14 +6,15 @@
 
 ## 统计
 
-- 真实项目数：13
+- 真实项目数：14
 - 种子参考数：17
-- 总条目数：30
+- 总条目数：31
 
 ## 按场景分类
 
 ### APK / Android 逆向
 
+- [2026-07-16_apk-goodshort-newreading-shorts-feed-rsa-sign-cleanroom](./2026-07-16_apk-goodshort-newreading-shorts-feed-rsa-sign-cleanroom.md) — GoodShort (com.newreading.goodreels) short-drama; extracted Discovery (home/index, home/nav/list) + Shorts (book/recommend immersive feed, chapter/load) APIs; recovered RSA-SHA256 request signing (hardcoded in-APK PKCS#8 key over "timestamp="+ts+body+ids+certMD5+pkg); clean-room Kotlin/MVVM ViewPager2-vertical + Media3 ExoPlayer app at ~/Projects/Android/ShortsApp; later re-skinned as "DramaStream" onto the same core from an imported Claude Design mockup (5-tab nav, onboarding, local-simulated coin/VIP economy, edge-to-edge inset bugs)
 - [2026-07-15_apk-tvremote-codematics-ir-pronto-multiprotocol-cleanroom](./2026-07-15_apk-tvremote-codematics-ir-pronto-multiprotocol-cleanroom.md) — Universal TV Remote (codematics); dual-path remote = IR Pronto DB (136 brands/8011 codes scraped to JSON assets) + 6 network protocols (Roku/Samsung/webOS/Vizio/FireTV/Android TV v2) behind one Kotlin interface; clean-room Compose rebuild builds+runs
 - [2026-07-13_apk-remakeface-faceswap-signed-cloud-protocol-cleanroom](./2026-07-13_apk-remakeface-faceswap-signed-cloud-protocol-cleanroom.md) — RemakeFace AI face-swap; "encrypted" = device-attestation + ECDSA-P256 request signing over a cloud API; reversed full protocol + runnable Node client+mock reproduction
 - [2026-07-07_apk-beautycam-meitu-mtee-cleanroom-native-reuse](./2026-07-07_apk-beautycam-meitu-mtee-cleanroom-native-reuse.md) — Meitu BeautyCam (myxj) clean-room repro; reuse .so/assets/icon + reconstruct MTEE beauty-engine JNI contract; assembleDebug SUCCESSFUL

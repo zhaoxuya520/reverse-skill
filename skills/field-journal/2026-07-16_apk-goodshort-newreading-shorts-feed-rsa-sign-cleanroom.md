@@ -2,7 +2,7 @@
 
 **Scenario:** APK / Android reverse — user handed `short.xapk` and wanted the Discovery ("Khám phá") + Shorts ("Video ngắn") tab APIs extracted and a **complete Kotlin TikTok-style vertical-swipe player app** rebuilt from them (ViewPager2 vertical + Media3 ExoPlayer, MVVM, Paging).
 **Target:** `short.xapk` (ApkPure) → `com.newreading.goodreels` — **GoodShort** v3.0.9.2109 (vc 3092109), min/target 23/35. Split XAPK: base **98 MB** + `config.arm64_v8a.apk`. **13 plain DEX, no packer** (`classes*.dex` decompiled straight). Heavy R8 (single/double-letter packages) **but the whole `com.newreading.goodreels.net` + `com.lib.http` layer kept real names**. Stack: Kotlin, **Retrofit2 + OkHttp3 + RxJava2 + Gson**, Firebase, AppLovin/Moloco/Tapjoy/ByteDance ads, Sobot. Short-drama app: **book = drama series, chapter = a video episode.**
-**Outcome:** ✅ full Discovery + Shorts protocol reversed (base `https://api.goodreels.com/`, prefix `hwycclientreels/`, 119 POST endpoints enumerated) + **request-signing scheme recovered verbatim** (RSA-SHA256 over a fixed base string, hardcoded PKCS#8 key in-APK) + a **clean-room Kotlin/MVVM app** at `~/Projects/Android/ShortsApp` (ViewPager2-vertical + Media3 ExoPlayer pool w/ SimpleCache preload, Retrofit signing interceptors ported, Paging3 infinite feed, **USE_MOCK=true runs offline** with sample videos). Built via a 7-slice parallel construction workflow + adversarial per-slice verify.
+**Outcome:** ✅ full Discovery + Shorts protocol reversed (base `https://api.goodreels.com/`, prefix `hwycclientreels/`, 119 POST endpoints enumerated) + **request-signing scheme recovered verbatim** (RSA-SHA256 over a fixed base string, hardcoded PKCS#8 key in-APK) + a **clean-room Kotlin/MVVM app** at `~/Projects/Android/ShortsApp` (ViewPager2-vertical + Media3 ExoPlayer pool w/ SimpleCache preload, Retrofit signing interceptors ported, Paging3 infinite feed, **USE_MOCK=true runs offline** with sample videos). Built via a 7-slice parallel construction workflow + adversarial per-slice verify. **Same-day follow-up:** the app was re-skinned end-to-end as "DramaStream" from an imported Claude Design mockup (5-tab nav + onboarding + local-simulated coin/VIP economy on top of the *same* reversed core, zero backend changes) — see the dedicated section below for the edge-to-edge/status-bar touch-dead-zone bug class it surfaced.
 
 ## Triage: categorize the XAPK, check DEX magic, locate native libs — before anything
 Same first move as [[remakeface-swap-repro]] / [[beautycam-repro]]: `unzip -l`. XAPK v2 = base apk + `config.arm64_v8a.apk` (native split) + `manifest.json`. Base has **13 real `dex\n035` files, no `libjiagu/secshell`**, so jadx directly. Native `.so` all live in the split and are **third-party SDKs** (`libapminsighta/b`=aliyun APM, `libapplovin*`, `libtapjoy`, `libsobot`, `libtt_ugen_layout`=ByteDance, `libpglarmor/libprotect/libnms`=app-protect but not on the request path). Rule reconfirmed: **the signing was in Java/Kotlin, not native** — don't reach for IDA until you've proven the crypto isn't in the DEX.
@@ -104,6 +104,89 @@ and passes every mock-mode test, then crashes at the first real reflective call.
 device-re-verified: Discovery grid (real covers/titles/view-counts), Detail (real 50-episode grid via
 `chapter/list`), and Player (real signed HLS, GoodShort watermark visible, "EP 1 / 50") all confirmed
 working end-to-end in real mode alongside the already-verified Shorts feed.
+
+## DramaStream redesign (2026-07-16, same-day follow-up) — importing a Claude Design mockup onto the already-reversed core, not another reversing pass
+
+A different kind of follow-up: the user published a **Claude Design** project (`claude.ai/design`, a
+`.dc.html` export — JSON-wrapped self-contained HTML with an embedded JS state machine, used purely as a
+UI/UX *spec* to translate into native Android, never executed directly) and asked to implement its full
+~10-screen redesign ("Good Reels Redesign", rebranded on-screen as **"DramaStream"**) as the interface for
+the already-built `ShortsApp`, explicitly **reusing the existing reversed API core** rather than inventing
+a new backend. This is the reverse-engineering payoff pattern worth naming: once a protocol is faithfully
+reproduced (real `Book`/`Chapter` fields, `charged`/`price`, real cover art), a completely different visual
+layer can be dropped on top with zero backend changes — the redesign touched **zero** files under
+`data/remote/RetrofitClient.kt` / `SignManager.kt` / `HeaderInterceptor.kt`.
+
+**Scope boundary that mattered:** the design's monetization surface (coin wallet, VIP status, watch
+progress, saved list, onboarding completion) has **no real backend counterpart** in the reversed protocol
+(`profile/balance`, `pay/sku/list`, `sign/award/receive` exist server-side but were never in scope to
+integrate) — implemented as **100% local-simulated `SharedPreferences` state**, explicitly **not** wired to
+Google Play Billing, with a `RewardsRepository` KDoc and an on-screen paywall disclaimer ("100% simulated
+for this build — no real payment is ever charged") both stating this in the app itself, not just the
+commit message. The free-episode-count/coin-pricing shown in the UI was grounded in the **real**
+`Chapter.charged`/`Chapter.price` fields already reversed, not invented numbers — the simulated economy
+still respects the real content-gating shape.
+
+Built the same way as the original 7-slice construction (locked `CONTRACT.md` + parallel `Workflow` +
+adversarial per-slice review, 9 slices this time: onboarding/home/shorts/search/library/rewards/
+profile-paywall/detail/player, 99 files). The adversarial pass caught 2 real bugs (stale search results
+surviving a failed query, a missing synopsis binding) before device testing even started — cheap to catch
+there. What it **couldn't** catch (each slice only reads its own files against the contract, never runs the
+app) is the interesting part below.
+
+### Bugs that only live device testing found — three are an edge-to-edge/status-bar class worth generalizing
+
+1. **Mock data baked a display prefix in twice.** `MockApiService.buildChapter()` set
+   `chapterName = "EP ${index+1} · $title"`, and the *redesigned* player screen's next-episode hint
+   independently reconstructed `"EP $n · $name"` from that same field — assuming `chapterName` was a bare
+   title. Mock mode is the only mode that ever exercised this path (real-mode `chapterName` format is
+   unknown/unverified), so it was invisible in every prior mock-only review. Rendered on-device as
+   `"EP 2 · EP 2 · The Big Escape"`. Fix: stop baking the prefix into the mock field — let the one place
+   that already formats "EP N" own it. **Lesson: a synthetic test-data generator that happens to already
+   contain the string a later formatting step will also produce is a silent duplication trap — it only
+   surfaces once something downstream actually concatenates the two, and nothing in a code review (or even
+   a screenshot of the *first* episode, where there's no "next" to compare against) will show it.**
+
+2. **A `MaterialToolbar`'s fixed height turns "add inset padding" into "clip the icon."** Three edge-to-edge
+   inset bugs surfaced by literally tapping every icon on-device: the VIP paywall's primary CTA sat half
+   under the gesture-nav bar, the Home header's search/profile icons had their top ~60% inside the status
+   bar's touch-exclusion zone (confirmed via `uiautomator dump` bounds vs. the `WindowManager` log's
+   `mInsetsHint=Insets{top=97,...}` — a tap at `y=84` silently ate `Back`/`Search`/`Profile` clicks with
+   *zero* logcat trace, they just never dispatched), and a `ProfileActivity` back arrow was unreachable
+   the same way. The fix shape differs by container:
+   - **`wrap_content` container** (the Home header `LinearLayout`) → add the inset as **top padding** via
+     `ViewCompat.setOnApplyWindowInsetsListener` + `updatePadding` — the container grows to fit, nothing
+     clips. Also grow the scrollable content's *reserved* top space by the same inset, or the taller
+     header now overlaps the first row of content.
+   - **Fixed-size view inside flexible layout** (a `MaterialButton`/`ImageButton` at the screen edge) →
+     add the inset as **margin**, not padding — `updateLayoutParams<MarginLayoutParams>`, confirmed on the
+     Subscribe screen's close button and continue CTA.
+   - **`MaterialToolbar`** (`android:layout_height="?attr/actionBarSize"`, a *fixed* height) → padding is
+     the wrong tool: padding the toolbar's own view eats into that fixed height and **clips the nav icon**
+     (tried it, the back arrow rendered as a barely-visible sliver). The correct, already-proven pattern
+     elsewhere in this same app (`DetailActivity`'s `AppBarLayout`) is to **wrap the toolbar in a
+     `com.google.android.material.appbar.AppBarLayout` with `android:fitsSystemWindows="true"`** — the
+     AppBarLayout absorbs the inset as its own top padding and the toolbar inside keeps its full,
+     unclipped height. **Lesson: "add a window-insets listener" is not one fix, it's three, chosen by
+     what kind of view is eating the inset — get the wrong one and you trade an invisible-touch-target bug
+     for a visibly-clipped-icon bug, not a working screen.**
+   - **Immersive full-bleed screens are a deliberate exception, not a bug to fix uniformly.**
+     `PlayerActivity` calls `WindowInsetsControllerCompat.hide(WindowInsetsCompat.Type.systemBars())` for
+     the video experience, so its back button correctly has *no* persistent status-bar collision to fix —
+     checking for this before "fixing" every top-anchored control saved a wasted change.
+
+**How the touch-dead-zone bug was actually diagnosed, since it produces zero error signal:** repeated taps
+at a coordinate that visually looked correct (matched the screenshot, matched `uiautomator dump` element
+bounds) kept landing on the wrong screen with no crash, no logcat line, nothing. Cross-checking against
+`adb shell dumpsys activity activities | grep topResumedActivity` before/after each tap (not just
+screenshots, which can't distinguish "click landed on the wrong invisible layer" from "click didn't
+register at all") confirmed the Activity truly never changed. The breakthrough was correlating the dead
+y-range against the `WindowManager` log line captured earlier in the same logcat session
+(`mInsetsHint=Insets{top=97,...}`) — the status bar is a **separate system window layered on top**, and it
+silently swallows taps in its zone before they ever reach the app, regardless of what the app draws there.
+**Any element positioned within the first ~100px of an edge-to-edge Android screen needs to be verified
+tappable on a real device, not just visually inspected in a screenshot — a screenshot shows what's drawn,
+not what's reachable.**
 
 ## Appendix — endpoint quick-reference (subset; 119 total under `hwycclientreels/`)
 Discovery: `home/index`, `home/nav/list`, `home/rankList`, `book/recommend`, `book/forUFilterTab`, `book/foru/introduction`, `book/suggest`, `book/search1`, `book/search/hot/words`.
