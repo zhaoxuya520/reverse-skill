@@ -87,6 +87,24 @@ seconds per attempt instead of a multi-minute Gradle+adb+logcat loop. Only porte
 once the Node probe proved it against production. This is the fast path whenever a reversed protocol
 needs live verification: reproduce the signer standalone before touching the app under test.
 
+## Sixth bug: Discovery real-mode crashed on a Kotlin/Retrofit interop trap, not a protocol issue
+
+After all five protocol fixes above, Shorts played real video but Discovery crashed immediately in
+real mode with `Parameter type must not include a type variable or wildcard: java.util.Map<java.lang.String, ?>
+(parameter #1) for method ApiService.homeNavList`. Root cause: `homeNavList`'s `@Body body: Map<String, Any>`
+was the **only** one of 6 endpoint methods missing `@JvmSuppressWildcards` on the value type. Kotlin
+compiles a bare `Any` type argument to a Java wildcard (`Map<String, ?>`) for interop unless suppressed;
+Retrofit's reflection-based validation explicitly **rejects wildcards on `@Body` parameters**, so
+`retrofit.create(ApiService::class.java)` throws at the very first real call. `MockApiService` (a plain
+Kotlin class, no dynamic proxy) never exercises this path, so the bug was invisible for the entire
+mock-mode build-and-review cycle and only surfaced once Discovery was driven in real mode on-device.
+**Lesson: a Kotlin interface meant to back a Retrofit dynamic proxy needs `@JvmSuppressWildcards` on
+every generic `Any`/covariant type parameter, consistently — a single missed occurrence compiles clean
+and passes every mock-mode test, then crashes at the first real reflective call.** Fixed and
+device-re-verified: Discovery grid (real covers/titles/view-counts), Detail (real 50-episode grid via
+`chapter/list`), and Player (real signed HLS, GoodShort watermark visible, "EP 1 / 50") all confirmed
+working end-to-end in real mode alongside the already-verified Shorts feed.
+
 ## Appendix — endpoint quick-reference (subset; 119 total under `hwycclientreels/`)
 Discovery: `home/index`, `home/nav/list`, `home/rankList`, `book/recommend`, `book/forUFilterTab`, `book/foru/introduction`, `book/suggest`, `book/search1`, `book/search/hot/words`.
 Shorts/player: `chapter/load`, `chapter/node/load`, `chapter/list`, `chapter/end/recommend`, `chapter/exit/recommend`, `chapter/recommend/last`, `book/quick/open`, `reader/init`, `chapter/download`.
