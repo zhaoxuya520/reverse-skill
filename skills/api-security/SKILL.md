@@ -1,3 +1,7 @@
+---
+name: api-security
+description: Use for authorized security assessment of REST, GraphQL, WebSocket, or SOAP APIs, including discovery, authentication, authorization, rate-limit, and CI/CD testing.
+---
 # API 安全测试
 
 ## ACTION REQUIRED（读完后立刻执行）

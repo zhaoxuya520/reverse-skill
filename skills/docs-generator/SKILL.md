@@ -1,4 +1,4 @@
-﻿---
+---
 name: docs-generator
 description: |
   Creates task-oriented technical documentation with progressive disclosure. Use when writing READMEs, API docs, architecture docs, or markdown documentation.
