@@ -10,6 +10,14 @@ metadata:
 
 # .NET / C# 逆向作业规范
 
+## ACTION REQUIRED（读完立刻执行）
+
+1. `NOW`: 用 DIE/`file`/CLR 头确认目标是 .NET 托管（否则 SWITCH 到 `ida-reverse/` / `reverse-engineering/`）
+2. `NOW`: 若疑似混淆 → 先 `de4dot` 脱壳，产出 `*-clean.exe`，保留原始样本
+3. `NEXT`: dnSpyEx（或 dnSpy MCP / `ilspycmd`）静态：C# 浏览 + **IL 视图**看关键判断
+4. `ACT`: 需要明文/C2 时动态调试；需要改逻辑时 **IL patch** 优先于 C# 重编译
+5. 阶段结束给用户 3–6 项下一步菜单（含导出报告）
+
 ## 适用范围
 
 当任务属于以下场景时优先使用本 skill：
@@ -174,3 +182,11 @@ File → Save Module → 替换原文件
 - [references/obfuscators.md](references/obfuscators.md) — ConfuserEx / SmartAssembly / Babel / Eazfuscator / .NET Reactor 脱混淆详解 + anti-tamper 绕过
 - [references/common-workflow.md](references/common-workflow.md) — 完整工作流、IL patch 可靠性、字符串解密器提取、状态机识别
 - [references/sharp-tools.md](references/sharp-tools.md) — 红队 Sharp* 工具分析、工具安装矩阵、dnSpy MCP 集成、社区资源索引
+
+## 任务完成自检
+
+- [ ] 是否确认过 CLR / 托管身份（或已 SWITCH 出本 skill）？
+- [ ] 混淆样本是否先 de4dot / 等价脱壳再深分析？
+- [ ] 关键逻辑是否用 IL 视图验证（而非只看 C# 伪代码）？
+- [ ] 产物（clean 样本 / 配置 / patch diff）是否落盘且可复现？
+- [ ] 是否提供了下一步菜单或报告出口？

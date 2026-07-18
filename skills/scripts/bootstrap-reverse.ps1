@@ -1,4 +1,4 @@
-#requires -Version 5
+﻿#requires -Version 5
 
 [CmdletBinding()]
 param(
@@ -341,16 +341,64 @@ function Approve-AnythingAnalyzerBuildScripts {
 function Get-GitHubLatestReleaseAsset {
     param(
         [Parameter(Mandatory = $true)][string]$Repo,
-        [Parameter(Mandatory = $true)][string]$AssetRegex
+        [Parameter(Mandatory = $true)][string]$AssetRegex,
+        [string]$ReleaseTag = ''
     )
 
-    $uri = "https://api.github.com/repos/$Repo/releases/latest"
+    if (-not [string]::IsNullOrWhiteSpace($ReleaseTag)) {
+        $uri = "https://api.github.com/repos/$Repo/releases/tags/$ReleaseTag"
+    }
+    else {
+        $uri = "https://api.github.com/repos/$Repo/releases/latest"
+    }
     $release = Invoke-RestMethod -Uri $uri -Headers @{ 'User-Agent' = 'reverse-skill-bootstrap' }
     $asset = @($release.assets) | Where-Object { $_.name -match $AssetRegex } | Select-Object -First 1
     if ($null -eq $asset) {
-        throw "No release asset matched $AssetRegex for $Repo"
+        throw "No release asset matched $AssetRegex for $Repo (tag=$ReleaseTag)"
     }
     return $asset
+}
+
+function Get-FileSha256Hex {
+    param([Parameter(Mandatory = $true)][string]$Path)
+    return (Get-FileHash -Algorithm SHA256 -LiteralPath $Path).Hash.ToLowerInvariant()
+}
+
+function Assert-DownloadedFileIntegrity {
+    param(
+        [Parameter(Mandatory = $true)][string]$Path,
+        $Definition = $null,
+        $Asset = $null
+    )
+
+    if (-not (Test-Path -LiteralPath $Path)) {
+        throw "Integrity check failed: file missing $Path"
+    }
+
+    $actual = Get-FileSha256Hex -Path $Path
+    $expected = $null
+    $source = $null
+
+    if ($null -ne $Definition -and $Definition.PSObject.Properties['assetSha256'] -and -not [string]::IsNullOrWhiteSpace([string]$Definition.assetSha256)) {
+        $expected = ([string]$Definition.assetSha256 -replace '^(?i)sha256:', '').Trim().ToLowerInvariant()
+        $source = 'manifest.assetSha256'
+    }
+    elseif ($null -ne $Asset -and $Asset.PSObject.Properties['digest'] -and -not [string]::IsNullOrWhiteSpace([string]$Asset.digest)) {
+        $expected = ([string]$Asset.digest -replace '^(?i)sha256:', '').Trim().ToLowerInvariant()
+        $source = 'github.api.digest'
+    }
+
+    if (-not [string]::IsNullOrWhiteSpace($expected)) {
+        if ($actual -ne $expected) {
+            Remove-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
+            throw "SHA256 mismatch for $(Split-Path -Leaf $Path) (via $source): expected $expected got $actual — file deleted"
+        }
+        Write-Host ("[integrity] SHA256 OK ({0}): {1}" -f $source, $actual) -ForegroundColor Green
+        return $actual
+    }
+
+    Write-Warning ("[integrity] No pinned digest for {0}; recorded sha256={1} (supply-chain residual — prefer assetSha256 in manifest)" -f (Split-Path -Leaf $Path), $actual)
+    return $actual
 }
 
 function Expand-ArchiveIntoDirectory {
@@ -403,10 +451,12 @@ function Ensure-GitHubZipInstall {
         return $existing
     }
 
-    $asset = Get-GitHubLatestReleaseAsset -Repo $Definition.repo -AssetRegex $Definition.assetRegex
+    $releaseTag = if ($Definition.PSObject.Properties['releaseTag']) { [string]$Definition.releaseTag } else { '' }
+    $asset = Get-GitHubLatestReleaseAsset -Repo $Definition.repo -AssetRegex $Definition.assetRegex -ReleaseTag $releaseTag
     $downloadUrl = if ($asset.PSObject.Properties['browser_download_url']) { $asset.browser_download_url } else { $asset.url }
     $downloadPath = Join-Path $env:TEMP $asset.name
     Invoke-WebRequest -Uri $downloadUrl -OutFile $downloadPath -Headers @{ 'Accept' = 'application/octet-stream' }
+    Assert-DownloadedFileIntegrity -Path $downloadPath -Definition $Definition -Asset $asset | Out-Null
     Ensure-DownloadDirectory -Path (Split-Path -Path $TargetPath -Parent)
     Expand-ArchiveIntoDirectory -ZipPath $downloadPath -Destination $TargetPath
     Remove-Item -LiteralPath $downloadPath -Force
@@ -434,7 +484,8 @@ function Ensure-ApktoolInstall {
     }
 
     Ensure-JavaRuntime
-    $asset = Get-GitHubLatestReleaseAsset -Repo $Definition.repo -AssetRegex $Definition.assetRegex
+    $releaseTag = if ($Definition.PSObject.Properties['releaseTag']) { [string]$Definition.releaseTag } else { '' }
+    $asset = Get-GitHubLatestReleaseAsset -Repo $Definition.repo -AssetRegex $Definition.assetRegex -ReleaseTag $releaseTag
     $installDir = $Definition.installDir
     Ensure-DownloadDirectory -Path $installDir
 
@@ -442,6 +493,7 @@ function Ensure-ApktoolInstall {
     $jarPath = Join-Path $installDir 'apktool.jar'
     $downloadUrl = if ($asset.PSObject.Properties['browser_download_url']) { $asset.browser_download_url } else { $asset.url }
     Invoke-WebRequest -Uri $downloadUrl -OutFile $jarPath -Headers @{ 'Accept' = 'application/octet-stream' }
+    Assert-DownloadedFileIntegrity -Path $jarPath -Definition $Definition -Asset $asset | Out-Null
 
     $wrapperPath = Join-Path $installDir $Definition.wrapperName
     @(

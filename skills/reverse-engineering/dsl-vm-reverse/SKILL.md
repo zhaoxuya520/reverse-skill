@@ -353,7 +353,7 @@ async function run() {
 
 | 类型 | 路由 |
 |------|------|
-| **目标类型**: WASM / DSL VM / 自定义指令集 | `dsl-vm-reverse/SKILL.md` |
+| **目标类型**: WASM / DSL VM / 自定义指令集 | `reverse-engineering/dsl-vm-reverse/SKILL.md` |
 | **用户意图**: "DSL VM / 风控引擎逆向" | 本 skill |
 | **工具链**: Playwright / Selenium CDP | 浏览器注入方案 |
 
@@ -361,7 +361,7 @@ async function run() {
 
 ```
 DSL VM 逆向路径:
-  dsl-vm-reverse/ → Phase 1-6 工作流
+  reverse-engineering/dsl-vm-reverse/ → Phase 1-6 工作流
   ↓ 若需要捕获运行时数据
   browser-automation/ → Playwright/Selenium CDP
   ↓ 若需要分析 API 协议层

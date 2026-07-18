@@ -5,10 +5,13 @@
 ## CRITICAL: 路由判定执行协议
 
 1. `MUST` 先完成路由再执行，不允许“先做再补路由”。
-2. `MUST` 输出你的路由依据（目标类型/意图/工具链至少命中一项）。
-3. `MUST NOT` 因为“看起来差不多”把任务塞进不匹配 skill。
-4. `MUST` 在路由未命中时联网补充方法论，并提议新增 skill。
-5. `MUST NOT` 只回复“请给具体任务”；应先基于现有输入启动可确定步骤。
+2. `SHOULD` 先读 `MASTER-ROUTING.md` 或运行 `scripts/master-route.ps1` 定 PRIMARY；本表用于疑难补全。
+3. `MUST` 输出你的路由依据（目标类型/意图/工具链至少命中一项）。
+4. `MUST` 对目标 ACT 前完成 `case-init` / `scope.md`（`ops/scope-contract.md`）：`auth.status=granted` + `network_profile`。
+5. `MUST NOT` 因为“看起来差不多”把任务塞进不匹配 skill。
+6. `MUST` 在路由未命中时联网补充方法论，并提议新增 skill。
+7. `MUST NOT` 只回复“请给具体任务”；应先基于现有输入启动可确定步骤。
+8. 作战契约：`ops/`（证据链 / 角色 / 时间线 / IDENTITY）。
 ## 按目标类型
 
 | 目标类型 | 推荐入口 | 备选方案 |
@@ -148,7 +151,26 @@
 | "Hydra/在线爆破/SSH 爆破" | `pentest-tools/SKILL.md` — 在线密码爆破 |
 | "Nikto/Web 服务器扫描" | `pentest-tools/SKILL.md` — Web 漏洞扫描 |
 | "Metasploit/msfconsole/exploit" | `pentest-tools/SKILL.md` — 利用框架 |
-| "Wireshark/抓包分析/PCAP" | `pentest-tools/SKILL.md` + `reverse-engineering/platforms.md` |
+| "Wireshark/抓包分析/PCAP" | `digital-forensics/` 或 `protocol-reverse/` |
+| "协议逆向/Protobuf/自定义协议" | `protocol-reverse/SKILL.md` |
+| "Ghidra/无 IDA" | `ghidra-reverse/SKILL.md` |
+| "K8s/容器逃逸/云安全" | `cloud-k8s/SKILL.md` |
+| "域渗透/BloodHound/Certipy/Kerberoast" | `windows-ad/SKILL.md` |
+| "取证/Volatility/内存转储" | `digital-forensics/SKILL.md` |
+| "代码审计/SAST/Semgrep" | `code-audit/SKILL.md` |
+| "威胁狩猎/蓝队/检测工程" | `threat-hunting/SKILL.md` |
+| "游戏逆向/IL2CPP/Unity" | `reverse-engineering/SKILL.md` + seed-014 |
+| "WiFi/无线渗透/aircrack" | `wifi-wireless/SKILL.md` |
+| "浏览器扩展/Chrome 扩展/crx" | `browser-extension-reverse/SKILL.md` |
+| "工控/OT/ICS/SCADA/PLC" | `ot-ics/SKILL.md` |
+| "macOS逆向/Mach-O" | `macos-reverse/SKILL.md` |
+| "厚客户端/桌面客户端" | `thick-client/SKILL.md` |
+| "Go逆向/Rust逆向" | `go-rust-reverse/SKILL.md` |
+| "UART/JTAG/硬件调试" | `hardware-security/SKILL.md` |
+| "数据库安全/Redis/Mongo" | `database-security/SKILL.md` |
+| "钓鱼邮件/SPF/DKIM/DMARC" | `email-security/SKILL.md` |
+| "SAML/OIDC/SSO联邦" | `identity-federation/SKILL.md` |
+| "SDR/射频/HackRF" | `radio-sdr/SKILL.md` |
 | "BurpSuite/Web 代理/拦截" | `pentest-tools/SKILL.md` — Web 代理 |
 | "Responder/LLMNR 投毒/NBT-NS" | `pentest-tools/SKILL.md` — 内网投毒 |
 | "BloodHound/AD 路径/攻击图" | `pentest-tools/SKILL.md` — AD 攻击路径可视化 |

@@ -28,12 +28,14 @@
       "name": "jadx",
       "bootstrapKind": "github-release-tar",
       "repo": "skylot/jadx",
-      "assetRegex": "^jadx-[0-9].*\\.zip$",
+      "assetRegex": "^jadx-1\\\\.5\\\\.6\\\\.zip$",
       "installDir": "$HOME/tools/jadx",
       "docsUrl": "https://github.com/skylot/jadx",
       "canAutoInstall": true,
       "verifyCommand": "jadx",
-      "kaliNote": "Kali 无预装，从 GitHub Release 下载"
+      "kaliNote": "Kali 无预装，从 GitHub Release 下载",
+      "releaseTag": "v1.5.6",
+      "assetSha256": "545ea2be9c242511bc145755cf4bda2485ade42966e096f8b4d3da2a230e8974"
     },
     {
       "name": "apktool",
@@ -41,12 +43,14 @@
       "aptPackage": "apktool",
       "fallbackKind": "github-release-jar",
       "repo": "iBotPeaches/Apktool",
-      "assetRegex": "^apktool_.*\\.jar$",
+      "assetRegex": "^apktool_3\\\\.0\\\\.2\\\\.jar$",
       "installDir": "$HOME/tools/apktool",
       "docsUrl": "https://apktool.org/",
       "canAutoInstall": true,
       "verifyCommand": "apktool",
-      "kaliNote": "apt install apktool 即可，版本较旧时可从 GitHub 下载最新"
+      "kaliNote": "apt install apktool 即可，版本较旧时可从 GitHub 下载最新",
+      "releaseTag": "v3.0.2",
+      "assetSha256": "eee4669a704a14e0623407e6701b0b91887e61e1e4049cb7a82833e14ae8b5fd"
     },
     {
       "name": "frida",
@@ -83,16 +87,22 @@
     {
       "name": "jshookmcp",
       "bootstrapKind": "npm-mcp",
-      "npmPackage": "@jshookmcp/jshook@latest",
-      "mcpNames": ["jshook"],
+      "npmPackage": "@jshookmcp/jshook@0.3.4",
+      "mcpNames": [
+        "jshook"
+      ],
       "mcpCommand": "npx",
-      "mcpArgs": ["-y", "@jshookmcp/jshook@latest"],
+      "mcpArgs": [
+        "-y",
+        "@jshookmcp/jshook@0.3.4"
+      ],
       "mcpEnv": {
         "JSHOOK_BASE_PROFILE": "search"
       },
       "docsUrl": "https://github.com/vmoranv/jshookmcp",
       "canAutoInstall": true,
-      "verifyCommand": "npx"
+      "verifyCommand": "npx",
+      "pinnedVersion": "0.3.4"
     },
     {
       "name": "anything-analyzer",
@@ -103,8 +113,13 @@
         "$HOME/tools/anything-analyzer"
       ],
       "startCommand": "pnpm",
-      "startArgs": ["dev"],
-      "mcpNames": ["anything-analyzer", "local-mcp"],
+      "startArgs": [
+        "dev"
+      ],
+      "mcpNames": [
+        "anything-analyzer",
+        "local-mcp"
+      ],
       "mcpUrl": "http://localhost:23816/mcp",
       "servicePort": 23816,
       "docsUrl": "https://github.com/Mouseww/anything-analyzer",
@@ -114,11 +129,18 @@
     {
       "name": "idapro",
       "bootstrapKind": "local-http-mcp",
-      "dependsOn": ["idalib-mcp"],
-      "mcpNames": ["idapro"],
+      "dependsOn": [
+        "idalib-mcp"
+      ],
+      "mcpNames": [
+        "idapro"
+      ],
       "mcpUrl": "http://127.0.0.1:13337/mcp",
       "servicePort": 13337,
-      "servicePortRange": [13337, 13350],
+      "servicePortRange": [
+        13337,
+        13350
+      ],
       "portNote": "IDA 多实例时端口递增 (13337→13338→...)，检查 IDA Output 窗口的 [MCP] port=xxxxx 日志",
       "startScript": "$SKILL_ROOT/../kali/scripts/ida-start.sh",
       "docsUrl": "https://hex-rays.com/ida-pro/",
@@ -132,11 +154,12 @@
       "aptPackage": "radare2",
       "fallbackKind": "github-release-tar",
       "repo": "radareorg/radare2",
-      "assetRegex": "^radare2_.*_amd64\\.deb$",
+      "assetRegex": "^radare2-.*-w64\\.zip$",
       "docsUrl": "https://github.com/radareorg/radare2",
       "canAutoInstall": true,
       "verifyCommand": "r2",
-      "kaliNote": "Kali 预装。如需最新版可从 GitHub 下载 .deb"
+      "kaliNote": "Kali 预装。如需最新版可从 GitHub 下载 .deb",
+      "preferApiDigest": true
     },
     {
       "name": "rabin2",
@@ -145,7 +168,9 @@
       "docsUrl": "https://github.com/radareorg/radare2",
       "canAutoInstall": true,
       "verifyCommand": "rabin2",
-      "kaliNote": "随 radare2 一起安装"
+      "kaliNote": "随 radare2 一起安装",
+      "assetRegex": "^radare2-.*-w64\\.zip$",
+      "preferApiDigest": true
     },
     {
       "name": "adb",
@@ -181,11 +206,14 @@
         "将插件 zip 安装到 Ghidra: File → Install Extensions → 选择下载的 zip",
         "MCP server 在 Ghidra 项目打开后自动监听 localhost:8765"
       ],
-      "mcpNames": ["ghidra"],
+      "mcpNames": [
+        "ghidra"
+      ],
       "mcpUrl": "http://localhost:8765/mcp",
       "servicePort": 8765,
       "verificationMode": "service-or-registration",
-      "kaliNote": "apt install ghidra 或从 GitHub 下载"
+      "kaliNote": "apt install ghidra 或从 GitHub 下载",
+      "preferApiDigest": true
     },
     {
       "name": "seclists",
@@ -208,7 +236,9 @@
     {
       "name": "burpsuite-mcp",
       "bootstrapKind": "manual",
-      "mcpNames": ["burpsuite"],
+      "mcpNames": [
+        "burpsuite"
+      ],
       "mcpUrl": "http://localhost:9876/mcp",
       "servicePort": 9876,
       "docsUrl": "https://portswigger.net/burp",
@@ -296,7 +326,9 @@
       "name": "mcp-kali-server",
       "bootstrapKind": "apt-package",
       "aptPackage": "mcp-kali-server",
-      "mcpNames": ["kali-server"],
+      "mcpNames": [
+        "kali-server"
+      ],
       "mcpUrl": "http://localhost:5000",
       "servicePort": 5000,
       "docsUrl": "https://github.com/Wh0am123/MCP-Kali-Server",
@@ -309,9 +341,14 @@
       "name": "metasploitmcp",
       "bootstrapKind": "apt-package",
       "aptPackage": "metasploitmcp",
-      "mcpNames": ["metasploit-mcp"],
+      "mcpNames": [
+        "metasploit-mcp"
+      ],
       "mcpCommand": "metasploitmcp",
-      "mcpArgs": ["--transport", "stdio"],
+      "mcpArgs": [
+        "--transport",
+        "stdio"
+      ],
       "mcpUrl": "http://127.0.0.1:8085",
       "servicePort": 8085,
       "docsUrl": "https://github.com/GH05TCREW/MetasploitMCP",
@@ -324,7 +361,9 @@
       "name": "hexstrike-ai",
       "bootstrapKind": "apt-package",
       "aptPackage": "hexstrike-ai",
-      "mcpNames": ["hexstrike"],
+      "mcpNames": [
+        "hexstrike"
+      ],
       "docsUrl": "https://github.com/0x4m4/hexstrike-ai",
       "canAutoInstall": true,
       "verifyCommand": "hexstrike-ai",
@@ -405,17 +444,27 @@
     {
       "name": "pentestswarm",
       "bootstrapKind": "go-install",
-      "goPackage": "github.com/Armur-Ai/Pentest-Swarm-AI/cmd/pentestswarm@latest",
+      "goPackage": "github.com/Armur-Ai/Pentest-Swarm-AI/cmd/pentestswarm@v0.1.0",
       "fallbackKind": "docker-image",
-      "dockerImage": "ghcr.io/armur-ai/pentestswarm:latest",
-      "mcpNames": ["pentestswarm"],
+      "dockerImage": "ghcr.io/armur-ai/pentestswarm:v0.1.0",
+      "mcpNames": [
+        "pentestswarm"
+      ],
       "mcpCommand": "pentestswarm",
-      "mcpArgs": ["mcp", "serve"],
+      "mcpArgs": [
+        "mcp",
+        "serve"
+      ],
       "docsUrl": "https://github.com/Armur-Ai/Pentest-Swarm-AI",
       "canAutoInstall": true,
       "verifyCommand": "pentestswarm",
-      "dependencies": ["go", "postgres", "redis"],
-      "kaliNote": "群体智能渗透框架。go install 或 Docker 运行。支持 MCP server 模式（pentestswarm mcp serve）。需要 Claude/Ollama API key。"
+      "dependencies": [
+        "go",
+        "postgres",
+        "redis"
+      ],
+      "kaliNote": "群体智能渗透框架。go install 或 Docker 运行。支持 MCP server 模式（pentestswarm mcp serve）。需要 Claude/Ollama API key。",
+      "pinnedVersion": "v0.1.0"
     },
     {
       "name": "coercer",

@@ -66,7 +66,7 @@ install_hint() {
     linux:r2|linux:radare2) echo "GitHub/source preferred; apt if available" ;;
     linux:ghidra) echo "GitHub release ZIP or Flatpak; Java required" ;;
     linux:burpsuite) echo "manual installer/jar; then load burp-mcp-full jar" ;;
-    linux:jshookmcp) echo "npx: npx -y @jshookmcp/jshook@latest" ;;
+    linux:jshookmcp) echo "npx: npx -y @jshookmcp/jshook@0.3.4" ;;
     linux:anything-analyzer) echo "git clone + pnpm install + pnpm dev" ;;
     linux:nuclei) echo "GitHub release or go install; apt may be unavailable" ;;
     linux:seclists) echo "git clone https://github.com/danielmiessler/SecLists ~/tools/SecLists" ;;
@@ -81,7 +81,7 @@ install_hint() {
     macos:r2|macos:radare2) echo "brew: brew install radare2" ;;
     macos:ghidra) echo "brew: brew install ghidra or brew install --cask ghidra" ;;
     macos:burpsuite) echo "brew cask/manual: brew install --cask burp-suite" ;;
-    macos:jshookmcp) echo "npx: npx -y @jshookmcp/jshook@latest" ;;
+    macos:jshookmcp) echo "npx: npx -y @jshookmcp/jshook@0.3.4" ;;
     macos:anything-analyzer) echo "git clone + corepack enable + pnpm install + pnpm dev" ;;
     macos:nuclei) echo "brew: brew install nuclei" ;;
     macos:seclists) echo "git clone https://github.com/danielmiessler/SecLists ~/tools/SecLists" ;;

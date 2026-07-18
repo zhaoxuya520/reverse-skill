@@ -233,21 +233,69 @@ ensure_pnpm() {
   if ! has_cmd pnpm; then npm install -g pnpm; fi
 }
 
-latest_github_asset_url() {
+# Args: repo regex [release_tag]
+# Prints: url\tdigest_or_empty
+latest_github_asset_meta() {
   local repo="$1"
   local regex="$2"
-  python3 - "$repo" "$regex" <<'PY'
+  local tag="${3:-}"
+  python3 - "$repo" "$regex" "$tag" <<'PY'
 import json, re, sys, urllib.request
-repo, pattern = sys.argv[1:]
-req = urllib.request.Request(f'https://api.github.com/repos/{repo}/releases/latest', headers={'User-Agent':'reverse-skill-bootstrap'})
+repo, pattern, tag = sys.argv[1:4]
+if tag:
+    url = f'https://api.github.com/repos/{repo}/releases/tags/{tag}'
+else:
+    url = f'https://api.github.com/repos/{repo}/releases/latest'
+req = urllib.request.Request(url, headers={'User-Agent':'reverse-skill-bootstrap'})
 with urllib.request.urlopen(req, timeout=30) as r:
     data = json.load(r)
 for asset in data.get('assets', []):
     if re.search(pattern, asset.get('name','')):
-        print(asset.get('browser_download_url'))
+        digest = asset.get('digest') or ''
+        print(f"{asset.get('browser_download_url')}\t{digest}")
         raise SystemExit(0)
-raise SystemExit(f'no asset matched {pattern} for {repo}')
+raise SystemExit(f'no asset matched {pattern} for {repo} tag={tag!r}')
 PY
+}
+
+latest_github_asset_url() {
+  local repo="$1"
+  local regex="$2"
+  local tag="${3:-}"
+  latest_github_asset_meta "$repo" "$regex" "$tag" | cut -f1
+}
+
+# verify_sha256 file expected_or_empty [github_digest]
+# expected may be "hex" or "sha256:hex"; github_digest same. Prefer expected.
+verify_sha256() {
+  local file="$1"
+  local expected="$2"
+  local api_digest="${3:-}"
+  local actual
+  if command -v sha256sum >/dev/null 2>&1; then
+    actual=$(sha256sum "$file" | awk '{print tolower($1)}')
+  elif command -v shasum >/dev/null 2>&1; then
+    actual=$(shasum -a 256 "$file" | awk '{print tolower($1)}')
+  else
+    log_warn "sha256 tool missing; skip integrity for $file"
+    return 0
+  fi
+  local exp="$expected"
+  if [[ -z "$exp" && -n "$api_digest" ]]; then
+    exp="$api_digest"
+  fi
+  exp=$(printf '%s' "$exp" | sed -E 's/^[Ss][Hh][Aa]256://')
+  exp=$(printf '%s' "$exp" | tr 'A-F' 'a-f')
+  if [[ -n "$exp" ]]; then
+    if [[ "$actual" != "$exp" ]]; then
+      rm -f "$file"
+      log_err "SHA256 mismatch for $(basename "$file"): expected $exp got $actual (file deleted)"
+      return 1
+    fi
+    log_ok "SHA256 OK: $actual"
+  else
+    log_warn "No pinned digest for $(basename "$file"); recorded sha256=$actual"
+  fi
 }
 
 extract_archive() {
@@ -279,16 +327,22 @@ extract_archive() {
   case "$dest.tmp" in /tmp/reverse-bootstrap-*|"$TOOLS_ROOT"/*.tmp) rm -rf "$dest.tmp" ;; esac
 }
 
+# install_github_release repo regex dest [release_tag] [expected_sha256]
 install_github_release() {
   local repo="$1"
   local regex="$2"
   local dest="$3"
-  local url file
+  local tag="${4:-}"
+  local expected_sha="${5:-}"
+  local meta url digest file
   ensure_dir "$TOOLS_ROOT"
-  url=$(latest_github_asset_url "$repo" "$regex")
+  meta=$(latest_github_asset_meta "$repo" "$regex" "$tag")
+  url=$(printf '%s' "$meta" | cut -f1)
+  digest=$(printf '%s' "$meta" | cut -f2)
   file="$(make_temp_file "$(basename "$url")")"
   log_info "download $url"
   curl -L -o "$file" "$url"
+  verify_sha256 "$file" "$expected_sha" "$digest" || return 1
   extract_archive "$file" "$dest"
   rm -rf "$(dirname "$file")"
   export PATH="$dest/bin:$dest:$PATH"
@@ -377,9 +431,12 @@ is_ready_cmd() {
 ensure_jadx() {
   if has_cmd jadx; then log_ok "jadx ready: $(cmd_path jadx)"; return 0; fi
   ensure_java_runtime
+  local tag="v1.5.6"
+  local sha="545ea2be9c242511bc145755cf4bda2485ade42966e096f8b4d3da2a230e8974"
+  local re='^jadx-1\.5\.6\.zip$'
   case "$PLATFORM" in
-    macos) install_brew jadx || install_github_release skylot/jadx '^jadx-[0-9].*\.zip$' "$TOOLS_ROOT/jadx" ;;
-    linux) install_github_release skylot/jadx '^jadx-[0-9].*\.zip$' "$TOOLS_ROOT/jadx" ;;
+    macos) install_brew jadx || install_github_release skylot/jadx "$re" "$TOOLS_ROOT/jadx" "$tag" "$sha" ;;
+    linux) install_github_release skylot/jadx "$re" "$TOOLS_ROOT/jadx" "$tag" "$sha" ;;
   esac
 }
 
@@ -391,10 +448,16 @@ ensure_apktool() {
     linux)
       if install_apt apktool; then return 0; fi
       ensure_dir "$TOOLS_ROOT/apktool"
-      local url jar wrapper
-      url=$(latest_github_asset_url iBotPeaches/Apktool '^apktool_.*\.jar$')
+      local meta url digest jar wrapper
+      local tag="v3.0.2"
+      local sha="eee4669a704a14e0623407e6701b0b91887e61e1e4049cb7a82833e14ae8b5fd"
+      local re='^apktool_3\.0\.2\.jar$'
+      meta=$(latest_github_asset_meta iBotPeaches/Apktool "$re" "$tag")
+      url=$(printf '%s' "$meta" | cut -f1)
+      digest=$(printf '%s' "$meta" | cut -f2)
       jar="$TOOLS_ROOT/apktool/apktool.jar"
       curl -L -o "$jar" "$url"
+      verify_sha256 "$jar" "$sha" "$digest" || return 1
       wrapper="$TOOLS_ROOT/apktool/apktool"
       printf '#!/usr/bin/env bash\njava -jar "%s" "$@"\n' "$jar" > "$wrapper"
       chmod +x "$wrapper"
@@ -420,7 +483,7 @@ ensure_idalib_mcp() {
 
 ensure_jshookmcp() {
   ensure_node_runtime
-  write_mcp_server "jshook" '{"command":"npx","args":["-y","@jshookmcp/jshook@latest"],"env":{"JSHOOK_BASE_PROFILE":"search"}}'
+  write_mcp_server "jshook" '{"command":"npx","args":["-y","@jshookmcp/jshook@0.3.4"],"env":{"JSHOOK_BASE_PROFILE":"search"}}'
 }
 
 ensure_anything_analyzer() {
@@ -550,10 +613,10 @@ ensure_pentestswarm() {
   if ! has_cmd go; then
     case "$PLATFORM" in macos) install_brew go ;; linux) install_apt golang-go ;; esac
   fi
-  if ! go install github.com/Armur-Ai/Pentest-Swarm-AI/cmd/pentestswarm@latest; then
+  if ! go install github.com/Armur-Ai/Pentest-Swarm-AI/cmd/pentestswarm@v0.1.0; then
     if has_cmd docker; then
-      write_mcp_server "pentestswarm" '{"command":"docker","args":["run","--rm","-i","ghcr.io/armur-ai/pentestswarm:latest","mcp","serve"]}'
-      log_warn "pentestswarm Go install failed; registered Docker fallback ghcr.io/armur-ai/pentestswarm:latest"
+      write_mcp_server "pentestswarm" '{"command":"docker","args":["run","--rm","-i","ghcr.io/armur-ai/pentestswarm:v0.1.0","mcp","serve"]}'
+      log_warn "pentestswarm Go install failed; registered Docker fallback ghcr.io/armur-ai/pentestswarm:v0.1.0"
     else
       manual_required pentestswarm "Install Go 1.24+ or Docker, then install Pentest-Swarm-AI and ensure pentestswarm is on PATH."
     fi

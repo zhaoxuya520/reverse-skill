@@ -3,6 +3,7 @@ node_modules/
 
 # Python
 __pycache__/
+**/__pycache__/
 *.pyc
 *.pyo
 
@@ -23,14 +24,14 @@ Desktop.ini
 *.bak
 *.log
 
-# User-specific config (不应该随仓库分发)
+# User-specific config
 .claude/
 
-# 测试案例（本地测试用，不随仓库分发）
+# 测试案例（本地）
 测试案例/
 测试案例.zip
 
-# 工具索引（每台机器不同，由脚本自动生成）
+# 工具索引（每台机器不同）
 skills/tool-index.md
 skills/tool-index.json
 
@@ -41,7 +42,6 @@ skills/tool-index.json
 *.dylib
 work/
 
-
 # Build artifacts
 burp-mcp-full/build/classes/
 burp-mcp-full/build/libs/
@@ -50,8 +50,22 @@ burp-mcp-full/lib/
 *.jar
 !burp-mcp-full/build/libs/burp-mcp-full.jar
 
-# 已弃用的文件（保留用于历史参考）
+# 已弃用
 BOOTSTRAP.md
 
-# 生成的报告目录（避免未脱敏内容泄漏）
+# 报告（防未脱敏泄漏）
 reports/
+
+# 运行产物 / 实验垃圾
+master-route-*/
+**/master-route-*/
+frontrun-lab-*/
+mcps/
+# local experiment dirs (never ship)
+crypto-case-*/
+skills/crypto-case-*/
+*-scope-*/
+
+# local-only trees (not reverse-skill core; keep out of git)
+web3-skill/
+skills/crypto-analysis/

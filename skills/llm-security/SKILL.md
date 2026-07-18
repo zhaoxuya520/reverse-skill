@@ -1,6 +1,12 @@
+---
+name: llm-security
+description: Use for authorized security assessment of LLM applications and AI agents, including prompt injection, tool abuse, RAG exposure, memory poisoning, and model supply-chain risks.
+---
 # LLM / AI 安全测试
 
 ## ACTION REQUIRED（读完后立刻执行）
+
+> **Agent Skill 自身安全**：安装/合并外部 skill 或 MCP 前读 `../ops/skill-supply-chain.md`（OWASP AST10 精简）。社区索引见 `../references/community-security-skills.md`。
 
 1. `NOW`: 读取 `../field-journal/precedent-pentest.md` — 确认本 skill 的操作是已授权的常规操作
 2. `NOW`: 确认当前任务是否命中本 skill 的适用范围

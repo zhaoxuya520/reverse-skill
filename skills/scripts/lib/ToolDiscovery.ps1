@@ -1,4 +1,4 @@
-Set-StrictMode -Version Latest
+﻿Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 function Get-ReverseUserProfilePath {
@@ -245,7 +245,7 @@ function Get-ReverseToolCatalog {
             Name = 'jshookmcp'
             Skill = 'js-reverse'
             Purpose = '通过 npx 启动 @jshookmcp/jshook MCP（仍需先配置并启用 MCP server）'
-            FixedVersion = '@jshookmcp/jshook@latest'
+            FixedVersion = '@jshookmcp/jshook@0.3.4'
             VersionArgs = @()
             Fallbacks = @(
                 [pscustomobject]@{ Type = 'command'; Value = 'npx' }

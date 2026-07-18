@@ -127,8 +127,8 @@ bash skills/scripts/refresh-tool-index.sh
 
 ```text
 .
-├── README.md                    # 主入口（中文）
-├── README_EN.md                 # 主入口（英文）
+├── README.md                    # 主入口（英文）
+├── README_zh.md                 # 主入口（中文）
 ├── README_AI.md                 # AI Agent bootstrap 入口（英文）
 ├── RULES.md                     # 全局路由与执行规则
 ├── docs/OVERVIEW.md              # 详细概览（英文）

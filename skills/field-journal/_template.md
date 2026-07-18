@@ -6,12 +6,34 @@
 ## 目标概述
 <!-- 一句话说明在干什么 -->
 
+## Scope 摘要（脱敏）
+<!-- auth.basis / network_profile.mode / in_scope 类型（勿写真实域名/IP） -->
+- auth_basis:
+- network_profile:
+- asset_types: []
+
+## 角色
+<!-- lead / cie / cpe / cre / … 见 skills/ops/role-map.md -->
+- lead_role: lead
+- specialists: []
+
 ## 完整执行链路
 <!-- 从拿到目标到产出结果的完整步骤，包括走过的弯路 -->
 
 1. ...
 2. ...
 3. ...
+
+## Evidence 链摘要（脱敏）
+<!-- 最多 3 条：E-id + 命令模式 + 结论类型；完整证据在用户项目 -->
+| E-id | source_type | 可复用命令模式 | 关联 Finding |
+|------|-------------|----------------|--------------|
+| E-001 | | | F-001 |
+
+## Finding / Path 摘要
+- top_finding:
+- path_type: attack | callflow | solve
+- path_one_liner:
 
 ## 踩坑记录
 

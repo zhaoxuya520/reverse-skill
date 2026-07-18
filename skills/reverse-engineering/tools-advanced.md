@@ -1,4 +1,4 @@
-# CTF Reverse - Advanced Tools & Deobfuscation
+﻿# CTF Reverse - Advanced Tools & Deobfuscation
 
 Advanced tooling for commercial packers/protectors, binary diffing, deobfuscation frameworks, emulation, and symbolic execution beyond angr.
 
@@ -393,7 +393,7 @@ def fail(state):
 m.run()
 ```
 
-**Best for:** EVM/smart contract analysis, simpler Linux binaries. angr is generally more mature for complex RE tasks.
+**Best for:** simpler Linux binaries and embedded targets. angr is generally more mature for complex RE tasks.
 
 ---
 

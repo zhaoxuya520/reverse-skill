@@ -4,6 +4,31 @@
 
 ---
 
+## 0. Evidence Chain（所有安全报告 MUST 包含）
+
+> 契约全文：`skills/ops/evidence-finding-path.md`  
+> Case 目录：`work/<case>/`（`case-init.ps1`）
+
+报告正文中 **MUST** 含以下章节（可并入「核心发现」但字段不得省略）：
+
+### 0.1 Scope 摘要
+- 链到 `scope.md`：`auth` / `in_scope` / `network_profile`
+- 无 scope → 不得宣称任务完成
+
+### 0.2 Evidence
+至少 1 条，字段：`E-id` / `source_ref` / `repro_command` / `content_hash|n/a`
+
+### 0.3 Findings
+每条：`F-id` / `severity|n/a_re` / `evidence_ids` / `confidence` / `location` / `status`
+
+### 0.4 Path
+至少 1 条 `P-id`：`path_type=attack|callflow|solve`，步骤可挂 E/F
+
+### 0.5 Timeline 摘要
+链到 `timeline.md` 或嵌入关键 3–10 条追加记录
+
+---
+
 ## 1. 逆向工程报告模板
 
 ```markdown

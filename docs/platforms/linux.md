@@ -41,7 +41,7 @@ python3 -m pipx ensurepath
 | Ghidra | GitHub release ZIP | Flatpak / distro package | Java required. |
 | IDA Pro | manual Linux installer | — | Commercial tool; set `IDADIR` or document local path. |
 | BurpSuite | manual installer / jar | distro package if available | Load `burp-mcp-full` extension manually. |
-| jshookmcp | `npx -y @jshookmcp/jshook@latest` | MCP config command | Requires Node/npm/npx. |
+| jshookmcp | `npx -y @jshookmcp/jshook@0.3.4` | MCP config command | Requires Node/npm/npx. |
 | anything-analyzer | project clone + `pnpm install` | custom local service | Register its MCP endpoint in the Agent client. |
 | nuclei | GitHub release / `go install` | distro package if available | Often absent in Ubuntu apt. |
 | SecLists | `git clone https://github.com/danielmiessler/SecLists ~/tools/SecLists` | distro package if available | Keep path in tool index. |
@@ -150,7 +150,7 @@ MCP stdio bridge example:
   "mcpServers": {
     "jshook": {
       "command": "npx",
-      "args": ["-y", "@jshookmcp/jshook@latest"],
+      "args": ["-y", "@jshookmcp/jshook@0.3.4"],
       "env": {
         "JSHOOK_BASE_PROFILE": "search"
       }

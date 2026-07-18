@@ -349,15 +349,15 @@ ensure_capability() {
                 log_ok "pentestswarm 已可用"
             elif command -v go &>/dev/null; then
                 log_info "go install pentestswarm ..."
-                go install github.com/Armur-Ai/Pentest-Swarm-AI/cmd/pentestswarm@latest
+                go install github.com/Armur-Ai/Pentest-Swarm-AI/cmd/pentestswarm@v0.1.0
             elif command -v docker &>/dev/null; then
                 log_info "拉取 pentestswarm Docker 镜像 ..."
-                docker pull ghcr.io/armur-ai/pentestswarm:latest
-                log_info "使用方式: docker run --rm ghcr.io/armur-ai/pentestswarm:latest scan <target> --scope <scope>"
+                docker pull ghcr.io/armur-ai/pentestswarm:v0.1.0
+                log_info "使用方式: docker run --rm ghcr.io/armur-ai/pentestswarm:v0.1.0 scan <target> --scope <scope>"
             else
                 log_warn "需要 Go 1.24+ 或 Docker 来安装 pentestswarm"
                 log_info "安装 Go: apt install golang-go"
-                log_info "然后: go install github.com/Armur-Ai/Pentest-Swarm-AI/cmd/pentestswarm@latest"
+                log_info "然后: go install github.com/Armur-Ai/Pentest-Swarm-AI/cmd/pentestswarm@v0.1.0"
                 return 1
             fi
             register_mcp_server "pentestswarm" '{
@@ -415,7 +415,7 @@ ensure_capability() {
             fi
             register_mcp_server "jshook" '{
                 "command": "npx",
-                "args": ["-y", "@jshookmcp/jshook@latest"],
+                "args": ["-y", "@jshookmcp/jshook@0.3.4"],
                 "env": {"JSHOOK_BASE_PROFILE": "search"}
             }'
             ;;

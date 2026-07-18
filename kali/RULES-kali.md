@@ -214,7 +214,7 @@ bash "<本包根目录>/kali/scripts/refresh-tool-index.sh"
 | Pentest Swarm AI | stdio | 群体智能自主渗透（recon→classify→exploit→report） | `pentestswarm mcp serve` |
 | idapro | 13337-13350 | IDA Pro 逆向工具 | `bash kali/scripts/ida-start.sh` |
 | anything-analyzer | 23816 | 浏览器自动化 + HTTP 捕获 | `cd ~/tools/anything-analyzer && pnpm dev` |
-| jshookmcp | — | JS Hook/CDP/Network/AST | `npx -y @jshookmcp/jshook@latest`（stdio） |
+| jshookmcp | — | JS Hook/CDP/Network/AST | `npx -y @jshookmcp/jshook@0.3.4`（stdio） |
 | ghidra | 8765 | Ghidra 免费反编译 | Ghidra GUI 启动后自动监听 |
 | burpsuite | 9876 | BurpSuite Web 代理 | BurpSuite 扩展启动 |
 

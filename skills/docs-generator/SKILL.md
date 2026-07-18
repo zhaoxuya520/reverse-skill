@@ -1,4 +1,4 @@
-﻿---
+---
 name: docs-generator
 description: |
   Creates task-oriented technical documentation with progressive disclosure. Use when writing READMEs, API docs, architecture docs, or markdown documentation.
@@ -53,6 +53,8 @@ For writing style, tone, and voice guidance, use `Skill(ce:writer)` with **The E
 - 关键发现必须有证据支撑
 - 复现步骤必须让第三方能独立重现
 - 敏感信息（真实 token、密码、内部 URL）用占位符替代
+- **MUST** 包含 Evidence → Finding → Path 链（见 `../ops/evidence-finding-path.md` 与模板 §0）
+- **SHOULD** 引用 case `scope.md` / `timeline.md`（`../scripts/case-init.ps1`）
 
 ### 图表集成
 
@@ -168,4 +170,5 @@ For README, API endpoint, and file organization templates, see [references/templ
 - [ ] 我是否执行了工作流中的每一步（而不是只阅读）？
 - [ ] 我是否基于 `tool-index` 使用了真实工具路径？
 - [ ] 我是否产出了可复现证据（命令/脚本/截图/报告）？
-- [ ] 我是否完成并回写了 RULES 要求的 Checklist 项？
+- [ ] 报告是否含 Evidence / Finding / Path（ops 契约）？
+- [ ] 是否完成并回写了 RULES 要求的 Checklist 项？
