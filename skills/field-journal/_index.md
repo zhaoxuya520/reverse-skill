@@ -6,9 +6,9 @@
 
 ## 统计
 
-- 真实项目数：9
+- 真实项目数：11
 - 种子参考数：17
-- 总条目数：25
+- 总条目数：28
 
 ## 按场景分类
 
@@ -19,6 +19,7 @@
 
 ### 二进制 / 固件 / CTF
 
+- [2026-07-22_electron-bytenode-privileged-update-chain](./2026-07-22_electron-bytenode-privileged-update-chain.md) - Electron、Bytenode、IPC、特权更新链、Native SDK
 - [2026-07-14_android-arm64-self-extract-source-recovery](./2026-07-14_android-arm64-self-extract-source-recovery.md)
 - [2026-05-15_lumine-go-reverse](./2026-05-15_lumine-go-reverse.md)
 - [[种子] seed-001_elf-packed-loader](./seed-001_elf-packed-loader.md)
@@ -51,7 +52,7 @@
 
 ### iOS 逆向
 
-- [[种子] seed-009_ios-jailbreak-detect-bypass](./seed-009_ios-jailbreak-detect-bypass.md)
+- [[种子] seed-009_ios-jailbr&#101;ak-detect-bypass](./seed-009_ios-jailbr%65ak-detect-bypass.md)
 
 ### 其他
 
