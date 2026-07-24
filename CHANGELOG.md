@@ -7,7 +7,21 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Bash PRIMARY path parity: `master-route.sh`, `case-init.sh` (presets `offline-sample|ctf-public|own-system`), `case-guard.sh`, `verify-routing-coherence.sh`, `smoke.sh`
+- PRIMARY showcase: `skills/scripts/demo-primary-path.sh`, `examples/primary-path-demo/`, terminal GIF pipeline (`record-primary-path-demo.sh` + Pillow renderer + vhs tape)
+- Install dual channel: root `.claude-plugin/marketplace.json`, skills.sh badge, `npx skills add` one-liner + first prompt after install
+- Skill maturity labels (`core` / `extended` / `experimental`) via `skills/references/skill-maturity.md`
+
+### Changed
+
+- Tool-index honesty: java stub / broken command detection; jshookmcp requires MCP registration (not mere `npx` on PATH)
+- Global Injection rules: confirm-before-write consent language in RULES / README_AI
+- README EN/ZH: 30-second proof, install honesty (agent skills ≠ full toolchain clone)
+
 ### Fixed
+
 
 - Routing: sigma vs malware, LLM 越狱 vs iOS 越狱, 完整渗透/打到域控 vs AD 域控, forensics vs OT ics; master-route.ps1 rewritten UTF-8 BOM for PS 5.1 CJK
 

@@ -1,5 +1,6 @@
 ---
 name: edr-bypass-re
+maturity: core
 description: |
   逆向防御方实现 → 红队针对性绕过。把 EDR / Defender / AV 的 hook 表、ETW provider、AMSI 实现先逆向出来，
   再写针对性的 unhook / 间接 syscall / ETW patch / call stack spoof。对照 MITRE ATT&CK T1562 防御规避。
@@ -8,6 +9,8 @@ description: |
   ntdll unhook、kernel callback、CrowdStrike 绕过、Defender 绕过、Sentinel One 绕过、Elastic Defend、
   Sysmon 规避、PPID spoof、Sleep mask、Process Hollowing、Reflective DLL。
 ---
+
+> **Maturity: `core`** · production-depth entry · see [`../references/skill-maturity.md`](../references/skill-maturity.md).
 
 ## ACTION REQUIRED（读完后立刻执行）
 

@@ -1,7 +1,11 @@
 ---
 name: api-security
+maturity: core
 description: Use for authorized security assessment of REST, GraphQL, WebSocket, or SOAP APIs, including discovery, authentication, authorization, rate-limit, and CI/CD testing.
 ---
+
+> **Maturity: `core`** · production-depth entry · see [`../references/skill-maturity.md`](../references/skill-maturity.md).
+
 # API 安全测试
 
 ## ACTION REQUIRED（读完后立刻执行）

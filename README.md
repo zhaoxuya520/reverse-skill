@@ -14,6 +14,7 @@
   <a href="https://github.com/zhaoxuya520/reverse-skill/issues"><img src="https://img.shields.io/github/issues/zhaoxuya520/reverse-skill?style=flat&logo=github" alt="issues"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="license"></a>
   <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/changelog-Keep%20a%20Changelog-orange" alt="changelog"></a>
+  <a href="https://skills.sh/zhaoxuya520/reverse-skill"><img src="https://skills.sh/b/zhaoxuya520/reverse-skill" alt="skills.sh"></a>
 </p>
 
 <p align="center">
@@ -65,6 +66,30 @@ User task
 
 PRIMARY ladder: [skills/MASTER-ROUTING.md](skills/MASTER-ROUTING.md) · Full matrix: [skills/routing.md](skills/routing.md) · Ops: [skills/ops/](skills/ops/)
 
+### 30-second proof (real run, not a mock)
+
+One sentence in → correct PRIMARY skill + ready case directory:
+
+<p align="center">
+  <img src="docs/assets/primary-path-demo.gif" alt="PRIMARY path demo GIF" width="720" />
+</p>
+
+```bash
+bash skills/scripts/demo-primary-path.sh
+bash skills/scripts/record-primary-path-demo.sh   # regenerate GIF (Pillow; or vhs if installed)
+# → examples/primary-path-demo/  + docs/assets/primary-path-demo.gif
+```
+
+| Live sample | PRIMARY |
+|-------------|---------|
+| APK / jadx / cert pinning | **R1** `apk-reverse` |
+| JS signature / webpack | **R3** `js-reverse` |
+| LLM prompt injection | **R14** `llm-security` |
+| radare2 ELF triage | **R7** `radare2` |
+| offline local APK + `case-guard` | **ready_for_act=true** |
+
+Artifacts from the last committed demo run: [examples/primary-path-demo/RESULT-CARD.md](examples/primary-path-demo/RESULT-CARD.md) · [result-card.html](examples/primary-path-demo/result-card.html)
+
 <br/>
 
 <div align="center">
@@ -99,8 +124,33 @@ PRIMARY ladder: [skills/MASTER-ROUTING.md](skills/MASTER-ROUTING.md) · Full mat
 
 ### Installation
 
+**One-line agent install** (skills into Claude Code / Codex / compatible agents):
+
+```bash
+npx skills add zhaoxuya520/reverse-skill
 ```
+
+[skills.sh catalog](https://skills.sh/zhaoxuya520/reverse-skill) · list without install: `npx skills add zhaoxuya520/reverse-skill -l`
+
+**After install, tell the agent (copy-paste):**
+
+```text
+Read README_AI.md and RULES.md first. You are the reverse-skill router: PRIMARY route → scope/auth gate → specialist skill. For a dry run, execute: bash skills/scripts/demo-primary-path.sh. For a real authorized offline APK: bash skills/scripts/case-init.sh --hint "apk reverse" --preset offline-sample --sample ./app.apk. Do not ACT on any live target until scope says ready_for_act=true.
+```
+
+**Claude Code plugin marketplace** (dual channel; after this lands on default branch):
+
+```text
+/plugin marketplace add zhaoxuya520/reverse-skill
+```
+
+Manifest: [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) (router pack entry — not “800 micro-skills”).
+
+**Full toolchain still needs a clone.** `npx skills add` ships agent skill files; scripts (`master-route`, `case-init`, `bootstrap`, tool-index refresh), Kali helpers, and local `work/` cases live in the git tree:
+
+```bash
 git clone https://github.com/zhaoxuya520/reverse-skill.git
+cd reverse-skill
 ```
 
 Then refresh the tool index per platform:
@@ -110,6 +160,23 @@ Then refresh the tool index per platform:
 | Windows | `powershell -File skills/scripts/refresh-tool-index.ps1` |
 | Linux / macOS | `bash skills/scripts/refresh-tool-index.sh` |
 | Kali Linux | `bash kali/scripts/refresh-tool-index.sh` |
+
+PRIMARY path (route → case scope → smoke), also per platform:
+
+| Platform | Route | Case init | Verify / smoke |
+|----------|-------|-----------|----------------|
+| Windows | `powershell -File skills/scripts/master-route.ps1 -Hint "<task>"` | `powershell -File skills/scripts/case-init.ps1 -Hint "<task>"` | `powershell -File skills/scripts/smoke.ps1` |
+| Linux / macOS / Kali | `bash skills/scripts/master-route.sh --hint "<task>"` | `bash skills/scripts/case-init.sh --hint "<task>"` | `bash skills/scripts/smoke.sh` |
+
+Authorized local/CTF work without fighting the auth gate:
+
+```bash
+# own APK / binary on disk (offline static analysis)
+bash skills/scripts/case-init.sh --hint "apk reverse" --preset offline-sample --sample ./app.apk
+
+# public CTF target
+bash skills/scripts/case-init.sh --hint "ctf web" --preset ctf-public --target-url https://chal.example
+```
 
 Check [skills/tool-index.md](skills/tool-index.md) to see detected tools.
 
@@ -167,6 +234,7 @@ Platform-specific docs:
 
 ```
 .
+├── .claude-plugin/marketplace.json   # Claude Code marketplace dual channel
 ├── README.md / README_zh.md / README_AI.md
 ├── RULES.md / RULES_zh.md
 ├── skills/

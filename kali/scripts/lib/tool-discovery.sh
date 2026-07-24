@@ -35,7 +35,7 @@ declare -a TOOL_CATALOG=(
     "pip|reverse-engineering|Python 包管理|--version|pip3,pip"
     "node|js-reverse|运行 Node 侧 JS 复现与 MCP 客户端|--version|node"
     "npx|js-reverse|运行临时 npm 包与 MCP 入口|--version|npx"
-    "jshookmcp|js-reverse|通过 npx 启动 @jshookmcp/jshook MCP||npx"
+    "jshookmcp|js-reverse|JS/CDP Hook MCP（须在客户端注册）||__jshookmcp_special__"
     "agent-browser|browser-automation|浏览器自动化（Playwright）|--version|agent-browser"
     "analyzeHeadless|reverse-engineering|Ghidra 无头分析||analyzeHeadless,${HOME}/tools/ghidra/support/analyzeHeadless,/opt/ghidra/support/analyzeHeadless,/usr/share/ghidra/support/analyzeHeadless"
     "playwright|browser-automation|Playwright 浏览器引擎|--version|playwright,npx playwright"
@@ -138,19 +138,55 @@ test_tcp_port() {
     return 1
 }
 
-# 获取工具版本
+# 获取工具版本（stdout: version text; exit code preserved in VERSION_EC）
 get_tool_version() {
     local cmd="$1"
     local version_args="$2"
+    VERSION_EC=0
+    VERSION_OUT=""
 
     if [[ -z "$version_args" ]]; then
         echo ""
-        return
+        return 0
     fi
 
-    local output
-    output=$("$cmd" $version_args 2>&1 | head -n1) || true
-    echo "$output"
+    local tmp
+    tmp="$(mktemp "${TMPDIR:-/tmp}/rs-kver.XXXXXX")"
+    set +e
+    # shellcheck disable=SC2086
+    "$cmd" $version_args >"$tmp" 2>&1
+    VERSION_EC=$?
+    set -e
+    VERSION_OUT="$(head -n1 "$tmp" 2>/dev/null | tr '\n' ' ' | sed 's/[[:space:]]*$//')"
+    rm -f "$tmp"
+    echo "$VERSION_OUT"
+}
+
+version_is_broken() {
+    local text="${1:-}"
+    local ec="${2:-0}"
+    if [[ "$ec" != "0" && -z "$text" ]]; then
+        return 0
+    fi
+    if [[ -z "$text" ]]; then
+        return 1
+    fi
+    printf '%s' "$text" | grep -Eiq       'unable to locate|no java runtime|not found|command not found|no such file|is not recognized|could not find|cannot find|not installed|Unable to locate a Java Runtime'       && return 0
+    return 1
+}
+
+
+# MCP registration (best-effort)
+mcp_server_registered() {
+    local needle="$1"
+    local cfg
+    for cfg in "${CLAUDE_MCP_CONFIG:-}" "${HOME}/.claude/mcp.json" "${HOME}/.config/claude/mcp.json"; do
+        [[ -n "$cfg" && -f "$cfg" ]] || continue
+        if grep -Eiq "$needle|@jshookmcp/jshook" "$cfg" 2>/dev/null; then
+            return 0
+        fi
+    done
+    return 1
 }
 
 # 解析工具定义并检测可用性
@@ -158,6 +194,20 @@ get_tool_version() {
 resolve_tool() {
     local entry="$1"
     IFS='|' read -r name skill purpose version_args fallbacks <<< "$entry"
+
+    # jshookmcp honesty: registration required
+    if [[ "$name" == "jshookmcp" ]]; then
+        local npx_path
+        npx_path=$(find_command npx)
+        if mcp_server_registered "jshook"; then
+            echo "${name}|${skill}|${purpose}|yes|${npx_path:-mcp-config}|MCP registered (jshook)|mcp-registered"
+        elif [[ -n "$npx_path" ]]; then
+            echo "${name}|${skill}|${purpose}|no|${npx_path}|npx present; MCP NOT registered|npx-only"
+        else
+            echo "${name}|${skill}|${purpose}|no|||missing"
+        fi
+        return
+    fi
 
     IFS=',' read -ra candidates <<< "$fallbacks"
 
@@ -169,6 +219,10 @@ resolve_tool() {
         if [[ -n "$expanded" && -x "$expanded" ]]; then
             local ver
             ver=$(get_tool_version "$expanded" "$version_args")
+            if [[ -n "$version_args" ]] && version_is_broken "$ver" "$VERSION_EC"; then
+                echo "${name}|${skill}|${purpose}|no|${expanded}|${ver}|path-broken"
+                return
+            fi
             echo "${name}|${skill}|${purpose}|yes|${expanded}|${ver}|path"
             return
         fi
@@ -179,6 +233,10 @@ resolve_tool() {
         if [[ -n "$cmd_path" ]]; then
             local ver
             ver=$(get_tool_version "$cmd_path" "$version_args")
+            if [[ -n "$version_args" ]] && version_is_broken "$ver" "$VERSION_EC"; then
+                echo "${name}|${skill}|${purpose}|no|${cmd_path}|${ver}|command-broken"
+                return
+            fi
             echo "${name}|${skill}|${purpose}|yes|${cmd_path}|${ver}|command"
             return
         fi

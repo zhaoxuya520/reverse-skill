@@ -27,14 +27,98 @@ esac
 has_cmd() { command -v "$1" >/dev/null 2>&1; }
 cmd_path() { command -v "$1" 2>/dev/null || true; }
 
-run_version() {
+# Capture first line + exit code without lying when stubs exist (macOS /usr/bin/java).
+# Sets: VERSION_OUT, VERSION_EC
+run_version_capture() {
   local cmd="$1"; shift
-  if ! has_cmd "$cmd"; then
-    echo ""
+  VERSION_OUT=""
+  VERSION_EC=127
+  if ! has_cmd "$cmd" && [[ ! -x "$cmd" ]]; then
     return 0
   fi
-  "$cmd" "$@" 2>&1 | head -n 1 | tr '\n' ' ' | sed 's/[[:space:]]*$//' || true
+  local tmp
+  tmp="$(mktemp "${TMPDIR:-/tmp}/rs-ver.XXXXXX")"
+  set +e
+  "$cmd" "$@" >"$tmp" 2>&1
+  VERSION_EC=$?
+  set -e
+  VERSION_OUT="$(head -n 1 "$tmp" 2>/dev/null | tr '\n' ' ' | sed 's/[[:space:]]*$//')"
+  rm -f "$tmp"
 }
+
+run_version() {
+  local cmd="$1"; shift
+  run_version_capture "$cmd" "$@"
+  printf '%s' "$VERSION_OUT"
+}
+
+# True when version text / exit code indicates a stub or missing runtime.
+version_is_broken() {
+  local text="${1:-}"
+  local ec="${2:-0}"
+  # Non-zero exit with empty/near-empty output
+  if [[ "$ec" != "0" && -z "$text" ]]; then
+    return 0
+  fi
+  if [[ -z "$text" ]]; then
+    return 1
+  fi
+  printf '%s' "$text" | grep -Eiq     'unable to locate|no java runtime|not found|command not found|no such file|is not recognized|could not find|cannot find|not installed|no such runtime|Unable to locate a Java Runtime|Unable to locate'     && return 0
+  return 1
+}
+
+
+# MCP registration probe (Claude Code-style mcp.json and common alternates).
+mcp_config_paths() {
+  local c
+  c="${CLAUDE_MCP_CONFIG:-}"
+  if [[ -n "$c" ]]; then
+    echo "$c"
+  fi
+  echo "${HOME}/.claude/mcp.json"
+  echo "${HOME}/.config/claude/mcp.json"
+  echo "${HOME}/.cursor/mcp.json"
+}
+
+# True if any MCP config lists a server mentioning the needle (e.g. jshook).
+mcp_server_registered() {
+  local needle="$1"
+  local cfg
+  for cfg in $(mcp_config_paths); do
+    [[ -f "$cfg" ]] || continue
+    if command -v python3 >/dev/null 2>&1; then
+      if python3 - "$cfg" "$needle" <<'PY'
+import json, sys
+path, needle = sys.argv[1], sys.argv[2].lower()
+try:
+    data = json.load(open(path, encoding="utf-8"))
+except Exception:
+    sys.exit(1)
+servers = data.get("mcpServers") or data.get("mcp") or {}
+if not isinstance(servers, dict):
+    sys.exit(1)
+for name, spec in servers.items():
+    blob = (name or "").lower()
+    if isinstance(spec, dict):
+        blob += " " + json.dumps(spec, ensure_ascii=False).lower()
+    else:
+        blob += " " + str(spec).lower()
+    if needle in blob:
+        sys.exit(0)
+sys.exit(1)
+PY
+      then
+        return 0
+      fi
+    else
+      if grep -Eiq "$needle|@jshookmcp/jshook" "$cfg" 2>/dev/null; then
+        return 0
+      fi
+    fi
+  done
+  return 1
+}
+
 
 file_exists_any() {
   local p
@@ -124,7 +208,7 @@ TOOLS=(
   "nuclei|pentest-tools|Template-based vulnerability scanner|nuclei|nuclei -version|"
   "binwalk|firmware-pentest|Firmware extraction and analysis|binwalk|binwalk --version|"
   "seclists|pentest-tools|Security wordlists|none|none|$HOME/tools/SecLists;/usr/share/seclists"
-  "jshookmcp|js-reverse|JS/CDP/Hook MCP runtime via npx|npx|npx --version|"
+  "jshookmcp|js-reverse|JS/CDP/Hook MCP server (requires client registration)|none|none|"
   "anything-analyzer|browser-automation|Browser/HTTP analyzer MCP project|none|none|$HOME/tools/anything-analyzer;$REPO_ROOT/../anything-analyzer"
   "burp-mcp-full|burp-mcp|Local Burp MCP extension and stdio bridge|none|none|$REPO_ROOT/burp-mcp-full/mcp-bridge.js"
   "binwalk|firmware-pentest|Firmware extraction and analysis|binwalk|binwalk --version|"
@@ -142,6 +226,7 @@ trap 'rm -f "$records_tmp"' EXIT
   echo "- Platform: $PLATFORM ($UNAME_S $UNAME_R)"
   echo "- Script: \`skills/scripts/refresh-tool-index.sh\`"
   echo "- Note: This script detects tools only. It does not install tools."
+  echo '- Honesty: available=yes requires a successful version/runtime probe when defined (macOS /usr/bin/java stubs count as no). MCP tools (jshookmcp) require client registration, not merely npx on PATH.' 
   echo ""
   echo "| Tool | Skill | Purpose | Available | Path | Version | Source | Install hint |"
   echo "|---|---|---|---|---|---|---|---|"
@@ -179,10 +264,73 @@ for entry in "${TOOLS[@]}"; do
     done
   fi
 
+  # --- MCP honesty: jshookmcp is not available merely because npx exists ---
+  if [[ "$name" == "jshookmcp" ]]; then
+    npx_path=""
+    if has_cmd npx; then
+      npx_path="$(cmd_path npx)"
+    fi
+    if mcp_server_registered "jshook"; then
+      available="yes"
+      path="${npx_path:-mcp-config}"
+      source="mcp-registered"
+      version="MCP server registered (jshook); launch via npx -y @jshookmcp/jshook"
+    else
+      available="no"
+      if [[ -n "$npx_path" ]]; then
+        path="$npx_path"
+        source="npx-only"
+        version="npx present; MCP server NOT registered/enabled"
+      else
+        path="—"
+        source="missing"
+        version="npx missing; MCP server not registered"
+      fi
+    fi
+    version_spec="none"
+  fi
+
+  VERSION_OUT=""
+  VERSION_EC=0
   if [[ "$version_spec" != "none" ]]; then
     read -r ver_cmd ver_arg1 ver_arg2 <<< "$version_spec"
-    if has_cmd "$ver_cmd"; then
-      version="$(run_version "$ver_cmd" ${ver_arg1:-} ${ver_arg2:-})"
+    # Prefer the resolved path when it is an executable path probe.
+    if [[ "$source" == "path-probe" && -n "$path" && -x "$path" ]]; then
+      run_version_capture "$path" ${ver_arg1:-} ${ver_arg2:-}
+    elif has_cmd "$ver_cmd" || [[ -x "$ver_cmd" ]]; then
+      run_version_capture "$ver_cmd" ${ver_arg1:-} ${ver_arg2:-}
+    fi
+    version="$VERSION_OUT"
+  fi
+
+  # Honesty gate: path-on-PATH is not enough if version/runtime probe fails.
+  # Classic case: macOS /usr/bin/java stub without JDK.
+  if [[ "$available" == "yes" && "$version_spec" != "none" ]]; then
+    if version_is_broken "$version" "$VERSION_EC"; then
+      available="no"
+      if [[ "$source" == "command" || "$source" == "path-probe" ]]; then
+        source="${source}-broken"
+      else
+        source="broken"
+      fi
+      # Keep path + broken version text so agents can see *why* it is not usable.
+    elif [[ "$VERSION_EC" != "0" && -n "$version" ]]; then
+      # Some tools print version on stderr and still exit non-zero rarely;
+      # only demote when the text itself looks broken (handled above) OR
+      # exit non-zero AND text is empty (handled in version_is_broken).
+      # java -version exits 0 when real JDK works; stub exits 1 with error text.
+      :
+    fi
+  fi
+
+  # Extra honesty: if we claimed available but required version probe never ran
+  # and command is a known stub-prone runtime, demote on non-zero bare exec.
+  if [[ "$available" == "yes" && "$version_spec" == "none" && "$name" == "java" ]]; then
+    run_version_capture java -version
+    version="$VERSION_OUT"
+    if version_is_broken "$version" "$VERSION_EC"; then
+      available="no"
+      source="command-broken"
     fi
   fi
 

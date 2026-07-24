@@ -1,0 +1,4 @@
+PRIMARY -> skills/js-reverse/SKILL.md
+Label: JS / frontend reverse | confidence: high
+Wrote /tmp/luban-inspect/reverse-skill/examples/primary-path-demo/routes/js/route-scope.md
+ACTION: Open PRIMARY SKILL.md now and execute ACTION REQUIRED.

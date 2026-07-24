@@ -1,0 +1,4 @@
+PRIMARY -> skills/apk-reverse/SKILL.md
+Label: APK reverse | confidence: high
+Wrote /tmp/luban-inspect/reverse-skill/examples/primary-path-demo/routes/offline/route-scope.md
+ACTION: Open PRIMARY SKILL.md now and execute ACTION REQUIRED.

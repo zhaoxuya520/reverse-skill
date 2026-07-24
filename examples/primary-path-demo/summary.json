@@ -1,0 +1,8 @@
+{
+  "generated_at": "2026-07-24T20:28:18+0800",
+  "route_failures": 0,
+  "case_guard_exit": 0,
+  "samples": 5,
+  "case": "demo-offline-apk",
+  "ok": true
+}

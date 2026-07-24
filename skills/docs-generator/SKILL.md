@@ -1,10 +1,13 @@
 ---
 name: docs-generator
+maturity: extended
 description: |
   Creates task-oriented technical documentation with progressive disclosure. Use when writing READMEs, API docs, architecture docs, or markdown documentation.
   Also use this skill at the END of any completed reverse engineering, penetration testing, CTF, or security analysis task to generate a formal report in the user's project directory.
   Trigger keywords: 写报告, 写文档, 出报告, writeup, 技术文档, report, documentation.
 ---
+
+> **Maturity: `extended`** · usable playbook · see [`../references/skill-maturity.md`](../references/skill-maturity.md). Expect more manual tool work than **core** skills.
 
 # Technical Documentation
 

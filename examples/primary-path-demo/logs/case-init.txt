@@ -1,0 +1,4 @@
+CASE -> /tmp/luban-inspect/reverse-skill/work/demo-offline-apk
+PRIMARY skill: skills/apk-reverse/SKILL.md (R1)
+auth.status=granted network_profile=offline ready_for_act=true
+NEXT: open PRIMARY SKILL.md and ACT within scope

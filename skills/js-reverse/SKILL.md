@@ -1,7 +1,10 @@
 ---
 name: js-reverse
+maturity: core
 description: 在使用 js-reverse-mcp 做前端 JavaScript 逆向时使用，适用于签名链路定位、页面观察取证、运行时采样、本地补环境复现与证据化输出。优先适配当前环境里的 js-reverse_* 工具，需要更强的浏览器/CDP/Hook 面时联动 jshookmcp。
 ---
+
+> **Maturity: `core`** · production-depth entry · see [`../references/skill-maturity.md`](../references/skill-maturity.md).
 
 # MCP 前端 JS 逆向作业规范
 
@@ -32,6 +35,8 @@ description: 在使用 js-reverse-mcp 做前端 JavaScript 逆向时使用，适
 如果当前任务明确提到 `jshookmcp`、`JS hook`、`CDP`、浏览器断点、网络拦截、SourceMap 或 AST 去混淆，也仍然走本 skill；只是把底层 MCP 面切到 `jshookmcp`，而不是把它当成一个新的总入口。
 
 前提条件：`jshookmcp` 不是本地裸命令工具，而是一个要先下载/注册/启用的 MCP server。只有在 Claude MCP 配置里接入并启用后，相关工具面才真的可调用。
+
+> **Index honesty:** `skills/tool-index.md` marks `jshookmcp` **available=yes only when the MCP server is registered** in the client config. `npx` on PATH alone is `available=no` / source `npx-only` — do not treat that as a working hook surface.
 
 常用映射：
 

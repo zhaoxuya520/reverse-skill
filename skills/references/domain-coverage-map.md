@@ -1,7 +1,16 @@
 # 本包领域覆盖图（深度优先）
 
 > 对照社区「几百个微 skill」：我们用 **少量深 skill + 路由 + ops** 覆盖主战场。  
-> 日期：2026-07-18
+> 日期：2026-07-18 · 成熟度表：[`skill-maturity.md`](skill-maturity.md)
+
+
+## 成熟度（深度诚实）
+
+完整表见 [`skill-maturity.md`](skill-maturity.md)。摘要：
+
+- **core** — 深 skill / 有脚本或多文件（如 `apk-reverse`、`pentest-tools`、`attack-chain`）
+- **extended** — 可用 playbook（如 `ghidra-reverse`、`windows-ad`、`docs-generator`）
+- **experimental** — 脚手架，路由仍可命中，但 ACT 前须点明成熟度（如 `radio-sdr`、`email-security`）
 
 ## 域 → 本包入口
 
