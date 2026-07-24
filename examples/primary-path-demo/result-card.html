@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>reverse-skill PRIMARY path result card</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif; margin: 0; padding: 32px; background: #0b1220; color: #e8eefc; }
+  .card { max-width: 820px; margin: 0 auto; border: 1px solid #243047; border-radius: 12px; background: linear-gradient(180deg,#121a2b,#0d1422); box-shadow: 0 20px 60px rgba(0,0,0,.35); overflow: hidden; }
+  header { padding: 28px 28px 12px; border-bottom: 1px solid #243047; }
+  header h1 { margin: 0 0 8px; font-size: 22px; letter-spacing: .2px; }
+  header p { margin: 0; color: #9db0d0; font-size: 14px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 20px 28px; }
+  .metric { background: #172033; border: 1px solid #2a3a58; border-radius: 10px; padding: 14px 16px; }
+  .metric .k { color: #8fa3c4; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+  .metric .v { margin-top: 6px; font-size: 20px; font-weight: 700; }
+  .ok { color: #5ddea8; }
+  table { width: calc(100% - 56px); margin: 0 28px 24px; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #243047; vertical-align: top; }
+  th { color: #8fa3c4; font-weight: 600; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; color: #c9dbff; }
+  footer { padding: 0 28px 24px; color: #7f92b3; font-size: 12px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <header>
+      <h1>reverse-skill · PRIMARY Path</h1>
+      <p>One sentence in → correct skill + ready case directory out · 2026-07-24T20:28:18+0800</p>
+    </header>
+    <div class="grid">
+      <div class="metric"><div class="k">Route samples</div><div class="v">5</div></div>
+      <div class="metric"><div class="k">Self-check fails</div><div class="v ok">0</div></div>
+      <div class="metric"><div class="k">Offline case-guard</div><div class="v ok">exit 0</div></div>
+      <div class="metric"><div class="k">Preset</div><div class="v">offline-sample</div></div>
+    </div>
+    <table>
+      <thead><tr><th>Sample</th><th>PRIMARY</th><th>Match</th></tr></thead>
+      <tbody>
+        <tr><td><code>apk</code><br/><span style="color:#8fa3c4">analyze this APK for certificate pinning with jadx</span></td><td><strong>R1</strong><br/>APK reverse</td><td class="ok">OK</td></tr>
+        <tr><td><code>js</code><br/><span style="color:#8fa3c4">frontend js reverse encrypted request signature webpack</span></td><td><strong>R3</strong><br/>JS / frontend reverse</td><td class="ok">OK</td></tr>
+        <tr><td><code>llm</code><br/><span style="color:#8fa3c4">llm prompt injection jailbreak garak agent security</span></td><td><strong>R14</strong><br/>LLM / Agent security</td><td class="ok">OK</td></tr>
+        <tr><td><code>r2</code><br/><span style="color:#8fa3c4">radare2 quick triage of unknown ELF</span></td><td><strong>R7</strong><br/>radare2</td><td class="ok">OK</td></tr>
+        <tr><td><code>offline</code><br/><span style="color:#8fa3c4">local offline apk static reverse sample</span></td><td><strong>R1</strong><br/>APK reverse</td><td class="ok">OK</td></tr>
+      </tbody>
+    </table>
+    <footer>
+      Reproduce: <code>bash skills/scripts/demo-primary-path.sh</code> · artifacts under <code>examples/primary-path-demo/</code><br/>
+      This card is a real script output, not a mock layout.
+    </footer>
+  </div>
+</body>
+</html>

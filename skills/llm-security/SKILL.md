@@ -1,7 +1,11 @@
 ---
 name: llm-security
+maturity: core
 description: Use for authorized security assessment of LLM applications and AI agents, including prompt injection, tool abuse, RAG exposure, memory poisoning, and model supply-chain risks.
 ---
+
+> **Maturity: `core`** · production-depth entry · see [`../references/skill-maturity.md`](../references/skill-maturity.md).
+
 # LLM / AI 安全测试
 
 ## ACTION REQUIRED（读完后立刻执行）

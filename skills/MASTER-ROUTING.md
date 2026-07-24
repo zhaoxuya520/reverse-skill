@@ -103,3 +103,18 @@ RULES.md → MASTER-ROUTING.md → PRIMARY SKILL.md
   → (可选) routing.md 三轴 / field-journal
   → tool-index.md → bootstrap → ACT
 ```
+
+> **Cross-platform:** Windows → `scripts/master-route.ps1`; Linux/macOS/Kali → `scripts/master-route.sh`. Same for `case-init` / `case-guard` / `smoke` / `verify-routing-coherence`.
+
+## Skill maturity
+
+Not every routed module is equally deep. See [`references/skill-maturity.md`](references/skill-maturity.md):
+
+| Level | Meaning |
+|-------|---------|
+| **core** | Production-depth PRIMARY candidates |
+| **extended** | Usable playbooks; more manual work |
+| **experimental** | Scaffold — announce maturity before ACT; prefer deeper siblings when overlapping |
+
+Routing still returns experimental skills when keywords match. Maturity is honesty, not deletion.
+

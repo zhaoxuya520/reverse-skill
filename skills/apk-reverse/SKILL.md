@@ -1,7 +1,10 @@
 ---
 name: apk-reverse
+maturity: core
 description: 在 CLI 环境下做 Android APK 逆向时使用。适用于 APK 解包、Java 反编译、smali 修改、重打包、Frida 动态 Hook，以及按需切换到 so/native 分析。优先使用本机已安装的 jadx、apktool、frida、adb、ida-reverse、radare2。
 ---
+
+> **Maturity: `core`** · production-depth entry · see [`../references/skill-maturity.md`](../references/skill-maturity.md).
 
 ## ACTION REQUIRED（读完后立刻执行）
 

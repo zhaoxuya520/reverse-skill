@@ -1,7 +1,10 @@
 ---
 name: protocol-reverse
+maturity: extended
 description: Use for authorized reverse engineering of custom binary protocols, Protobuf/gRPC, WebSocket frames, and PCAP-driven protocol recovery.
 ---
+
+> **Maturity: `extended`** · usable playbook · see [`../references/skill-maturity.md`](../references/skill-maturity.md). Expect more manual tool work than **core** skills.
 
 # Protocol Reverse Engineering
 

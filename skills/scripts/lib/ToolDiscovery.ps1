@@ -986,20 +986,72 @@ function Get-ReverseToolReport {
     foreach ($name in $selectedNames) {
         $spec = Resolve-ReverseToolSpec -Name $name
         $capabilityState = Get-ReverseCapabilityState -Name $name
+        $versionText = Get-ReverseToolVersion -Spec $spec
+        $availableHonest = [bool]$spec.Available
+        $sourceHonest = $spec.Source
+        # Honesty: path/command presence is not enough when version/runtime probe fails
+        # (classic: macOS /usr/bin/java stub without a JDK).
+        if ($availableHonest -and -not [string]::IsNullOrWhiteSpace([string]$versionText)) {
+            if ($versionText -match '(?i)unable to locate|no java runtime|not found|command not found|no such file|could not find|cannot find|not installed') {
+                $availableHonest = $false
+                $sourceHonest = 'BrokenRuntime'
+            }
+        }
+        # Honesty: jshookmcp requires MCP client registration, not merely npx on PATH.
+        if ($name -eq 'jshookmcp') {
+            $registered = $false
+            try {
+                $cap = Get-ReverseCapabilityState -Name 'jshookmcp'
+                if ($null -ne $cap -and $cap.PSObject.Properties['Registered'] -and [bool]$cap.Registered) {
+                    $registered = $true
+                }
+            } catch { $registered = $false }
+            if (-not $registered) {
+                # also probe mcp.json keys directly
+                $mcpPaths = @()
+                if ($env:CLAUDE_MCP_CONFIG) { $mcpPaths += $env:CLAUDE_MCP_CONFIG }
+                $mcpPaths += (Join-Path $HOME '.claude/mcp.json')
+                $mcpPaths += (Join-Path $HOME '.config/claude/mcp.json')
+                foreach ($mp in $mcpPaths) {
+                    if (-not (Test-Path -LiteralPath $mp)) { continue }
+                    try {
+                        $raw = Get-Content -LiteralPath $mp -Raw -Encoding UTF8
+                        if ($raw -match '(?i)jshook') { $registered = $true; break }
+                    } catch {}
+                }
+            }
+            if ($registered) {
+                $availableHonest = $true
+                $sourceHonest = 'McpRegistered'
+                if ([string]::IsNullOrWhiteSpace([string]$versionText)) {
+                    $versionText = 'MCP server registered (jshook)'
+                }
+            } else {
+                $availableHonest = $false
+                $sourceHonest = 'NpxOnlyOrMissing'
+                $npx = Get-Command npx -ErrorAction SilentlyContinue
+                if ($npx) {
+                    $versionText = 'npx present; MCP server NOT registered/enabled'
+                    if (-not $spec.ResolvedPath) { $spec | Add-Member -NotePropertyName ResolvedPath -NotePropertyValue $npx.Source -Force }
+                } else {
+                    $versionText = 'npx missing; MCP server not registered'
+                }
+            }
+        }
         [pscustomobject]@{
             Name = $spec.Name
             Skill = $spec.Skill
             Purpose = $spec.Purpose
-            Available = $spec.Available
+            Available = $availableHonest
             IsExecutable = if ($spec.PSObject.Properties['IsExecutable']) { $spec.IsExecutable } else { -not [string]::IsNullOrWhiteSpace([string]$spec.Command) }
             IsDirectory = if ($spec.PSObject.Properties['IsDirectory']) { $spec.IsDirectory } else { $false }
             ResolvedPath = $spec.ResolvedPath
-            Source = $spec.Source
-            Version = Get-ReverseToolVersion -Spec $spec
+            Source = $sourceHonest
+            Version = $versionText
             BootstrapKind = if ($capabilityState) { $capabilityState.BootstrapKind } else { '' }
             CanAutoInstall = if ($capabilityState) { $capabilityState.CanAutoInstall } else { $false }
             DocsUrl = if ($capabilityState) { $capabilityState.DocsUrl } else { '' }
-            Ready = if ($capabilityState) { $capabilityState.Ready } else { $spec.Available }
+            Ready = if ($capabilityState) { $capabilityState.Ready } else { $availableHonest }
             McpRegistered = if ($capabilityState) { $capabilityState.Registered } else { $false }
             ServiceOnline = if ($capabilityState) { $capabilityState.ServiceOnline } else { $false }
             McpHttpVerified = if ($capabilityState) { $capabilityState.McpHttpVerified } else { $false }

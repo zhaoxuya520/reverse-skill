@@ -10,10 +10,10 @@ description: Routes reverse engineering, exploitation, penetration testing, malw
 
 读完本文件后，不允许只回复“已读/已理解”。必须按顺序执行：
 
-1. `NOW`：读 `MASTER-ROUTING.md`（或跑 `scripts/master-route.ps1 -Hint "..."`）定 PRIMARY；疑难再读 `routing.md` 三轴表。
-2. `NOW`：`scripts/case-init.ps1` 落地 `work/<case>/scope.md`（契约见 `ops/scope-contract.md`）；**auth 未 granted 禁止对目标 ACT**。
+1. `NOW`：读 `MASTER-ROUTING.md`（或跑 `scripts/master-route.ps1 -Hint "..."` / `scripts/master-route.sh --hint "..."`）定 PRIMARY；疑难再读 `routing.md` 三轴表。
+2. `NOW`：`scripts/case-init.ps1` / `scripts/case-init.sh` 落地 `work/<case>/scope.md`（契约见 `ops/scope-contract.md`）；**auth 未 granted 禁止对目标 ACT**。
 3. `NOW`：按 `ops/role-map.md` 标 lead/specialist；立即打开 PRIMARY `SKILL.md` 执行 ACTION REQUIRED。
-4. `NEXT`：涉及本机工具时读 `tool-index.md`；**禁止猜路径**；缺工具 → `bootstrap-reverse.ps1`（仅 manifest）。
+4. `NEXT`：涉及本机工具时读 `tool-index.md`；**禁止猜路径**；缺工具 → `bootstrap-reverse.ps1` / `bootstrap-reverse.sh`（仅 manifest）。
 5. `ACT`：执行并 **追加 timeline / 更新 workitems**；结论用 Evidence→Finding→Path（`ops/evidence-finding-path.md`）。
 6. 结束：`docs-generator` 报告 + 脱敏 `field-journal`；阶段菜单 3–6 项。
 
@@ -28,6 +28,9 @@ description: Routes reverse engineering, exploitation, penetration testing, malw
 - `SHOULD`：原则上要做，不做必须说明原因。
 - `MAY`：可选动作。
 ## 当前模块
+
+> 深度不均：见 [`references/skill-maturity.md`](references/skill-maturity.md)。**experimental** 为脚手架，命中后须向用户点明成熟度；优先深 skill。
+
 
 | 模块 | 目录 | 适用场景 |
 |------|------|---------|
@@ -55,6 +58,7 @@ description: Routes reverse engineering, exploitation, penetration testing, malw
 | **恶意软件分析** | `malware-analysis/` | 样本分析六阶段、YARA/Sigma、反分析检测、沙箱编排 |
 | **DSL 虚拟机逆向** | `reverse-engineering/dsl-vm-reverse/` | JS 自定义指令集 VM（IIFE + switch-case opcode）；风控/验证码引擎等 |
 | **作战契约 ops** | `ops/` | Scope / 证据链 / 角色 / 时间线 / 身份 / skill 供应链安全 |
+| **Skill 成熟度** | `references/skill-maturity.md` | core / extended / experimental — 薄 skill 诚实标注 |
 | **社区 skill 对照** | `references/community-security-skills.md` | 外部安全 skill 索引与借鉴规则（禁止盲装） |
 | **Skill 供应链** | `ops/skill-supply-chain.md` | 外部 skill/MCP 安装门闩（AST10 精简） |
 | **RE 阶段门闩** | `reverse-engineering/references/re-agent-workflow.md` | triage→static→dynamic→synthesis |

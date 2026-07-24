@@ -1,7 +1,10 @@
 ---
 name: digital-forensics
+maturity: experimental
 description: Use for authorized digital forensics including memory dumps, disk timelines, PCAP investigation, artifact triage, and IR evidence preservation.
 ---
+
+> **Maturity: `experimental`** · scaffold playbook · see [`../references/skill-maturity.md`](../references/skill-maturity.md). Prefer deeper sibling skills when they overlap; extend `references/` before relying on this in production engagements.
 
 # Digital Forensics & IR Artifacts
 

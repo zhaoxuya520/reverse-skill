@@ -1,0 +1,4 @@
+PRIMARY -> skills/radare2/SKILL.md
+Label: radare2 | confidence: high
+Wrote /tmp/luban-inspect/reverse-skill/examples/primary-path-demo/routes/r2/route-scope.md
+ACTION: Open PRIMARY SKILL.md now and execute ACTION REQUIRED.

@@ -1,7 +1,10 @@
 ---
 name: database-security
+maturity: experimental
 description: Use for authorized database security assessment covering PostgreSQL/MySQL/MSSQL/Mongo/Redis exposure, authz, UDF/command paths, and misconfiguration review.
 ---
+
+> **Maturity: `experimental`** · scaffold playbook · see [`../references/skill-maturity.md`](../references/skill-maturity.md). Prefer deeper sibling skills when they overlap; extend `references/` before relying on this in production engagements.
 
 # Database Security Assessment
 

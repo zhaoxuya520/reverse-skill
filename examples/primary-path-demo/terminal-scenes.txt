@@ -1,0 +1,35 @@
+$ bash skills/scripts/demo-primary-path.sh
+# one sentence in → PRIMARY skill + ready case out
+---
+
+---
+=== reverse-skill PRIMARY path demo ===
+out: /tmp/luban-inspect/reverse-skill/examples/primary-path-demo/recording/live-demo
+[route] apk -> R1 (expect R1) OK
+---
+[route] js -> R3 (expect R3) OK
+---
+[route] llm -> R14 (expect R14) OK
+---
+[route] r2 -> R7 (expect R7) OK
+---
+[route] offline -> R1 (expect R1) OK
+---
+CASE -> /tmp/luban-inspect/reverse-skill/work/demo-offline-apk
+PRIMARY skill: skills/apk-reverse/SKILL.md (R1)
+auth.status=granted network_profile=offline ready_for_act=true
+---
+NEXT: open PRIMARY SKILL.md and ACT within scope
+CASE-GUARD OK: /tmp/luban-inspect/reverse-skill/work/demo-offline-apk
+---
+{"generated_at": "2026-07-24T20:38:10+0800", "route_failures": 0, "case_guard_exit": 0, "samples": 5, "case": "demo-offline-apk", "ok": true}
+DEMO OK → /tmp/luban-inspect/reverse-skill/examples/primary-path-demo/recording/live-demo
+---
+DEMO OK → /tmp/luban-inspect/reverse-skill/examples/primary-path-demo/recording/live-demo
+---
+# route-matrix (live)
+| `apk` | analyze this APK for certificate pinning with jadx | **R1** | APK reverse | high | OK |
+| `js` | frontend js reverse encrypted request signature webpack | **R3** | JS / frontend reverse | high | OK |
+| `llm` | llm prompt injection jailbreak garak agent security | **R14** | LLM / Agent security | high | OK |
+| `r2` | radare2 quick triage of unknown ELF | **R7** | radare2 | high | OK |
+| `offline` | local offline apk static reverse sample | **R1** | APK reverse | high | OK |

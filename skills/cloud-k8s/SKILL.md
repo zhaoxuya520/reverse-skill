@@ -1,7 +1,10 @@
 ---
 name: cloud-k8s
+maturity: extended
 description: Use for authorized cloud, container, and Kubernetes security assessment including metadata SSRF, IAM misconfig, container escape paths, and cluster RBAC review.
 ---
+
+> **Maturity: `extended`** · usable playbook · see [`../references/skill-maturity.md`](../references/skill-maturity.md). Expect more manual tool work than **core** skills.
 
 # Cloud / Container / Kubernetes Security
 

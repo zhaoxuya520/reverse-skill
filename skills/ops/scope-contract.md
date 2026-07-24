@@ -11,6 +11,15 @@ powershell -NoProfile -ExecutionPolicy Bypass -File skills\scripts\case-init.ps1
 # 产出：work/<case>/scope.md 等
 ```
 
+```bash
+# Linux / macOS / Kali
+bash skills/scripts/case-init.sh --hint "<任务一句话>" --case-name my-case
+
+# 合法本地样本 / 公开 CTF：用 preset，避免 auth 卡死静态分析
+bash skills/scripts/case-init.sh --hint "apk reverse" --preset offline-sample --sample ./app.apk
+bash skills/scripts/case-init.sh --hint "ctf web" --preset ctf-public --target-url https://chal.example
+```
+
 ## scope.md 完整模板
 
 ```markdown

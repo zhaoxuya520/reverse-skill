@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "reverse-skill",
+  "owner": {
+    "name": "zhaoxuya520",
+    "email": "24781737@qq.com",
+    "url": "https://github.com/zhaoxuya520"
+  },
+  "metadata": {
+    "description": "Authorized reverse-engineering / pentest Skill router pack: PRIMARY route first, then scope gate, then tools.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "reverse-skill",
+      "source": "./",
+      "description": "Cybersecurity Skills Router — routes authorized reverse engineering, mobile/APK, JS, binary, CTF, and pentest tasks to the right PRIMARY skill, with scope/auth gate, tool-index bootstrap, and field-journal. Not a pile of 800 micro-skills: one router pack with domain specialists.",
+      "version": "1.0.0",
+      "author": {
+        "name": "zhaoxuya520",
+        "email": "24781737@qq.com",
+        "url": "https://github.com/zhaoxuya520"
+      },
+      "homepage": "https://github.com/zhaoxuya520/reverse-skill",
+      "repository": "https://github.com/zhaoxuya520/reverse-skill",
+      "license": "MIT",
+      "category": "security",
+      "tags": [
+        "security",
+        "reverse-engineering",
+        "apk",
+        "pentest",
+        "ctf",
+        "malware",
+        "router",
+        "authorized-only"
+      ],
+      "keywords": [
+        "reverse-skill",
+        "skill-router",
+        "apk-reverse",
+        "js-reverse",
+        "ida",
+        "radare2",
+        "authorized-pentest"
+      ]
+    }
+  ]
+}

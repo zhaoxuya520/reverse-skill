@@ -4,6 +4,22 @@
 
 ---
 
+
+## 安装通道（维护者须知）
+
+对外安装有两条公开通道，改入口时两边一起核对：
+
+1. **Agent skill 一行安装**：`npx skills add zhaoxuya520/reverse-skill`（[skills.sh](https://skills.sh/zhaoxuya520/reverse-skill) 徽章在 README 首屏）
+2. **Claude Code plugin marketplace**：根目录 [`.claude-plugin/marketplace.json`](../.claude-plugin/marketplace.json) — 路由器包单入口，勿吹成“成百上千微 skill”
+
+`npx skills add` 不等于完整工具链。脚本 / Kali / tool-index / 本地 case 仍以 **git clone** 为准；README 安装节必须同时写清这一点与“装完第一句话”。
+
+改 marketplace 或 README 安装段后跑：
+
+```bash
+bash skills/scripts/smoke.sh
+```
+
 ## 0. 服从性工程约束
 
 从本次版本开始，所有新建 skill 都必须自带“强执行骨架”，避免 AI 读完不执行：
@@ -651,3 +667,23 @@ AI 提议时应说明：
 - 与现有 skill 的关系（互补/替代/上下游）
 
 用户确认后，AI 按本文档流程执行新增。
+
+## Skill maturity (required for new modules)
+
+New domain skills **default to `experimental`** until they earn a promotion.
+
+| Level | Gate |
+|-------|------|
+| experimental | default for new dirs |
+| extended | meaningful references + lines ≥ ~90 or clear playbook |
+| core | scripts and/or multi-file depth (files ≥ 4 or lines ≥ 180) or proven field use |
+
+When adding a skill:
+
+1. Set `maturity:` in `SKILL.md` frontmatter and the maturity banner under it.
+2. Update `references/skill-maturity.md` counts/table.
+3. Prefer deepening an experimental skill over creating another thin directory.
+4. Do not advertise experimental skills as full automation.
+
+See `references/skill-maturity.md`.
+

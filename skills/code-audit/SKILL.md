@@ -1,7 +1,10 @@
 ---
 name: code-audit
+maturity: experimental
 description: Use for authorized source-code security review and SAST workflows including Semgrep, CodeQL patterns, dangerous API hunting, and fix verification.
 ---
+
+> **Maturity: `experimental`** · scaffold playbook · see [`../references/skill-maturity.md`](../references/skill-maturity.md). Prefer deeper sibling skills when they overlap; extend `references/` before relying on this in production engagements.
 
 # Source Code Security Audit
 

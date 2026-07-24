@@ -1,7 +1,11 @@
 ---
 name: attack-chain
+maturity: core
 description: Use for authorized multi-stage attack-path planning and orchestration when a task spans reconnaissance, initial access, privilege escalation, lateral movement, or impact assessment. Route single-stage tasks directly to their specialist skill.
 ---
+
+> **Maturity: `core`** · production-depth entry · see [`../references/skill-maturity.md`](../references/skill-maturity.md).
+
 # Attack Chain Orchestration Skill
 
 ## ACTION REQUIRED（读完后立刻执行）

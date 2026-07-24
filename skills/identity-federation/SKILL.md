@@ -1,7 +1,10 @@
 ---
 name: identity-federation
+maturity: experimental
 description: Use for authorized assessment of federated identity systems including SAML, OIDC, OAuth2 flows, SSO misconfiguration, and token confusion issues.
 ---
+
+> **Maturity: `experimental`** · scaffold playbook · see [`../references/skill-maturity.md`](../references/skill-maturity.md). Prefer deeper sibling skills when they overlap; extend `references/` before relying on this in production engagements.
 
 # Identity Federation (SAML / OIDC / OAuth)
 

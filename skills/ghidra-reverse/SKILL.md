@@ -1,7 +1,10 @@
 ---
 name: ghidra-reverse
+maturity: extended
 description: Use for free/open reverse engineering with Ghidra (headless or GUI), including decompile, cross-refs, and optional Ghidra MCP workflows when IDA is unavailable.
 ---
+
+> **Maturity: `extended`** · usable playbook · see [`../references/skill-maturity.md`](../references/skill-maturity.md). Expect more manual tool work than **core** skills.
 
 # Ghidra Reverse Engineering
 

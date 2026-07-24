@@ -1,7 +1,10 @@
 ---
 name: thick-client
+maturity: experimental
 description: Use for authorized security testing of desktop thick clients including local storage, update channels, IPC, traffic, and client-side trust boundaries.
 ---
+
+> **Maturity: `experimental`** · scaffold playbook · see [`../references/skill-maturity.md`](../references/skill-maturity.md). Prefer deeper sibling skills when they overlap; extend `references/` before relying on this in production engagements.
 
 # Thick Client Security Testing
 

@@ -1,7 +1,11 @@
 ---
 name: supply-chain-security
+maturity: extended
 description: Use for software supply-chain security assessment covering SBOM, SCA, CI/CD pipelines, container images, build integrity, dependency provenance, and vulnerability reachability.
 ---
+
+> **Maturity: `extended`** · usable playbook · see [`../references/skill-maturity.md`](../references/skill-maturity.md). Expect more manual tool work than **core** skills.
+
 # Supply Chain Security Testing
 
 ## ACTION REQUIRED（读完后立刻执行）

@@ -1,5 +1,6 @@
 ---
 name: reverse-engineering
+maturity: core
 description: Provides reverse engineering techniques. Use when the main job is to understand how a compiled, obfuscated, packed, or virtualized target works before exploiting or solving it, including binaries, APKs, WASM, firmware, custom VMs, bytecode, malware-like loaders, and anti-debug or anti-analysis logic. Do not use it when the vulnerability is already understood and the remaining task is exploitation; use pwn instead. Do not use it for pure web workflows, log or disk forensics, or standalone crypto problems unless reversing the implementation is the real blocker.
 license: MIT
 compatibility: Requires a filesystem-based code agent or CLI with shell access, Python 3, and internet access for tool installation.
@@ -7,6 +8,8 @@ allowed-tools: Bash Read Write Edit Glob Grep Task WebFetch WebSearch
 metadata:
   user-invocable: "false"
 ---
+
+> **Maturity: `core`** · production-depth entry · see [`../references/skill-maturity.md`](../references/skill-maturity.md).
 
 # Reverse Engineering
 

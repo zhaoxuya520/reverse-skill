@@ -1,7 +1,11 @@
 ---
 name: mobile-reverse
+maturity: core
 description: Use for authorized Android or iOS application reverse engineering and security testing, including APK or IPA analysis, runtime instrumentation, SSL pinning, and platform protection checks.
 ---
+
+> **Maturity: `core`** · production-depth entry · see [`../references/skill-maturity.md`](../references/skill-maturity.md).
+
 # Mobile Reverse Engineering
 
 ## ACTION REQUIRED（读完后立刻执行）

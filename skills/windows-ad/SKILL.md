@@ -1,7 +1,10 @@
 ---
 name: windows-ad
+maturity: extended
 description: Use for authorized Active Directory and Windows identity attacks including Kerberos, AD CS, BloodHound paths, NTLM relay, and domain privilege escalation research.
 ---
+
+> **Maturity: `extended`** · usable playbook · see [`../references/skill-maturity.md`](../references/skill-maturity.md). Expect more manual tool work than **core** skills.
 
 # Windows / Active Directory Security
 
