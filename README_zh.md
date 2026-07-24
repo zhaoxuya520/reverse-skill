@@ -117,6 +117,8 @@ bash skills/scripts/record-primary-path-demo.sh   # 重生成 GIF（Pillow；有
 
 ## 快速开始
 
+本轮打磨中文说明：[docs/LUBAN-POLISH-zh.md](docs/LUBAN-POLISH-zh.md)
+
 ### 前置依赖
 
 - **Java / JDK** — 运行 jadx、apktool
