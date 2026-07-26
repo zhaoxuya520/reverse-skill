@@ -13,6 +13,8 @@ function Check([bool] $Condition, [string] $Message) {
 
 Check ($text -match '(?m)^\s{2}validate:\s*$') 'validate job exists'
 Check ($text -match '(?m)^\s{2}merge:\s*$') 'merge job exists'
+Check ($text -match '(?m)^\s{2}pull_request_target:\s*$') 'trusted base workflow handles fork pull requests'
+Check ($text -notmatch '(?m)^\s{2}pull_request:\s*$') 'workflow does not run privileged logic from the PR merge ref'
 Check ($text -match '(?ms)validate:.*?contents:\s*read') 'validate has contents read'
 Check ($text -match '(?ms)validate:.*?pull-requests:\s*read') 'validate has pull-request read'
 Check ($text -match '(?ms)merge:.*?contents:\s*write') 'merge has contents write'
