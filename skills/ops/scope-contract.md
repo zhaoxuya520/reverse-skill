@@ -1,92 +1,109 @@
-# 通用 Scope 契约（任务启动硬门槛）
+# Scope 契约（执行硬门槛）
 
-> **MUST**：任何安全/逆向/渗透任务在 **ACT 之前** 在用户项目或 `work/<case>/` 落地 `scope.md`。  
-> 无 scope → 只允许读文档/路由，**禁止** 对目标主动扫描、Hook、利用。  
-> 模板可复制；字段名保持英文键，便于脚本校验。
+任何主动安全、逆向或网络操作都必须先通过当前用户提供的 `scope.json`。`scope.json` 是唯一事实源；`scope.md` 仅由 `case-init.ps1` 从 JSON 派生，不能通过手工编辑授权。
 
-## 如何初始化
+## 初始化
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File skills\scripts\case-init.ps1 -Hint "<任务一句话>" -CaseName "my-case"
-# 产出：work/<case>/scope.md 等
+# 默认产出 work/<case>/scope.json（draft）和兼容的 scope.md
+powershell -NoProfile -ExecutionPolicy Bypass -File skills\scripts\case-init.ps1 -ScopeFile .\approved-scope.json -CaseName "my-case"
+powershell -NoProfile -ExecutionPolicy Bypass -File skills\scripts\case-guard.ps1 -CaseRoot work\my-case
 ```
 
-## scope.md 完整模板
+旧的 `-AuthGranted`、`-AuthStatus`、`-ReadyForAct` 和 `case-guard.ps1 -Force` 参数仅为兼容调用方保留；它们不能创建授权、修改策略或绕过执行门。
 
-```markdown
-# Case Scope
+## scope.json 最小格式
 
-## meta
-- case_id: {YYYYMMDD-short}
-- created: {ISO-8601}
-- operator: {name or local}
-- primary_skill: {from master-route}
-- lead_role: lead   # see ops/role-map.md
-- specialist_roles: []  # e.g. cie, cpe, cre
+```json
+{
+  "schemaVersion": "1",
+  "scopeId": "approval-2026-001",
+  "status": "granted",
+  "approvalId": "ticket-123",
+  "issuedAt": "2026-07-19T00:00:00Z",
+  "expiresAt": "2026-07-20T00:00:00Z",
+  "targets": [
+    {
+      "type": "network",
+      "scheme": "https",
+      "host": "app.example.test",
+      "port": 443,
+      "pathPrefixes": ["/lab"]
+    }
+  ],
+  "allowedActions": ["passive.read", "request.send"],
+  "notes": "User-provided approval record"
+}
+```
 
-## auth
-- status: granted | pending | denied
-- basis: written_contract | bug_bounty_scope | ctf_public | own_system | lab_only
-- evidence_of_auth: {ticket/path or "CTF public" or "owner-operated"}
-- MUST NOT proceed if status != granted
+Schema: `skills/ops/scope.schema.json`.
 
-## in_scope
-- assets: []          # hosts, domains, APK paths, binaries, URLs
-- surfaces: []        # web, mobile, binary, network, api
-- activities: []      # recon, reverse, exploit_validate, report
+Rules:
+
+- `schemaVersion`, `scopeId`, `status`, `approvalId`, `issuedAt`, `expiresAt`, `targets`, and `allowedActions` are required.
+- A granted document requires a non-placeholder approval ID, at least one target, at least one action, and a future expiry.
+- Network targets match exact scheme, host, port, and path-prefix boundaries. `*`, `?`, blank hosts, and implicit wildcard domains are rejected.
+- Local file targets match one normalized exact path. Redirects and follow-up targets must be checked again; leaving the declared target is denied.
+- Missing, malformed, expired, denied, wildcard, or out-of-scope documents fail closed.
+
+## Capability policy
+
+The enforced policy labels operations with `readOnly`, `network`, `credentials`, `destructive`, `requiresScope`, and `requiresConfirmation`. Reserved fields are `filesystemRead`, `filesystemWrite`, `deviceControl`, and `sensitiveOutput`.
+
+`passive.read` is the default authenticated read-only capability. Requests, scans, replay, Intruder, WebSocket sends, cookie writes, configuration writes, project writes, and similar active operations require a valid scope, an exact target/action match, and explicit confirmation. Policy failures return `blocked` or `confirmation_required`; Markdown, journal text, and `-Force` cannot change the result.
 
 ## out_of_scope
-- assets: []
-- activities: []      # e.g. DoS, phishing real users, data exfil
 
-## network_profile
-- mode: offline | lab_only | authorized_target_only | unrestricted_lab
-- notes: |
-    offline = 无对外发包（纯静态/本地样本）
-    lab_only = 仅 lab/VM IP
-    authorized_target_only = 仅 in_scope 资产
-- MUST NOT use unrestricted against production without written auth
+- assets: []
+- activities: [dos, phishing_real_users, unrestricted_exfil]
 
 ## deliverables
+
 - report: true
 - field_journal: true
 - diagrams: true
 - timeline: true
 
-## constraints
-- timebox: {}
-- stealth: low | medium | high
-- data_handling: anonymize | no_user_pii
+## Derived scope.md compatibility view
+
+The generated Markdown retains the legacy sections and keys used by older tooling:
+
+```markdown
+## auth
+- status: granted | draft | denied | expired
+- source_of_truth: scope.json
+- scope_id: <scopeId>
+- approval_id: <approvalId>
+- scope.md is derived and cannot grant authorization
+
+## in_scope
+- assets: []
+
+## network_profile
+- mode: offline | lab_only | authorized_target_only | unrestricted_lab
 
 ## signoff
 - ready_for_act: false
-- checklist:
-  - [ ] auth.status = granted
-  - [ ] in_scope.assets non-empty OR offline sample path set
-  - [ ] network_profile.mode chosen
-  - [ ] out_of_scope reviewed
 ```
 
-## 路由挂钩（AI 必须执行）
+Consumers must read and validate `scope.json`; the compatibility view is informational only.
 
-```text
-RULES / MASTER-ROUTING / SKILL:
-  1) master-route → PRIMARY
-  2) case-init 或手写 scope.md
-  3) auth 未 granted → STOP，只允许补授权材料
-  4) ready_for_act = true → 打开 PRIMARY SKILL.md → ACT
-```
+## Routing hook
 
-## network_profile 速查
+1. Run `master-route.ps1` or read the primary route.
+2. Run `case-init.ps1` to create a draft or import a user-provided `scope.json`.
+3. Run `case-guard.ps1`; a non-zero result means stop active execution.
+4. Before every active MCP/script call, apply capability policy and exact target matching.
+5. Keep timeline/workitems and sanitized evidence under the case directory.
 
-| mode | 允许 | 禁止 |
-|------|------|------|
-| `offline` | 静态分析、本地文件、模拟 | 任意外连、公网 RPC |
-| `lab_only` | lab/CTF 靶机网段 | 生产/未授权 IP |
-| `authorized_target_only` | in_scope 列表 | 列表外资产 |
-| `unrestricted_lab` | 隔离实验网（书面） | 互联网生产 |
+## Network profile quick reference
 
-## 特色
+| mode | allowed | denied |
+|------|---------|--------|
+| `offline` | local files, static analysis, simulation | external network |
+| `lab_only` | explicitly declared lab/VM targets | production or undeclared IPs |
+| `authorized_target_only` | exact `scope.json` targets | everything outside the document |
+| `unrestricted_lab` | isolated lab with explicit approval | internet production |
 
-- 纯 Markdown，**无数据库**  
-- 与 `tool-index` / bootstrap 正交：scope 管「能不能打」，tool-index 管「用什么打」
+Journal, reports, and examples must not be used to expand this table or infer authorization.

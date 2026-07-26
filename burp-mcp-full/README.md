@@ -1,6 +1,51 @@
 # BurpSuite MCP Full Control Extension
 
-通过 MCP 协议完整控制 BurpSuite 的所有核心功能。跨平台支持 Windows / Linux (Kali) / macOS。
+通过 MCP 协议控制 BurpSuite 核心功能。跨平台支持 Windows / Linux (Kali) / macOS。
+
+> `1.1.0-rc.1` 起默认启用认证、精确 Scope、主动操作确认、严格隐私脱敏和真实调用审计。服务只监听 `127.0.0.1`，不能通过 MCP 关闭这些门控。
+
+## 安全前置配置
+
+启动 Burp 之前，至少设置 32 字符的 bearer token。主动操作还必须配置用户提供、未过期且精确匹配目标的 `scope.json`。
+
+```powershell
+$env:BURP_MCP_TOKEN = '<至少 32 字符的随机值>'
+$env:BURP_MCP_SCOPE_FILE = 'C:\path\to\scope.json'
+$env:BURP_MCP_ALLOWED_ORIGINS = 'http://localhost:3000,http://127.0.0.1:3000'
+$env:BURP_MCP_AUDIT_LOG = 'C:\path\to\burp-mcp-audit.jsonl'
+```
+
+也可用 JVM property `-Dburpmcp.token=...`。环境变量必须由启动 Burp 的进程继承；不要把真实 token 提交到仓库或共享配置。
+
+最小 Scope 模板：
+
+```json
+{
+  "schemaVersion": "1",
+  "scopeId": "scope-example",
+  "status": "granted",
+  "approvalId": "FILL_ME_WITH_USER_APPROVAL",
+  "issuedAt": "2026-07-26T00:00:00Z",
+  "expiresAt": "2026-07-27T00:00:00Z",
+  "targets": [{
+    "type": "network",
+    "scheme": "https",
+    "host": "app.example.invalid",
+    "port": 443,
+    "pathPrefixes": ["/api"]
+  }],
+  "allowedActions": ["passive.read", "request.send", "replay.send", "scan.active"]
+}
+```
+
+- 协议、主机、端口和路径前缀必须精确匹配；通配符、路径穿越和越界重定向默认拒绝。
+- `BURP_MCP_ALLOWED_ORIGINS` 是逗号分隔的精确 Origin allowlist；未设置时拒绝所有带 `Origin` 的浏览器请求。
+- 无 `Origin` 的请求只接受本机 loopback 原生 bridge。CORS 不返回通配符。
+- 被动只读工具仍要求 bearer token；发送、重放、Intruder、主动扫描、写配置、写 Cookie、WebSocket 发送等还要求 Scope 和确认。
+- 首次主动调用会在 Burp UI 展示工具、规范化目标和参数摘要。批准后签发五分钟、单次使用且绑定参数的一次性令牌；重放返回 `410`。
+- `privacyStrict` 始终开启，统一脱敏 `Authorization`、`Cookie`、`Set-Cookie`、查询密钥、请求体和日志。
+- `scope_gate` 与 `privacy_mode` 仅用于读取当前安全状态，不能改变门控。
+- 每次真实工具调用和拒绝原因写入 JSONL audit；默认路径为 `~/.burp-mcp/audit.jsonl`。
 
 ## 快速开始
 
@@ -43,7 +88,11 @@ Burp Suite → Extensions → Add → Java → 选择 build/libs/burp-mcp-full.j
   "mcpServers": {
     "burpsuite": {
       "command": "node",
-      "args": ["<本目录路径>/mcp-bridge.js"]
+      "args": ["<本目录路径>/mcp-bridge.js"],
+      "env": {
+        "BURP_MCP_TOKEN": "<通过客户端安全变量注入，不要提交真实值>",
+        "BURP_MCP_PORT": "9876"
+      }
     }
   }
 }
@@ -55,7 +104,7 @@ Burp Suite → Extensions → Add → Java → 选择 build/libs/burp-mcp-full.j
 
 ## 功能列表
 
-扩展暴露 63 个工具。常用分类如下（完整列表见 `src/main/java/com/burpmcp/McpHttpServer.java` 的 `getToolList()`，或访问 `GET http://127.0.0.1:9876/tools`）：
+扩展暴露 83 个工具。常用分类如下（完整列表见 `src/main/java/com/burpmcp/McpHttpServer.java` 的 `getToolList()`，或携带 bearer token 访问 `GET http://127.0.0.1:9876/tools`）：
 
 | 分类 | 工具 |
 |------|------|
@@ -107,6 +156,13 @@ Burp Suite → Extensions → Add → Java → 选择 build/libs/burp-mcp-full.j
 
 ## 调用示例
 
+以下 HTTP 调用都必须包含：
+
+```http
+Authorization: Bearer <BURP_MCP_TOKEN>
+Content-Type: application/json
+```
+
 ### 查看代理历史
 ```json
 POST http://127.0.0.1:9876
@@ -144,7 +200,7 @@ POST http://127.0.0.1:9876
 
 ## 端口配置
 
-默认监听 `127.0.0.1:9876`。如需更改（例如与 PortSwigger 官方 MCP 扩展同端口冲突）：
+默认且仅监听 `127.0.0.1:9876`。第一批安全版本不支持直接远程监听。如需更改端口（例如与 PortSwigger 官方 MCP 扩展冲突）：
 
 1. **Burp 侧**：启动 Burp 时传 JVM 参数 `-Dburp.mcp.port=9877`，或设环境变量 `BURP_MCP_PORT=9877`。
 2. **桥接侧**：MCP 客户端配置里设环境变量 `BURP_MCP_PORT=9877` 与 `BURP_MCP_HOST=127.0.0.1`。
@@ -155,8 +211,13 @@ POST http://127.0.0.1:9876
 
 | 现象 | 排查 |
 |------|------|
-| Burp Output 无 "[MCP] Server started" | 端口被占用或扩展加载失败，查 Burp Errors 面板 |
+| Burp Output 无 "[MCP] Server started" | 确认 token 至少 32 字符，再检查端口冲突与 Burp Errors 面板 |
 | MCP 客户端报 "Burp MCP not connected" | 确认 Burp 已运行且扩展已加载；确认两侧端口一致 |
+| HTTP 返回 `401` | bridge 与 Burp 必须使用相同的 `BURP_MCP_TOKEN` |
+| HTTP 返回 `403 blocked` | 检查 `scope.json` 状态、有效期、allowedActions 和精确目标 |
+| HTTP 返回 `409 confirmation_required` | 在 Burp UI 审阅并批准；标准 bridge 会携带一次性令牌重试 |
+| HTTP 返回 `410 gone` | 确认令牌已过期或已使用，重新发起主动调用 |
+| 浏览器请求被 CORS 拒绝 | 将精确 Origin 加入 `BURP_MCP_ALLOWED_ORIGINS`，不要使用 `*` |
 | 扫描返回 "requires Burp Professional" | 正常，Community 版不支持 Scanner API |
 | `remove_http_handler` / `remove_proxy_rule` 无效 | 确认之前 `register_*` 返回 success=true |
 

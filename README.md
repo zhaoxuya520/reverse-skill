@@ -8,7 +8,7 @@
 <p align="center"><em style="font-family: Georgia, serif; font-size: 1.2em; color: #777;">Navigate the dark waters, sail against the stream.</em></p>
 
 <p align="center">
-  <a href="https://github.com/zhaoxuya520/reverse-skill/releases/tag/v1.0.0"><img src="https://img.shields.io/badge/release-v1.0.0-blue" alt="release"></a>
+  <a href="VERSION"><img src="https://img.shields.io/badge/release-v1.1.0--rc.1-blue" alt="release"></a>
   <a href="https://github.com/zhaoxuya520/reverse-skill/stargazers"><img src="https://img.shields.io/github/stars/zhaoxuya520/reverse-skill?style=flat&logo=github" alt="stars"></a>
   <a href="https://github.com/zhaoxuya520/reverse-skill/forks"><img src="https://img.shields.io/github/forks/zhaoxuya520/reverse-skill?style=flat&logo=github" alt="forks"></a>
   <a href="https://github.com/zhaoxuya520/reverse-skill/issues"><img src="https://img.shields.io/github/issues/zhaoxuya520/reverse-skill?style=flat&logo=github" alt="issues"></a>
@@ -52,7 +52,7 @@ When an AI agent (Claude Code, Codex CLI, Cursor, etc.) encounters an APK, a bin
 User task
   → RULES.md
   → MASTER-ROUTING / master-route.ps1 (PRIMARY)
-  → case-init / scope.md (auth + network_profile; no target ACT until ready)
+  → case-init / scope.json (approval + expiry + exact targets; scope.md is derived)
   → Scenario skill → tools / MCP / scripts
   → timeline + Evidence→Finding→Path → report + field-journal
 ```

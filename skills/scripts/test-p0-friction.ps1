@@ -17,6 +17,27 @@ if ([string]::IsNullOrWhiteSpace($ScratchDir)) {
     $ScratchDir = Join-Path $env:TEMP ('rs-p0-test-' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
 }
 New-Item -ItemType Directory -Path $ScratchDir -Force | Out-Null
+$CasePackageRoot = $ScratchDir
+
+$scopeFixturePath = Join-Path $ScratchDir 'approved-scope.json'
+$scopeFixture = [ordered]@{
+    schemaVersion = '1'
+    scopeId = 'fixture-approved-scope'
+    status = 'granted'
+    approvalId = 'fixture-ticket-001'
+    issuedAt = (Get-Date).ToUniversalTime().AddMinutes(-1).ToString('o')
+    expiresAt = (Get-Date).ToUniversalTime().AddHours(1).ToString('o')
+    targets = @([ordered]@{
+        type = 'network'
+        scheme = 'https'
+        host = 'app.example.invalid'
+        port = 443
+        pathPrefixes = @('/')
+    })
+    allowedActions = @('passive.read', 'request.send', 'replay.send', 'scan.active')
+    notes = 'test fixture only'
+}
+$scopeFixture | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $scopeFixturePath -Encoding UTF8
 
 $fail = New-Object System.Collections.Generic.List[string]
 function Ok($m) { Write-Host "[OK] $m" -ForegroundColor Green }
@@ -36,38 +57,42 @@ $smokeText = Get-Content $smokeLog -Raw -Encoding UTF8
 if ($smokeText -match 'verify-routing-coherence|VERIFY_EXIT=0|ALL PASS') { Ok 'smoke log has verify/pass signal' } else { Bad 'smoke log missing verify/pass signal' }
 if ($smokeText -match 'route apk|parse master-route|parse case-init') { Ok 'smoke log has parse/route activity' } else { Bad 'smoke log missing parse/route activity' }
 
-# 2) case-init ready-to-act
+# 2) case-init imports only a valid user-provided scope.json
 $caseName = 'p0-ready-' + (Get-Date -Format 'HHmmss')
 $ciLog = Join-Path $ScratchDir 'case-init.log'
 $ci = Join-Path $scriptDir 'case-init.ps1'
 & powershell -NoProfile -ExecutionPolicy Bypass -File $ci `
     -Hint 'web pentest nmap nuclei' `
     -CaseName $caseName `
-    -PackageRoot $PackageRoot `
+    -PackageRoot $CasePackageRoot `
+    -ScopeFile $scopeFixturePath `
     -AuthGranted `
     -TargetUrl 'https://app.example.invalid/' `
     -NetworkProfile 'authorized_target_only' 2>&1 |
     Tee-Object -FilePath $ciLog | Out-Null
-$caseRoot = Join-Path $PackageRoot ("work\{0}" -f $caseName)
+$caseRoot = Join-Path $CasePackageRoot ("work\{0}" -f $caseName)
+$scopeJsonPath = Join-Path $caseRoot 'scope.json'
+if (Test-Path $scopeJsonPath) { Ok 'scope.json written' } else { Bad 'scope.json missing' }
 $scopePath = Join-Path $caseRoot 'scope.md'
 if (-not (Test-Path $scopePath)) { Bad "scope.md missing at $scopePath" }
 else {
     $scope = Get-Content $scopePath -Raw -Encoding UTF8
     $scope | Set-Content (Join-Path $ScratchDir 'scope.md') -Encoding UTF8
-    if ($scope -match 'status:\s*granted') { Ok 'scope auth granted' } else { Bad 'scope auth not granted' }
+    if ($scope -match 'status:\s*granted' -and $scope -match 'source_of_truth:\s*scope\.json') { Ok 'scope auth derived from scope.json' } else { Bad 'scope auth/source missing' }
     if ($scope -match 'app\.example\.invalid') { Ok 'scope in_scope has target' } else { Bad 'scope missing target asset' }
     if ($scope -match 'mode:\s*authorized_target_only') { Ok 'scope network authorized_target_only' } else { Bad 'scope network not authorized_target_only' }
     if ($scope -match 'ready_for_act:\s*true') { Ok 'scope ready_for_act true' } else { Bad 'scope ready_for_act not true' }
 }
 
-# 3) bare case-init still pending defaults
+# 3) bare case-init creates a draft and AuthGranted cannot self-grant
 $bareName = 'p0-bare-' + (Get-Date -Format 'HHmmss')
-& powershell -NoProfile -ExecutionPolicy Bypass -File $ci -CaseName $bareName -PackageRoot $PackageRoot 2>&1 | Out-Null
-$bareScope = Get-Content (Join-Path $PackageRoot ("work\{0}\scope.md" -f $bareName)) -Raw -Encoding UTF8
-if ($bareScope -match 'status:\s*pending' -and $bareScope -match 'ready_for_act:\s*false') {
-    Ok 'bare case-init still pending/offline defaults'
+& powershell -NoProfile -ExecutionPolicy Bypass -File $ci -CaseName $bareName -PackageRoot $CasePackageRoot -AuthGranted -TargetUrl 'https://app.example.invalid/' -NetworkProfile authorized_target_only 2>&1 | Out-Null
+$bareRoot = Join-Path $CasePackageRoot ("work\{0}" -f $bareName)
+$bareScope = Get-Content (Join-Path $bareRoot 'scope.md') -Raw -Encoding UTF8
+if ($bareScope -match 'status:\s*draft' -and $bareScope -match 'ready_for_act:\s*false' -and (Test-Path (Join-Path $bareRoot 'scope.json'))) {
+    Ok 'bare/AuthGranted case-init remains draft/offline'
 } else {
-    Bad 'bare case-init defaults changed unexpectedly'
+    Bad 'bare/AuthGranted case-init incorrectly granted'
 }
 
 # 4) append-evidence
@@ -130,53 +155,62 @@ foreach ($zc in $zhCases) {
     else { Bad ("zh route miss {0}: {1}" -f $zc.Expect, ($raw.Substring(0, [Math]::Min(120, $raw.Length)))) }
 }
 
-# 9) case-guard: ready case exits 0; bare pending exits 2
+# 9) case-guard: valid scope exits 0; draft and -Force remain blocked
 $cg = Join-Path $scriptDir 'case-guard.ps1'
 & powershell -NoProfile -ExecutionPolicy Bypass -File $cg -CaseRoot $caseRoot 2>&1 | Out-Null
 if ($LASTEXITCODE -eq 0) { Ok 'case-guard ready exit 0' } else { Bad "case-guard ready exit $LASTEXITCODE" }
-$bareRoot = Join-Path $PackageRoot ("work\{0}" -f $bareName)
 & powershell -NoProfile -ExecutionPolicy Bypass -File $cg -CaseRoot $bareRoot 2>&1 | Out-Null
 if ($LASTEXITCODE -eq 2) { Ok 'case-guard pending exit 2' } else { Bad "case-guard pending expected 2 got $LASTEXITCODE" }
 & powershell -NoProfile -ExecutionPolicy Bypass -File $cg -CaseRoot $bareRoot -Force 2>&1 | Out-Null
-if ($LASTEXITCODE -eq 0) { Ok 'case-guard -Force exit 0' } else { Bad "case-guard -Force exit $LASTEXITCODE" }
+if ($LASTEXITCODE -eq 2) { Ok 'case-guard -Force remains blocked' } else { Bad "case-guard -Force expected 2 got $LASTEXITCODE" }
 
-# 10) AuthGranted must not be clobbered by junk AuthStatus / multi-asset lab init
-$labName = 'p0-lab-' + (Get-Date -Format 'HHmmss')
-& powershell -NoProfile -ExecutionPolicy Bypass -File $ci `
-    -Hint 'gin juice lab pentest' `
-    -CaseName $labName `
-    -PackageRoot $PackageRoot `
-    -AuthGranted `
-    -AuthBasis 'public_training_lab' `
-    -EvidenceOfAuth 'PortSwigger intentionally vulnerable public site example' `
-    -TargetUrl 'https://ginandjuice.shop/' `
-    -NetworkProfile 'lab_only' `
-    -InScopeAssets @('https://ginandjuice.shop/', 'ginandjuice.shop') 2>&1 | Out-Null
-$labScopePath = Join-Path $PackageRoot ("work\{0}\scope.md" -f $labName)
-$labScope = Get-Content $labScopePath -Raw -Encoding UTF8
-$labScope | Set-Content (Join-Path $ScratchDir 'scope-lab.md') -Encoding UTF8
-if ($labScope -match 'status:\s*granted') { Ok 'lab AuthGranted stays granted' } else { Bad 'lab auth not granted (AuthStatus clobber?)' }
-if ($labScope -match 'ready_for_act:\s*true') { Ok 'lab ready_for_act true with lab_only' } else { Bad 'lab ready_for_act false' }
-if ($labScope -match 'mode:\s*lab_only') { Ok 'lab network lab_only' } else { Bad 'lab network wrong' }
-if ($labScope -match 'ginandjuice\.shop') { Ok 'lab in_scope has target' } else { Bad 'lab missing target asset' }
-
-# 10b) garbage AuthStatus must not override AuthGranted
-$junkName = 'p0-junk-' + (Get-Date -Format 'HHmmss')
-& powershell -NoProfile -ExecutionPolicy Bypass -File $ci `
-    -Hint 'web pentest lab' `
-    -CaseName $junkName `
-    -PackageRoot $PackageRoot `
-    -AuthGranted `
-    -AuthStatus 'demo.owasp-juice.shop' `
-    -TargetUrl 'https://example.invalid/' `
-    -NetworkProfile 'lab_only' 2>&1 | Tee-Object -FilePath (Join-Path $ScratchDir 'case-init-junk-auth.log') | Out-Null
-$junkScope = Get-Content (Join-Path $PackageRoot ("work\{0}\scope.md" -f $junkName)) -Raw -Encoding UTF8
-$junkScope | Set-Content (Join-Path $ScratchDir 'scope-junk-auth.md') -Encoding UTF8
-if ($junkScope -match 'status:\s*granted' -and $junkScope -notmatch 'status:\s*demo\.owasp') {
-    Ok 'junk AuthStatus ignored; remains granted'
-} else {
-    Bad 'junk AuthStatus clobbered granted'
+# 10) authorization and malformed-scope regression cases
+$scopeCases = @(
+    @{ Name = 'missing'; Content = $null; Expect = 'blocked' },
+    @{ Name = 'malformed'; Content = '{"schemaVersion":'; Expect = 'blocked' },
+    @{ Name = 'expired'; Content = (($scopeFixture | ConvertTo-Json -Depth 8) -replace '"expiresAt"\s*:\s*"[^"]+"', ('"expiresAt": "{0}"' -f (Get-Date).ToUniversalTime().AddMinutes(-1).ToString('o'))); Expect = 'blocked' },
+    @{ Name = 'missing-approval'; Content = (($scopeFixture | ConvertTo-Json -Depth 8) -replace '"approvalId"\s*:\s*"[^"]+"', '"approvalId": ""'); Expect = 'blocked' },
+    @{ Name = 'wildcard'; Content = (($scopeFixture | ConvertTo-Json -Depth 8) -replace 'app\.example\.invalid', '*.example.invalid'); Expect = 'blocked' },
+    @{ Name = 'path-wildcard'; Content = (($scopeFixture | ConvertTo-Json -Depth 8) -replace '"pathPrefixes"\s*:\s*\[\s*"/"\s*\]', '"pathPrefixes": ["/*"]'); Expect = 'blocked' }
+)
+foreach ($scopeCase in $scopeCases) {
+    $name = 'p0-scope-' + $scopeCase.Name + '-' + (Get-Date -Format 'HHmmssfff')
+    $input = $scopeFixturePath
+    if ($scopeCase.Name -eq 'missing') { $input = Join-Path $ScratchDir 'does-not-exist.json' }
+    elseif ($scopeCase.Content) {
+        $input = Join-Path $ScratchDir ($scopeCase.Name + '.json')
+        Set-Content -LiteralPath $input -Value $scopeCase.Content -Encoding UTF8
+    }
+    & powershell -NoProfile -ExecutionPolicy Bypass -File $ci -CaseName $name -PackageRoot $CasePackageRoot -ScopeFile $input -TargetUrl 'https://app.example.invalid/' -NetworkProfile authorized_target_only 2>&1 | Out-Null
+    $root = Join-Path $CasePackageRoot ("work\{0}" -f $name)
+    & powershell -NoProfile -ExecutionPolicy Bypass -File $cg -CaseRoot $root 2>&1 | Out-Null
+    if ($LASTEXITCODE -eq 2) { Ok ("scope {0} blocked" -f $scopeCase.Name) } else { Bad ("scope {0} expected blocked, got {1}" -f $scopeCase.Name, $LASTEXITCODE) }
 }
+
+$outOfScopeName = 'p0-out-of-scope-' + (Get-Date -Format 'HHmmssfff')
+& powershell -NoProfile -ExecutionPolicy Bypass -File $ci -CaseName $outOfScopeName -PackageRoot $CasePackageRoot -ScopeFile $scopeFixturePath -TargetUrl 'https://outside.example.invalid/' -NetworkProfile authorized_target_only 2>&1 | Out-Null
+$outOfScopeRoot = Join-Path $CasePackageRoot ("work\{0}" -f $outOfScopeName)
+$outOfScopeJson = Get-Content (Join-Path $outOfScopeRoot 'scope.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+if ($outOfScopeJson.targets[0].host -eq 'app.example.invalid') { Ok 'scope target comes from scope.json, not TargetUrl' } else { Bad 'TargetUrl changed imported scope' }
+. (Join-Path $scriptDir 'lib\ScopePolicy.ps1')
+$loadedScope = Import-ScopeDocument -Path $scopeFixturePath -RequireGranted
+if (-not (Test-ScopeTargetMatch -Scope $loadedScope -Target 'https://outside.example.invalid/' -Action 'request.send')) { Ok 'out-of-scope host rejected' } else { Bad 'out-of-scope host matched' }
+if (-not (Test-ScopeTargetMatch -Scope $loadedScope -Target 'http://app.example.invalid/' -Action 'request.send')) { Ok 'out-of-scope scheme rejected' } else { Bad 'out-of-scope scheme matched' }
+if (-not (Test-ScopeTargetMatch -Scope $loadedScope -Target 'https://app.example.invalid:8443/' -Action 'request.send')) { Ok 'out-of-scope port rejected' } else { Bad 'out-of-scope port matched' }
+$prefixScope = (($scopeFixture | ConvertTo-Json -Depth 8) | ConvertFrom-Json)
+$prefixScope.targets[0].pathPrefixes = @('/api')
+$prefixScopePath = Join-Path $ScratchDir 'path-prefix-scope.json'
+$prefixScope | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $prefixScopePath -Encoding UTF8
+$prefixLoadedScope = Import-ScopeDocument -Path $prefixScopePath -RequireGranted
+if (Test-ScopeTargetMatch -Scope $prefixLoadedScope -Target 'https://app.example.invalid/api/v1' -Action 'request.send') { Ok 'path prefix child accepted' } else { Bad 'path prefix child rejected' }
+if (-not (Test-ScopeTargetMatch -Scope $prefixLoadedScope -Target 'https://app.example.invalid/apix' -Action 'request.send')) { Ok 'path boundary rejects /apix' } else { Bad 'path boundary accepted /apix' }
+if (-not (Test-ScopeTargetMatch -Scope $prefixLoadedScope -Target 'https://app.example.invalid/api/%2e%2e/admin' -Action 'request.send')) { Ok 'encoded path traversal rejected' } else { Bad 'encoded path traversal matched' }
+if (-not (Test-ScopeRedirectChain -Scope $prefixLoadedScope -Targets @('https://app.example.invalid/api/start', 'https://outside.example.invalid/api/final') -Action 'request.send')) { Ok 'redirect chain rejects out-of-scope hop' } else { Bad 'redirect chain accepted out-of-scope hop' }
+. (Join-Path $scriptDir 'lib\CapabilityPolicy.ps1')
+$passivePolicy = Test-CapabilityPolicy -Capability 'passive.read' -Authenticated
+$activePolicy = Test-CapabilityPolicy -Capability 'network.request' -Authenticated -ScopeValid
+if ($passivePolicy.Status -eq 'allowed') { Ok 'passive.read allowed after authentication' } else { Bad 'passive.read policy blocked unexpectedly' }
+if ($activePolicy.Status -eq 'confirmation_required') { Ok 'active policy requires confirmation' } else { Bad 'active policy did not require confirmation' }
 
 # 11) append-evidence: special-char excerpt via -File + -RawExcerptFile (real nested CLI path)
 $ae2 = Join-Path $ScratchDir 'case-ev'
@@ -244,9 +278,9 @@ if (Test-Path $recon) {
 # 13) ReadyForAct alone must NOT mark ready without auth/assets
 $forceName = 'p0-forceonly-' + (Get-Date -Format 'HHmmss')
 & powershell -NoProfile -ExecutionPolicy Bypass -File $ci `
-    -CaseName $forceName -PackageRoot $PackageRoot -ReadyForAct 2>&1 | Out-Null
-$forceScope = Get-Content (Join-Path $PackageRoot ("work\{0}\scope.md" -f $forceName)) -Raw -Encoding UTF8
-if ($forceScope -match 'ready_for_act:\s*false' -and $forceScope -match 'status:\s*pending') {
+    -CaseName $forceName -PackageRoot $CasePackageRoot -ReadyForAct 2>&1 | Out-Null
+$forceScope = Get-Content (Join-Path $CasePackageRoot ("work\{0}\scope.md" -f $forceName)) -Raw -Encoding UTF8
+if ($forceScope -match 'ready_for_act:\s*false' -and $forceScope -match 'status:\s*draft') {
     Ok 'ReadyForAct alone does not bypass auth'
 } else {
     Bad 'ReadyForAct alone incorrectly set ready/granted'
@@ -274,6 +308,10 @@ Set-Content (Join-Path $ghostCase 'scope.md') $ghostScope -Encoding UTF8
 & powershell -NoProfile -ExecutionPolicy Bypass -File $cg -CaseRoot $ghostCase 2>&1 | Out-Null
 if ($LASTEXITCODE -eq 2) { Ok 'case-guard rejects empty assets despite ops_refs URLs' }
 else { Bad "case-guard should fail empty assets; exit=$LASTEXITCODE" }
+
+# 15) workflow PR-title injection regression
+& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $scriptDir 'test-workflow-security.ps1') 2>&1 | Out-Null
+if ($LASTEXITCODE -eq 0) { Ok 'workflow security regression checks' } else { Bad "workflow security checks exit $LASTEXITCODE" }
 
 # 13) copy smoke primary log alias for harness
 $smokeLogs = Join-Path $ScratchDir 'smoke-logs'

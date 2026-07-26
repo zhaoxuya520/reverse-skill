@@ -27,6 +27,8 @@ import burp.api.montoya.core.ByteArray;
 import burp.api.montoya.http.sessions.*;
 import burp.api.montoya.websocket.extension.ExtensionWebSocket;
 import java.time.ZonedDateTime;
+import java.nio.charset.StandardCharsets;
+import java.net.InetAddress;
 import java.net.URI;
 import java.util.*;
 import java.util.concurrent.*;
@@ -39,47 +41,192 @@ public class McpHttpServer extends NanoHTTPD {
     private CollaboratorClient collaborator;
     private volatile Audit activeAudit = null;
     private volatile Crawl activeCrawl = null;
+    private final BurpMcpSecurityConfig securityConfig;
+    private final PrivacyRedactor privacyRedactor;
+    private final ConfirmationProvider confirmationProvider;
+    private final BurpRequestPolicy requestPolicy;
+    private final AuditLogger auditLogger;
+    private final Semaphore activeOperationSlots = new Semaphore(BurpMcpSecurityConfig.MAX_ACTIVE_OPERATIONS);
+    private final ExecutorService dispatchExecutor = Executors.newFixedThreadPool(4, runnable -> {
+        Thread thread = new Thread(runnable, "burp-mcp-dispatch");
+        thread.setDaemon(true);
+        return thread;
+    });
 
     public McpHttpServer(MontoyaApi api, int port) {
+        this(api, port, BurpMcpSecurityConfig.load(port), ConfirmationProvider.swing());
+    }
+
+    McpHttpServer(MontoyaApi api, int port, BurpMcpSecurityConfig securityConfig, ConfirmationProvider confirmationProvider) {
         super("127.0.0.1", port);
         this.api = api;
+        this.securityConfig = securityConfig;
+        this.privacyRedactor = new PrivacyRedactor();
+        this.confirmationProvider = confirmationProvider;
+        this.requestPolicy = new BurpRequestPolicy(securityConfig, confirmationProvider, privacyRedactor);
+        this.auditLogger = new AuditLogger(securityConfig.auditLog(), privacyRedactor);
     }
 
     @Override
     public Response serve(IHTTPSession session) {
+        String origin = header(session, "Origin");
+        if (!hostAllowed(session)) return jsonResponse(Response.Status.BAD_REQUEST, error("blocked", "invalid local Host header"), origin);
+        if (origin != null && !securityConfig.isOriginAllowed(origin)) return jsonResponse(Response.Status.FORBIDDEN, error("blocked", "Origin is not allowlisted"), null);
+        if (origin == null && !loopback(session.getRemoteIpAddress())) return jsonResponse(Response.Status.FORBIDDEN, error("blocked", "non-local requests require an allowlisted Origin"), null);
         if (Method.OPTIONS.equals(session.getMethod())) {
-            Response resp = newFixedLengthResponse(Response.Status.OK, "text/plain", "");
-            addCorsHeaders(resp); return resp;
+            Response response = newFixedLengthResponse(Response.Status.OK, "text/plain", "");
+            addCorsHeaders(response, origin);
+            return response;
+        }
+        if (!securityConfig.isAuthorized(header(session, "Authorization"))) {
+            auditLogger.record("rejected", "", "", "authentication failed", "");
+            return jsonResponse(Response.Status.UNAUTHORIZED, error("unauthorized", "Bearer token required"), origin);
         }
         if (Method.GET.equals(session.getMethod()) && "/health".equals(session.getUri())) {
-            Response resp = newFixedLengthResponse(Response.Status.OK, "application/json",
-                    "{\"status\":\"ok\",\"version\":\"2.0.0\",\"tools\":" + getToolList() + "}");
-            addCorsHeaders(resp); return resp;
+            JsonObject health = new JsonObject();
+            health.addProperty("status", "ok");
+            health.addProperty("version", version());
+            health.add("tools", JsonParser.parseString(getToolList()));
+            return jsonResponse(Response.Status.OK, health, origin);
         }
         if (Method.GET.equals(session.getMethod()) && "/tools".equals(session.getUri())) {
-            Response resp = newFixedLengthResponse(Response.Status.OK, "application/json", getToolList());
-            addCorsHeaders(resp); return resp;
+            return jsonResponse(Response.Status.OK, JsonParser.parseString(getToolList()), origin);
         }
-        if (!Method.POST.equals(session.getMethod())) {
-            Response resp = newFixedLengthResponse(Response.Status.METHOD_NOT_ALLOWED, "text/plain", "POST only");
-            addCorsHeaders(resp); return resp;
+        if (!Method.POST.equals(session.getMethod())) return jsonResponse(Response.Status.METHOD_NOT_ALLOWED, error("method_not_allowed", "POST only"), origin);
+        String contentLength = header(session, "Content-Length");
+        if (contentLength != null) {
+            try {
+                if (Long.parseLong(contentLength) > BurpMcpSecurityConfig.MAX_REQUEST_BODY_BYTES) {
+                    return jsonResponse(HTTP_PAYLOAD_TOO_LARGE, error("blocked", "request body is too large"), origin);
+                }
+            } catch (NumberFormatException exception) {
+                return jsonResponse(Response.Status.BAD_REQUEST, error("bad_request", "invalid Content-Length"), origin);
+            }
         }
         try {
             Map<String, String> bodyMap = new HashMap<>();
             session.parseBody(bodyMap);
-            String body = bodyMap.get("postData");
-            if (body == null) body = "";
+            String body = bodyMap.getOrDefault("postData", "");
+            if (body.getBytes(StandardCharsets.UTF_8).length > BurpMcpSecurityConfig.MAX_REQUEST_BODY_BYTES) {
+                return jsonResponse(HTTP_PAYLOAD_TOO_LARGE, error("blocked", "request body is too large"), origin);
+            }
             JsonObject request = JsonParser.parseString(body).getAsJsonObject();
-            String tool = request.has("tool") ? request.get("tool").getAsString() : "";
-            JsonObject params = request.has("params") ? request.getAsJsonObject("params") : new JsonObject();
-            JsonObject result = dispatch(tool, params);
-            Response resp = newFixedLengthResponse(Response.Status.OK, "application/json", gson.toJson(result));
-            addCorsHeaders(resp); return resp;
-        } catch (Exception e) {
-            JsonObject err = new JsonObject(); err.addProperty("error", e.getMessage());
-            Response resp = newFixedLengthResponse(Response.Status.INTERNAL_ERROR, "application/json", gson.toJson(err));
-            addCorsHeaders(resp); return resp;
+            String tool = request.has("tool") && request.get("tool").isJsonPrimitive() ? request.get("tool").getAsString() : "";
+            JsonObject params = request.has("params") && request.get("params").isJsonObject()
+                    ? request.getAsJsonObject("params").deepCopy() : new JsonObject();
+            String confirmationToken = firstNonBlank(header(session, "X-Burp-MCP-Confirmation"),
+                    params.has("_confirmationToken") ? params.get("_confirmationToken").getAsString() : null);
+            params.remove("_confirmationToken");
+            params.remove("confirmationToken");
+            BurpRequestPolicy.Decision decision = requestPolicy.evaluate(tool, params, confirmationToken);
+            if (decision.outcome() != BurpRequestPolicy.Outcome.ALLOW) {
+                auditLogger.record("rejected", tool, decision.target(), decision.reason(), decision.parameterDigest());
+                return policyResponse(decision, origin);
+            }
+            boolean acquired = !decision.active() || activeOperationSlots.tryAcquire();
+            if (!acquired) {
+                auditLogger.record("rejected", tool, decision.target(), "active operation concurrency limit", decision.parameterDigest());
+                return jsonResponse(HTTP_TOO_MANY_REQUESTS, error("blocked", "too many active operations"), origin);
+            }
+            try {
+                Future<JsonObject> future = dispatchExecutor.submit(() -> dispatch(tool, params));
+                JsonObject result;
+                try {
+                    result = future.get(BurpMcpSecurityConfig.REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                } catch (TimeoutException timeout) {
+                    future.cancel(true);
+                    auditLogger.record("error", tool, decision.target(), "request timeout", decision.parameterDigest());
+                    return jsonResponse(Response.Status.REQUEST_TIMEOUT, error("timeout", "tool execution timed out"), origin);
+                }
+                auditLogger.record("allowed", tool, decision.target(), "tool call", decision.parameterDigest());
+                return jsonResponse(Response.Status.OK, privacyRedactor.redact(result).getAsJsonObject(), origin);
+            } finally {
+                if (decision.active()) activeOperationSlots.release();
+            }
+        } catch (Exception exception) {
+            auditLogger.record("error", "", "", "request handling failed", "");
+            return jsonResponse(Response.Status.INTERNAL_ERROR, error("internal_error", privacyRedactor.redactText(exception.getMessage())), origin);
         }
+    }
+
+    private static final Response.IStatus HTTP_PAYLOAD_TOO_LARGE = new NumericStatus(413, "Payload Too Large");
+    private static final Response.IStatus HTTP_TOO_MANY_REQUESTS = new NumericStatus(429, "Too Many Requests");
+    private static final Response.IStatus HTTP_GONE = new NumericStatus(410, "Gone");
+
+    private Response policyResponse(BurpRequestPolicy.Decision decision, String origin) {
+        JsonObject result = new JsonObject();
+        result.addProperty("status", decision.outcome() == BurpRequestPolicy.Outcome.CONFIRMATION_REQUIRED
+                ? "confirmation_required" : decision.outcome() == BurpRequestPolicy.Outcome.GONE ? "gone" : "blocked");
+        result.addProperty("reason", privacyRedactor.redactText(decision.reason()));
+        result.addProperty("action", decision.action());
+        if (decision.target() != null && !decision.target().isBlank()) result.addProperty("target", privacyRedactor.redactTarget(decision.target()));
+        if (decision.confirmationToken() != null) {
+            result.addProperty("confirmationToken", decision.confirmationToken());
+            result.addProperty("expiresInSeconds", 300);
+        }
+        Response.IStatus status = decision.outcome() == BurpRequestPolicy.Outcome.CONFIRMATION_REQUIRED
+                ? Response.Status.CONFLICT : decision.outcome() == BurpRequestPolicy.Outcome.GONE ? HTTP_GONE : Response.Status.FORBIDDEN;
+        return jsonResponse(status, result, origin);
+    }
+
+    private Response jsonResponse(Response.IStatus status, JsonElement payload, String origin) {
+        Response response = newFixedLengthResponse(status, "application/json", gson.toJson(payload));
+        addCorsHeaders(response, origin);
+        return response;
+    }
+
+    private static JsonObject error(String status, String message) {
+        JsonObject result = new JsonObject();
+        result.addProperty("status", status);
+        result.addProperty("error", message == null ? "" : message);
+        return result;
+    }
+
+    private boolean hostAllowed(IHTTPSession session) {
+        return securityConfig.isHostAllowed(header(session, "Host"));
+    }
+
+    private static String header(IHTTPSession session, String name) {
+        if (session == null || session.getHeaders() == null) return null;
+        for (Map.Entry<String, String> entry : session.getHeaders().entrySet()) {
+            if (entry.getKey() != null && entry.getKey().equalsIgnoreCase(name)) return entry.getValue();
+        }
+        return null;
+    }
+
+    private static boolean loopback(String address) {
+        if (address == null || address.isBlank()) return false;
+        try {
+            return InetAddress.getByName(address).isLoopbackAddress();
+        } catch (Exception exception) {
+            return false;
+        }
+    }
+
+    private static String firstNonBlank(String first, String second) {
+        if (first != null && !first.isBlank()) return first;
+        return second == null || second.isBlank() ? null : second;
+    }
+
+    private static String version() {
+        String value = McpHttpServer.class.getPackage().getImplementationVersion();
+        return value == null || value.isBlank() ? "1.1.0-rc.1" : value;
+    }
+
+    private static final class NumericStatus implements Response.IStatus {
+        private final int status;
+        private final String description;
+
+        private NumericStatus(int status, String description) {
+            this.status = status;
+            this.description = description;
+        }
+
+        @Override
+        public String getDescription() { return status + " " + description; }
+
+        @Override
+        public int getRequestStatus() { return status; }
     }
 
     private JsonObject dispatch(String tool, JsonObject params) {
@@ -852,7 +999,7 @@ public class McpHttpServer extends NanoHTTPD {
     private JsonObject logMessage(JsonObject params) {
         JsonObject result = new JsonObject();
         try {
-            String message = params.get("message").getAsString();
+            String message = privacyRedactor.redactText(params.get("message").getAsString());
             String level = params.has("level") ? params.get("level").getAsString() : "info";
             if ("error".equals(level)) api.logging().logToError(message);
             else api.logging().logToOutput(message);
@@ -1453,12 +1600,11 @@ public class McpHttpServer extends NanoHTTPD {
     private final java.util.Map<String, ExtensionWebSocket> wsConnections = new java.util.concurrent.ConcurrentHashMap();
     private int wsCounter = 0;
     private volatile Registration sessionActionRegistration = null;
-    private boolean scopeGateEnabled = false;
-    private boolean privacyStrict = false;
-    private java.util.ArrayList<String> auditLogEntries = new java.util.ArrayList();
-    private java.util.concurrent.ExecutorService threadPool = java.util.concurrent.Executors.newFixedThreadPool(20);
-
-    private void addAuditLog(String e) { auditLogEntries.add(java.time.Instant.now() + " " + e); if(auditLogEntries.size()>1000) auditLogEntries.remove(0); }
+    private java.util.concurrent.ExecutorService threadPool = java.util.concurrent.Executors.newFixedThreadPool(4, runnable -> {
+        Thread thread = new Thread(runnable, "burp-mcp-tool");
+        thread.setDaemon(true);
+        return thread;
+    });
 
     private HttpRequestResponse sendOne(String method, String url, String body) {
         try { java.net.URL u=new java.net.URL(url); boolean h="https".equals(u.getProtocol());
@@ -1584,14 +1730,15 @@ public class McpHttpServer extends NanoHTTPD {
 
     // === PHASE 3-4 ===
     private JsonObject scopeGate(JsonObject p) { JsonObject r=new JsonObject();
-        String a=p.has("action")?p.get("action").getAsString():""; if("enable".equals(a)){scopeGateEnabled=true;addAuditLog("scope:enabled");r.addProperty("scope_gate",true);}
-        else if("disable".equals(a)){scopeGateEnabled=false;addAuditLog("scope:disabled");r.addProperty("scope_gate",false);} else r.addProperty("scope_gate",scopeGateEnabled); return r; }
+        r.addProperty("scope_gate",true); r.addProperty("read_only",true); r.addProperty("scope_file_configured",securityConfig.scopeFile()!=null);
+        r.addProperty("message","Scope enforcement is always active; MCP cannot disable it."); return r; }
     private JsonObject privacyMode(JsonObject p) { JsonObject r=new JsonObject();
-        String m=p.has("mode")?p.get("mode").getAsString():""; if("strict".equals(m)){privacyStrict=true;addAuditLog("privacy:strict");r.addProperty("privacy","strict");}
-        else if("off".equals(m)){privacyStrict=false;addAuditLog("privacy:off");r.addProperty("privacy","off");} else r.addProperty("privacy",privacyStrict?"strict":"off"); return r; }
+        r.addProperty("privacy","strict"); r.addProperty("read_only",true); r.addProperty("immutable",true);
+        if(p.has("mode") && "off".equalsIgnoreCase(p.get("mode").getAsString())) r.addProperty("blocked",true);
+        return r; }
     private JsonObject auditLog(JsonObject p) { JsonObject r=new JsonObject();
         int lim=p.has("limit")?p.get("limit").getAsInt():50; var items=new JsonArray();
-        int start=Math.max(0,auditLogEntries.size()-lim); for(int i=start;i<auditLogEntries.size();i++) items.add((String)auditLogEntries.get(i));
+        for(String entry:auditLogger.recent(lim)) items.add(entry);
         r.add("entries",items); r.addProperty("total",items.size()); return r; }
     private String getToolList() {
         return "[\"proxy_history\",\"proxy_detail\",\"proxy_websocket\",\"proxy_listeners\"," +
@@ -1613,10 +1760,15 @@ public class McpHttpServer extends NanoHTTPD {
                "\"extensions_list\",\"log\",\"cookie_jar_set\",\"send_request_parallel\",\"websocket_create\",\"websocket_send_text\",\"websocket_send_binary\",\"websocket_close\",\"websocket_list\",\"passive_intel\",\"session_create_rule\",\"session_list_rules\",\"session_remove_rule\",\"jwt_decode\",\"jwt_attack\",\"injection_probe\",\"access_control_sweep\",\"race_condition\",\"inline_fuzzer\",\"scope_gate\",\"privacy_mode\",\"audit_log\"]";
     }
 
-    private void addCorsHeaders(Response resp) {
-        resp.addHeader("Access-Control-Allow-Origin", "*");
+    private void addCorsHeaders(Response resp, String origin) {
+        // Only reflect allowlisted Origins. Never echo an unapproved Origin on error or success responses.
+        if (origin != null && !origin.isBlank() && securityConfig.isOriginAllowed(origin)) {
+            resp.addHeader("Access-Control-Allow-Origin", origin);
+            resp.addHeader("Vary", "Origin");
+        }
         resp.addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-        resp.addHeader("Access-Control-Allow-Headers", "Content-Type");
+        resp.addHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, X-Burp-MCP-Confirmation");
+        resp.addHeader("Cache-Control", "no-store");
+        resp.addHeader("X-Content-Type-Options", "nosniff");
     }
 }
-

@@ -3,7 +3,7 @@
  * BurpSuite MCP Stdio Bridge
  * 
  * Bridges the custom HTTP API (port 9876) to standard MCP JSON-RPC 2.0 stdio protocol.
- * This allows any MCP client (Claude Code, Kiro, Cursor, Cline, etc.) to use all 63 Burp tools.
+ * This allows any MCP client (Claude Code, Kiro, Cursor, Cline, etc.) to use all 83 Burp tools.
  * 
  * Cross-platform: Works on Windows, Linux (Kali), macOS.
  * 
@@ -13,52 +13,109 @@
  * Environment variables:
  *   BURP_MCP_HOST - Burp HTTP API host (default: 127.0.0.1)
  *   BURP_MCP_PORT - Burp HTTP API port (default: 9876)
+ *   BURP_MCP_TOKEN - bearer token configured in Burp
  */
 
 const http = require('http');
 const readline = require('readline');
 
-const BURP_HOST = process.env.BURP_MCP_HOST || '127.0.0.1';
-const BURP_PORT = parseInt(process.env.BURP_MCP_PORT || '9876', 10);
+const LOOPBACK_HOSTS = new Set(['127.0.0.1', 'localhost', '::1']);
+const REQUEST_TIMEOUT_MS = 30000;
+
+function resolveBurpHost(raw) {
+  const host = (raw || '127.0.0.1').trim().toLowerCase();
+  if (!LOOPBACK_HOSTS.has(host)) {
+    throw new Error(
+      `BURP_MCP_HOST must be a loopback address (127.0.0.1, localhost, or ::1); got "${raw}"`
+    );
+  }
+  return host === 'localhost' ? '127.0.0.1' : host;
+}
+
+function resolveBurpPort(raw) {
+  const port = parseInt(raw || '9876', 10);
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new Error(`BURP_MCP_PORT must be an integer 1-65535; got "${raw}"`);
+  }
+  return port;
+}
+
+function resolveBurpToken(raw) {
+  const token = raw || '';
+  if (typeof token !== 'string') {
+    throw new Error('BURP_MCP_TOKEN must be a string');
+  }
+  if (token.length > 0 && token.length < 8) {
+    throw new Error('BURP_MCP_TOKEN must be at least 8 characters when set');
+  }
+  return token;
+}
+
+const BURP_HOST = resolveBurpHost(process.env.BURP_MCP_HOST);
+const BURP_PORT = resolveBurpPort(process.env.BURP_MCP_PORT);
+const BURP_TOKEN = resolveBurpToken(process.env.BURP_MCP_TOKEN);
 
 // Tool definitions for MCP
 let TOOLS = null;
 
-async function fetchTools() {
+async function requestJson(method, path, payload) {
   return new Promise((resolve, reject) => {
-    http.get(`http://${BURP_HOST}:${BURP_PORT}/tools`, (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        try { resolve(JSON.parse(data)); } catch (e) { reject(e); }
-      });
-    }).on('error', reject);
-  });
-}
-
-async function callTool(toolName, params) {
-  return new Promise((resolve, reject) => {
-    const body = JSON.stringify({ tool: toolName, params: params || {} });
+    const body = payload == null ? '' : JSON.stringify(payload);
+    const headers = {
+      'Authorization': `Bearer ${BURP_TOKEN}`,
+      'Content-Type': 'application/json',
+      'Content-Length': Buffer.byteLength(body)
+    };
     const req = http.request({
-      hostname: BURP_HOST, port: BURP_PORT, path: '/', method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) }
+      hostname: BURP_HOST,
+      port: BURP_PORT,
+      path,
+      method,
+      headers,
+      timeout: REQUEST_TIMEOUT_MS
     }, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
-        try { resolve(JSON.parse(data)); } catch (e) { resolve({ error: data }); }
+        let parsed;
+        try { parsed = JSON.parse(data || '{}'); } catch (e) { parsed = { error: data }; }
+        resolve({ statusCode: res.statusCode || 0, body: parsed });
       });
     });
-    req.on('error', (err) => {
-      reject(new Error(
-        `Cannot reach Burp MCP at ${BURP_HOST}:${BURP_PORT} (${err.code || err.message}). ` +
-        `Ensure Burp Suite is running with the "MCP Full Control" extension loaded. ` +
-        `If the port differs, set BURP_MCP_PORT and -Dburp.mcp.port=<same> on Burp.`
-      ));
+    req.on('timeout', () => {
+      req.destroy(new Error(`Burp MCP request timed out after ${REQUEST_TIMEOUT_MS}ms`));
     });
-    req.write(body);
+    req.on('error', reject);
+    if (body) req.write(body);
     req.end();
   });
+}
+
+async function fetchTools() {
+  const response = await requestJson('GET', '/tools');
+  if (response.statusCode !== 200) throw new Error(response.body.error || `Burp returned HTTP ${response.statusCode}`);
+  return response.body;
+}
+
+async function callTool(toolName, params) {
+  if (!BURP_TOKEN) throw new Error('BURP_MCP_TOKEN is required to connect to Burp MCP');
+  const baseParams = { ...(params || {}) };
+  let response;
+  try {
+    response = await requestJson('POST', '/', { tool: toolName, params: baseParams });
+  } catch (err) {
+    throw new Error(
+      `Cannot reach Burp MCP at ${BURP_HOST}:${BURP_PORT} (${err.code || err.message}). ` +
+      `Ensure Burp Suite is running with the "MCP Full Control" extension loaded. ` +
+      `If the port differs, set BURP_MCP_PORT and -Dburp.mcp.port=<same> on Burp.`
+    );
+  }
+  if (response.statusCode === 409 && response.body && response.body.confirmationToken) {
+    baseParams._confirmationToken = response.body.confirmationToken;
+    response = await requestJson('POST', '/', { tool: toolName, params: baseParams });
+  }
+  if (response.statusCode === 401) throw new Error('Burp MCP authentication failed; check BURP_MCP_TOKEN');
+  return response.body;
 }
 
 function buildToolDefinitions(toolNames) {
@@ -246,7 +303,7 @@ function handleRequest(msg) {
       return { jsonrpc: '2.0', id, result: {
         protocolVersion: '2024-11-05',
         capabilities: { tools: {} },
-        serverInfo: { name: 'burpsuite-mcp', version: '2.0.0' }
+        serverInfo: { name: 'burpsuite-mcp', version: '1.1.0-rc.1' }
       }};
 
     case 'notifications/initialized':

@@ -174,17 +174,16 @@ foreach ($ghost in @('blockchain-security', 'bitcoin-puzzle')) {
     if (Test-Path -LiteralPath $gp) { Bad "core must not contain skills/$ghost" } else { Ok "no skills/$ghost" }
 }
 
-# default outdir under work
-$def = & powershell -NoProfile -ExecutionPolicy Bypass -File $masterRoute -Hint 'radare2 analyze' 2>&1 | Out-String
-$def | Set-Content (Join-Path $ScratchDir 'default-out.txt') -Encoding UTF8
-if ($def -match 'work[\\/]master-route-') { Ok 'default OutDir under work/' } else { Bad 'default OutDir not under work/' }
+# default outdir compatibility is checked statically to avoid writing test artifacts into package work/.
+$masterRouteText = Get-Content -LiteralPath $masterRoute -Raw -Encoding UTF8
+if ($masterRouteText -match 'work[\\/].{0,80}master-route-|Join-Path\s+\$PackageRoot\s+.{0,80}work') { Ok 'default OutDir under work/' } else { Bad 'default OutDir not under work/' }
 
 # case-init real path
 $caseName = 'verify-ops-' + (Get-Date -Format 'HHmmss')
-$ci = & powershell -NoProfile -ExecutionPolicy Bypass -File $caseInit -Hint 'apk jadx reverse' -CaseName $caseName -PackageRoot $packageRoot 2>&1 | Out-String
+$ci = & powershell -NoProfile -ExecutionPolicy Bypass -File $caseInit -Hint 'apk jadx reverse' -CaseName $caseName -PackageRoot $ScratchDir 2>&1 | Out-String
 $ci | Set-Content (Join-Path $ScratchDir 'case-init.txt') -Encoding UTF8
-$caseRoot = Join-Path $packageRoot ("work\{0}" -f $caseName)
-foreach ($f in @('scope.md', 'timeline.md', 'workitems.md')) {
+$caseRoot = Join-Path $ScratchDir ("work\{0}" -f $caseName)
+foreach ($f in @('scope.json', 'scope.md', 'timeline.md', 'workitems.md')) {
     $fp = Join-Path $caseRoot $f
     if (Test-Path $fp) { Ok "case-init $f" } else { Bad "case-init missing $f" }
 }

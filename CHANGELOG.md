@@ -29,6 +29,27 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 - `game-reverse/` (not a product focus; Unity/IL2CPP remains via `reverse-engineering` + seed-014)
 
+## [1.1.0-rc.1] — 2026-07-26
+
+### Security
+
+- Made user-provided `scope.json` the sole authorization source; journal and precedent files are explicitly untrusted references.
+- Added exact scheme/host/port/path matching, wildcard and traversal rejection, redirect-chain checks, draft-by-default case initialization, and non-bypassable `case-guard -Force` behavior.
+- Added a minimal capability policy with fail-closed unknown capabilities and confirmation requirements for active network, replay, scan, Intruder, configuration, Cookie, WebSocket, and project-write actions.
+- Hardened Burp MCP with a 32-character bearer token, loopback-only binding, exact Origin allowlist, Host/body/timeout/concurrency limits, immutable privacy mode, centralized Scope enforcement, one-time confirmations, and per-call audit records.
+- Split journal auto-merge into read-only validation and minimal-write merge jobs; PR titles now reach shell commands only through quoted environment variables.
+
+### Changed
+
+- Updated the package and Burp bridge version source to `1.1.0-rc.1` without changing R0–R38, legacy Skill paths, or `master-route.ps1 -Hint/-OutDir` compatibility.
+- Kept `scope_gate` and `privacy_mode` as read-only compatibility tools and documented the four Burp security environment variables.
+
+### Tests
+
+- Added PowerShell Scope regressions for missing/malformed/expired approval, wildcard, path-boundary, traversal, redirect, and `-Force` cases.
+- Added Burp HTTP mock tests for authentication, Origin/CORS, missing Scope, confirmation, token replay/expiry, privacy redaction, audit logging, and explicit policy coverage for all 83 tools.
+- Added workflow injection tests using shell metacharacters and exact IP-range validation.
+
 ## [1.0.0] — 2026-07-18
 
 First **formal** public release of the reverse-skill skill-router pack.
@@ -79,4 +100,5 @@ First **formal** public release of the reverse-skill skill-router pack.
 - Tag: `v1.0.0`
 - Repository: https://github.com/zhaoxuya520/reverse-skill
 
+[1.1.0-rc.1]: https://github.com/zhaoxuya520/reverse-skill/releases/tag/v1.1.0-rc.1
 [1.0.0]: https://github.com/zhaoxuya520/reverse-skill/releases/tag/v1.0.0

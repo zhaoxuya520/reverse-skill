@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'com.burpmcp'
-version = '1.0.0'
+version = file('../VERSION').text.trim()
 sourceCompatibility = '21'
 targetCompatibility = '21'
 
@@ -13,8 +13,15 @@ repositories {
 
 dependencies {
     compileOnly 'net.portswigger.burp.extensions:montoya-api:2025.5'
+    // Tests construct McpHttpServer; MontoyaApi is needed at test compile and runtime.
+    testImplementation 'net.portswigger.burp.extensions:montoya-api:2025.5'
     implementation 'com.google.code.gson:gson:2.11.0'
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 jar {
