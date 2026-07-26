@@ -156,6 +156,47 @@ class BurpSecurityTest {
     }
 
     @Test
+    void privacyStrictRedactsKnownCredentialArtifacts() {
+        PrivacyRedactor redactor = new PrivacyRedactor();
+        String awsKey = "AKIA" + "ABCDEFGHIJKLMNOP";
+        String slackToken = "xoxb-" + "1234567890-1234567890-abcdefghijklmnopqrstuvwx";
+        String jwt = "eyJhbGciOiJIUzI1NiJ9" + ".eyJzdWIiOiJ1c2VyIn0.signature";
+        String privateKey = "-----BEGIN " + "PRIVATE KEY-----\nsecret-material\n-----END PRIVATE KEY-----";
+        String redacted = redactor.redactText(String.join("\n", awsKey, slackToken, jwt, privateKey));
+        assertFalse(redacted.contains(awsKey));
+        assertFalse(redacted.contains(slackToken));
+        assertFalse(redacted.contains(jwt));
+        assertFalse(redacted.contains("secret-material"));
+    }
+
+    @Test
+    void websocketFollowupCallsReuseScopedConnectionTarget() throws Exception {
+        Path scope = writeScopeForAction("websocket.send", "app.example.test", "/ws");
+        BurpMcpSecurityConfig config = BurpMcpSecurityConfig.forTests(
+                TOKEN, Set.of(), scope, tempDir.resolve("websocket-audit.jsonl"), 9876);
+        McpHttpServer server = new McpHttpServer(null, 9876, config,
+                new ConfirmationProvider((tool, target, summary) -> true));
+
+        var targetsField = McpHttpServer.class.getDeclaredField("websocketTargets");
+        targetsField.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        Map<String, String> targets = (Map<String, String>) targetsField.get(server);
+        targets.put("ws-1", "https://app.example.test:443/ws");
+
+        Method policyParamsFor = McpHttpServer.class.getDeclaredMethod("policyParamsFor", String.class, JsonObject.class);
+        policyParamsFor.setAccessible(true);
+        JsonObject params = new JsonObject();
+        params.addProperty("id", "ws-1");
+        params.addProperty("text", "hello");
+        JsonObject policyParams = (JsonObject) policyParamsFor.invoke(server, "websocket_send_text", params);
+
+        BurpRequestPolicy policy = new BurpRequestPolicy(config,
+                new ConfirmationProvider((tool, target, summary) -> true), new PrivacyRedactor());
+        assertEquals(BurpRequestPolicy.Outcome.CONFIRMATION_REQUIRED,
+                policy.evaluate("websocket_send_text", policyParams, null).outcome());
+    }
+
+    @Test
     void confirmationExpiryReturnsGoneSemanticsBeforeCleanup() {
         MutableClock clock = new MutableClock(Instant.parse("2026-07-26T12:00:00Z"));
         ConfirmationProvider confirmations = new ConfirmationProvider(
@@ -260,6 +301,9 @@ class BurpSecurityTest {
         assertFalse(source.contains("privacyStrict=false"));
         assertTrue(source.contains("MCP cannot disable it"));
         assertTrue(source.contains("immutable"));
+        int timeoutCancellation = source.indexOf("future.cancel(true)");
+        assertTrue(timeoutCancellation > 0);
+        assertEquals(-1, source.indexOf("activeOperationSlots.release()", timeoutCancellation));
     }
 
     @Test
@@ -301,6 +345,12 @@ class BurpSecurityTest {
                 """.formatted(status, approvalId, expiresAt, host, prefix);
         Path path = tempDir.resolve("scope-" + System.nanoTime() + ".json");
         Files.writeString(path, json);
+        return path;
+    }
+
+    private Path writeScopeForAction(String action, String host, String prefix) throws Exception {
+        Path path = writeScope("granted", "ticket-action", Instant.now().plusSeconds(3600), host, prefix);
+        Files.writeString(path, Files.readString(path).replace("\"request.send\"", "\"" + action + "\""));
         return path;
     }
 

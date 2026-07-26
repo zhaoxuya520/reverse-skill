@@ -163,6 +163,14 @@ if ($LASTEXITCODE -eq 0) { Ok 'case-guard ready exit 0' } else { Bad "case-guard
 if ($LASTEXITCODE -eq 2) { Ok 'case-guard pending exit 2' } else { Bad "case-guard pending expected 2 got $LASTEXITCODE" }
 & powershell -NoProfile -ExecutionPolicy Bypass -File $cg -CaseRoot $bareRoot -Force 2>&1 | Out-Null
 if ($LASTEXITCODE -eq 2) { Ok 'case-guard -Force remains blocked' } else { Bad "case-guard -Force expected 2 got $LASTEXITCODE" }
+& powershell -NoProfile -ExecutionPolicy Bypass -File $cg -CaseRoot $caseRoot -Capability 'request.send' -Target 'https://app.example.invalid/api/v1' 2>&1 | Out-Null
+if ($LASTEXITCODE -eq 2) { Ok 'case-guard active action requires confirmation' } else { Bad "case-guard active action without confirmation expected 2 got $LASTEXITCODE" }
+& powershell -NoProfile -ExecutionPolicy Bypass -File $cg -CaseRoot $caseRoot -Capability 'request.send' -Target 'https://app.example.invalid/api/v1' -Confirmed 2>&1 | Out-Null
+if ($LASTEXITCODE -eq 0) { Ok 'case-guard confirmed in-scope action allowed' } else { Bad "case-guard confirmed in-scope action expected 0 got $LASTEXITCODE" }
+& powershell -NoProfile -ExecutionPolicy Bypass -File $cg -CaseRoot $caseRoot -Capability 'request.send' -Target 'https://outside.example.invalid/api/v1' -Confirmed 2>&1 | Out-Null
+if ($LASTEXITCODE -eq 2) { Ok 'case-guard confirmed out-of-scope target blocked' } else { Bad "case-guard out-of-scope target expected 2 got $LASTEXITCODE" }
+& powershell -NoProfile -ExecutionPolicy Bypass -File $cg -CaseRoot $caseRoot -Capability 'cookie.write' -Target 'https://app.example.invalid/' -Confirmed 2>&1 | Out-Null
+if ($LASTEXITCODE -eq 2) { Ok 'case-guard disallowed action blocked' } else { Bad "case-guard disallowed action expected 2 got $LASTEXITCODE" }
 
 # 10) authorization and malformed-scope regression cases
 $scopeCases = @(
@@ -208,7 +216,7 @@ if (-not (Test-ScopeTargetMatch -Scope $prefixLoadedScope -Target 'https://app.e
 if (-not (Test-ScopeRedirectChain -Scope $prefixLoadedScope -Targets @('https://app.example.invalid/api/start', 'https://outside.example.invalid/api/final') -Action 'request.send')) { Ok 'redirect chain rejects out-of-scope hop' } else { Bad 'redirect chain accepted out-of-scope hop' }
 . (Join-Path $scriptDir 'lib\CapabilityPolicy.ps1')
 $passivePolicy = Test-CapabilityPolicy -Capability 'passive.read' -Authenticated
-$activePolicy = Test-CapabilityPolicy -Capability 'network.request' -Authenticated -ScopeValid
+$activePolicy = Test-CapabilityPolicy -Capability 'request.send' -Authenticated -ScopeValid
 if ($passivePolicy.Status -eq 'allowed') { Ok 'passive.read allowed after authentication' } else { Bad 'passive.read policy blocked unexpectedly' }
 if ($activePolicy.Status -eq 'confirmation_required') { Ok 'active policy requires confirmation' } else { Bad 'active policy did not require confirmation' }
 
