@@ -14,6 +14,7 @@ assert.throws(() => resolveBurpHost('example.com'), /loopback/);
 assert.throws(() => resolveBurpPort('9876abc'), /integer/);
 assert.throws(() => resolveBurpPort('0'), /1-65535/);
 assert.throws(() => resolveBurpToken(''), /required/);
+assert.throws(() => resolveBurpToken(' '.repeat(32)), /required/);
 assert.throws(() => resolveBurpToken('12345678'), /32 characters/);
 
 process.stdout.write('BRIDGE SECURITY TESTS PASSED\n');

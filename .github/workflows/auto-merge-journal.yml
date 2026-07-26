@@ -46,17 +46,25 @@ jobs:
         shell: bash
         env:
           FILES_JSON: ${{ runner.temp }}/pr-files.json
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           python - <<'PY'
+          import base64
+          import binascii
           import ipaddress
           import json
           import os
           import re
+          import urllib.error
+          import urllib.request
           from pathlib import Path
 
           files = json.loads(Path(os.environ["FILES_JSON"]).read_text(encoding="utf-8"))
           reasons = []
+          repository = os.environ["REPOSITORY"]
+          token = os.environ["GH_TOKEN"]
+          max_file_bytes = 51200
           allowed = re.compile(r"^skills/field-journal/.+\.md$")
           prompt = re.compile(r"ignore previous|ignore all|disregard|system prompt|override|jailbreak|bypass safety", re.I)
           markup = re.compile(r"<script|<iframe|<object|<embed|<form|javascript:|onerror=|onload=", re.I)
@@ -68,38 +76,78 @@ jobs:
               "192.0.2.0/24", "198.51.100.0/24", "203.0.113.0/24",
           ))
 
+          def fetch_blob_text(blob_sha):
+              if not re.fullmatch(r"[0-9a-fA-F]{40}", blob_sha or ""):
+                  raise ValueError("invalid blob SHA")
+              request = urllib.request.Request(
+                  f"https://api.github.com/repos/{repository}/git/blobs/{blob_sha}",
+                  headers={
+                      "Accept": "application/vnd.github+json",
+                      "Authorization": f"Bearer {token}",
+                      "User-Agent": "reverse-skill-journal-validator",
+                      "X-GitHub-Api-Version": "2022-11-28",
+                  },
+              )
+              try:
+                  with urllib.request.urlopen(request, timeout=20) as response:
+                      payload = json.load(response)
+              except (urllib.error.URLError, json.JSONDecodeError) as error:
+                  raise ValueError("blob fetch failed") from error
+              if payload.get("encoding") != "base64" or not isinstance(payload.get("content"), str):
+                  raise ValueError("blob content is missing or not base64")
+              declared_size = payload.get("size")
+              if not isinstance(declared_size, int) or declared_size < 0 or declared_size > max_file_bytes:
+                  raise ValueError("blob size is invalid or too large")
+              try:
+                  raw = base64.b64decode("".join(payload["content"].split()), validate=True)
+              except (binascii.Error, ValueError) as error:
+                  raise ValueError("blob base64 is invalid") from error
+              if len(raw) != declared_size or len(raw) > max_file_bytes:
+                  raise ValueError("blob size mismatch or too large")
+              try:
+                  text = raw.decode("utf-8")
+              except UnicodeDecodeError as error:
+                  raise ValueError("blob is not valid UTF-8") from error
+              if "\x00" in text or any(ord(char) < 32 and char not in "\r\n\t" for char in text):
+                  raise ValueError("blob appears to be binary")
+              return text
+
           if not files:
               reasons.append("no changed files were returned")
           if len(files) > 5:
               reasons.append("more than five files changed")
           for item in files:
               name = item.get("filename", "")
-              patch = item.get("patch", "") or ""
               if not allowed.fullmatch(name):
-                  reasons.append(f"invalid path: {name}")
+                  reasons.append(f"invalid path: {name!r}")
+              previous_name = item.get("previous_filename")
+              if previous_name and not allowed.fullmatch(previous_name):
+                  reasons.append(f"invalid previous path: {previous_name!r}")
               if name.endswith("CONTRIBUTE-BACK.md") or name.endswith("_template.md"):
-                  reasons.append(f"protected file: {name}")
-              if len(patch.encode("utf-8")) > 51200:
-                  reasons.append(f"file patch too large: {name}")
-              if prompt.search(patch):
-                  reasons.append(f"prompt-injection marker: {name}")
-              if markup.search(patch):
-                  reasons.append(f"markup/script marker: {name}")
-              if executable.search(patch):
-                  reasons.append(f"executable marker: {name}")
-              if secret.search(patch):
-                  reasons.append(f"secret marker: {name}")
-              for value in real_ip.findall(patch):
+                  reasons.append(f"protected file: {name!r}")
+              if item.get("status") == "removed":
+                  continue
+              try:
+                  content = fetch_blob_text(item.get("sha"))
+              except ValueError as error:
+                  reasons.append(f"{error}: {name!r}")
+                  continue
+              if prompt.search(content):
+                  reasons.append(f"prompt-injection marker: {name!r}")
+              if markup.search(content):
+                  reasons.append(f"markup/script marker: {name!r}")
+              if executable.search(content):
+                  reasons.append(f"executable marker: {name!r}")
+              if secret.search(content):
+                  reasons.append(f"secret marker: {name!r}")
+              for value in real_ip.findall(content):
                   try:
                       address = ipaddress.ip_address(value)
                   except ValueError:
                       continue
                   if not any(address in network for network in allowed_ip_ranges):
-                      reasons.append(f"possible real IP: {name}")
+                      reasons.append(f"possible real IP: {name!r}")
                       break
-              first = next((line for line in patch.splitlines() if line.strip().startswith("+") and not line.startswith("+++")), "")
-              if first and not first[1:].lstrip().startswith(("#", "-", "*", "[", "`")):
-                  pass
 
           if reasons:
               print("Validation blocked:")
@@ -124,6 +172,7 @@ jobs:
       PR_SUBJECT: ${{ format('[field-journal] {0}', github.event.pull_request.title) }}
       HEAD_SHA: ${{ github.event.pull_request.head.sha }}
       REPOSITORY: ${{ github.repository }}
+      GH_REPO: ${{ github.repository }}
     steps:
       - name: Comment on validation failure
         if: ${{ needs.validate.outputs.valid != 'true' }}
@@ -132,7 +181,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          gh pr comment "$PR_NUMBER" --body-file - <<'EOF'
+          gh pr comment "$PR_NUMBER" --repo "$REPOSITORY" --body-file - <<'EOF'
           ❌ **自动审核未通过**
 
           本 PR 未通过 field-journal 安全检查，无法自动合并。请检查修改路径、注入特征、凭据、真实目标和文件大小后重新提交。
@@ -166,4 +215,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          gh pr merge "$PR_NUMBER" --auto --squash --subject "$PR_SUBJECT"
+          gh pr merge "$PR_NUMBER" --repo "$REPOSITORY" --auto --squash --subject "$PR_SUBJECT" --match-head-commit "$HEAD_SHA"

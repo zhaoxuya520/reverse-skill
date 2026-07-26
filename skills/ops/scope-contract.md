@@ -9,6 +9,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File skills\scripts\case-init.ps1
 # 默认产出 work/<case>/scope.json（draft）和兼容的 scope.md
 powershell -NoProfile -ExecutionPolicy Bypass -File skills\scripts\case-init.ps1 -ScopeFile .\approved-scope.json -CaseName "my-case"
 powershell -NoProfile -ExecutionPolicy Bypass -File skills\scripts\case-guard.ps1 -CaseRoot work\my-case
+powershell -NoProfile -ExecutionPolicy Bypass -File skills\scripts\case-guard.ps1 -CaseRoot work\my-case -Capability request.send -Target https://app.example.test/lab -Confirmed
 ```
 
 旧的 `-AuthGranted`、`-AuthStatus`、`-ReadyForAct` 和 `case-guard.ps1 -Force` 参数仅为兼容调用方保留；它们不能创建授权、修改策略或绕过执行门。
@@ -52,6 +53,8 @@ Rules:
 The enforced policy labels operations with `readOnly`, `network`, `credentials`, `destructive`, `requiresScope`, and `requiresConfirmation`. Reserved fields are `filesystemRead`, `filesystemWrite`, `deviceControl`, and `sensitiveOutput`.
 
 `passive.read` is the default authenticated read-only capability. Requests, scans, replay, Intruder, WebSocket sends, cookie writes, configuration writes, project writes, and similar active operations require a valid scope, an exact target/action match, and explicit confirmation. Policy failures return `blocked` or `confirmation_required`; Markdown, journal text, and `-Force` cannot change the result.
+
+`request.send` is the canonical request capability. `network.request` remains a compatibility alias and is evaluated against the same `request.send` action in `scope.json`.
 
 ## out_of_scope
 

@@ -500,13 +500,13 @@ These are not recommendations; they are mandatory workflow steps. Skipping any s
 
 ## User Guidance When Bootstrap Fails
 
-When the AI tries to auto-complete installation and still fails, it **must not stay silent or retry endlessly**. It must immediately switch to "guide the user to configure manually" mode with structured guidance.
+When an explicitly approved installation attempt fails, the AI **must not stay silent or retry endlessly**. It must immediately switch to "guide the user to configure manually" mode with structured guidance.
 
 ### AI Failure-Handling Flow
 
 ```text
-1. Call bootstrap-reverse.ps1 to attempt automatic installation
-2. Verify whether the tool is usable after installation
+1. Present the source, pinned version, permissions, and planned changes; obtain explicit user confirmation
+2. Call bootstrap-reverse.ps1 for the approved installation and verify whether the tool is usable
 3. If it is still unavailable → do not retry → immediately output structured guidance
 ```
 

@@ -18,6 +18,12 @@ final class PrivacyRedactor {
     private static final Pattern HEADER = Pattern.compile("(?im)^(authorization|proxy-authorization|cookie|set-cookie)\\s*:\\s*.*$");
     private static final Pattern QUERY_SECRET = Pattern.compile("(?i)([?&](?:token|access_token|refresh_token|api_?key|key|secret|password|passwd|auth|authorization|signature|sig)=)[^&#\\s]*");
     private static final Pattern JSON_SECRET = Pattern.compile("(?i)(\"(?:authorization|cookie|set-cookie|token|access_token|refresh_token|api_?key|secret|password|passwd|body|request_body)\"\\s*:\\s*)\"(?:\\\\.|[^\"])*\"");
+    private static final Pattern AWS_ACCESS_KEY = Pattern.compile("\\bAKIA[0-9A-Z]{16}\\b");
+    private static final Pattern SLACK_TOKEN = Pattern.compile("\\bxox[baprs]-[A-Za-z0-9-]{20,}\\b");
+    private static final Pattern JWT = Pattern.compile("\\beyJ[A-Za-z0-9_-]*\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\b");
+    private static final Pattern PRIVATE_KEY = Pattern.compile(
+            "-----BEGIN(?: [A-Z0-9]+)? PRIVATE KEY-----.*?-----END(?: [A-Z0-9]+)? PRIVATE KEY-----",
+            Pattern.DOTALL);
     private static final Set<String> SENSITIVE_KEYS = Set.of(
             "authorization", "proxy-authorization", "cookie", "set-cookie", "token", "access_token",
             "refresh_token", "apikey", "api_key", "secret", "password", "passwd", "request_body",
@@ -52,10 +58,14 @@ final class PrivacyRedactor {
 
     String redactText(String input) {
         if (input == null || input.isEmpty()) return input;
-        String value = HEADER.matcher(input).replaceAll("$1: " + REDACTED);
+        String value = PRIVATE_KEY.matcher(input).replaceAll(REDACTED);
+        value = HEADER.matcher(value).replaceAll("$1: " + REDACTED);
         value = QUERY_SECRET.matcher(value).replaceAll("$1" + REDACTED);
         Matcher jsonMatcher = JSON_SECRET.matcher(value);
         value = jsonMatcher.replaceAll("$1\"" + REDACTED + "\"");
+        value = AWS_ACCESS_KEY.matcher(value).replaceAll(REDACTED);
+        value = SLACK_TOKEN.matcher(value).replaceAll(REDACTED);
+        value = JWT.matcher(value).replaceAll(REDACTED);
         return value;
     }
 

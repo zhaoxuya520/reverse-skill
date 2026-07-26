@@ -301,9 +301,13 @@ class BurpSecurityTest {
         assertFalse(source.contains("privacyStrict=false"));
         assertTrue(source.contains("MCP cannot disable it"));
         assertTrue(source.contains("immutable"));
-        int timeoutCancellation = source.indexOf("future.cancel(true)");
-        assertTrue(timeoutCancellation > 0);
-        assertEquals(-1, source.indexOf("activeOperationSlots.release()", timeoutCancellation));
+        assertFalse(source.contains("future.cancel(true)"));
+        int workerStart = source.indexOf("dispatchExecutor.submit(() -> {");
+        int dispatchCall = source.indexOf("dispatch(tool, params)", workerStart);
+        int workerRelease = source.indexOf("activeOperationSlots.release()", dispatchCall);
+        assertTrue(workerStart > 0);
+        assertTrue(dispatchCall > workerStart);
+        assertTrue(workerRelease > dispatchCall);
     }
 
     @Test

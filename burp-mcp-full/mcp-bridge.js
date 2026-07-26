@@ -33,7 +33,11 @@ function resolveBurpHost(raw) {
 }
 
 function resolveBurpPort(raw) {
-  const port = parseInt(raw || '9876', 10);
+  const value = raw == null || raw === '' ? '9876' : String(raw);
+  if (!/^[0-9]+$/.test(value)) {
+    throw new Error(`BURP_MCP_PORT must be an integer 1-65535; got "${raw}"`);
+  }
+  const port = Number(value);
   if (!Number.isInteger(port) || port < 1 || port > 65535) {
     throw new Error(`BURP_MCP_PORT must be an integer 1-65535; got "${raw}"`);
   }
@@ -41,24 +45,31 @@ function resolveBurpPort(raw) {
 }
 
 function resolveBurpToken(raw) {
-  const token = raw || '';
+  const token = raw == null ? '' : raw;
   if (typeof token !== 'string') {
     throw new Error('BURP_MCP_TOKEN must be a string');
   }
-  if (token.length > 0 && token.length < 8) {
-    throw new Error('BURP_MCP_TOKEN must be at least 8 characters when set');
+  const value = token.trim();
+  if (value.length === 0) {
+    throw new Error('BURP_MCP_TOKEN is required');
   }
-  return token;
+  if (value.length < 32) {
+    throw new Error('BURP_MCP_TOKEN must be at least 32 characters');
+  }
+  return value;
 }
 
-const BURP_HOST = resolveBurpHost(process.env.BURP_MCP_HOST);
-const BURP_PORT = resolveBurpPort(process.env.BURP_MCP_PORT);
-const BURP_TOKEN = resolveBurpToken(process.env.BURP_MCP_TOKEN);
+let BURP_HOST;
+let BURP_PORT;
+let BURP_TOKEN;
 
 // Tool definitions for MCP
 let TOOLS = null;
 
 async function requestJson(method, path, payload) {
+  if (!BURP_HOST || !BURP_PORT || !BURP_TOKEN) {
+    throw new Error('Burp MCP bridge is not initialized');
+  }
   return new Promise((resolve, reject) => {
     const body = payload == null ? '' : JSON.stringify(payload);
     const headers = {
@@ -195,8 +206,8 @@ function getToolDescription(name) {
     extensions_list: 'Get information about loaded extensions',
     log: 'Write a message to Burp extension output log',
     audit_log: 'View audit log entries',
-    privacy_mode: 'Set privacy mode (strict/off)',
-    scope_gate: 'Enable/disable scope gate',
+    privacy_mode: 'Inspect immutable strict privacy mode',
+    scope_gate: 'Inspect immutable scope enforcement',
     inline_fuzzer: 'FUZZ marker fuzzing',
     race_condition: 'Race condition testing',
     access_control_sweep: 'Test different auth levels',
@@ -331,6 +342,10 @@ function handleRequest(msg) {
 
 // Main stdio loop
 async function main() {
+  BURP_HOST = resolveBurpHost(process.env.BURP_MCP_HOST);
+  BURP_PORT = resolveBurpPort(process.env.BURP_MCP_PORT);
+  BURP_TOKEN = resolveBurpToken(process.env.BURP_MCP_TOKEN);
+
   // Try to fetch tools from Burp
   try {
     TOOLS = await fetchTools();
@@ -377,4 +392,15 @@ async function main() {
   });
 }
 
-main();
+if (require.main === module) {
+  main().catch((error) => {
+    process.stderr.write(`[burp-mcp-bridge] ${error.message || 'startup failed'}\n`);
+    process.exitCode = 1;
+  });
+}
+
+module.exports = {
+  resolveBurpHost,
+  resolveBurpPort,
+  resolveBurpToken,
+};

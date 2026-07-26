@@ -118,7 +118,8 @@ public class McpHttpServer extends NanoHTTPD {
                     params.has("_confirmationToken") ? params.get("_confirmationToken").getAsString() : null);
             params.remove("_confirmationToken");
             params.remove("confirmationToken");
-            BurpRequestPolicy.Decision decision = requestPolicy.evaluate(tool, params, confirmationToken);
+            JsonObject policyParams = policyParamsFor(tool, params);
+            BurpRequestPolicy.Decision decision = requestPolicy.evaluate(tool, policyParams, confirmationToken);
             if (decision.outcome() != BurpRequestPolicy.Outcome.ALLOW) {
                 auditLogger.record("rejected", tool, decision.target(), decision.reason(), decision.parameterDigest());
                 return policyResponse(decision, origin);
@@ -128,20 +129,30 @@ public class McpHttpServer extends NanoHTTPD {
                 auditLogger.record("rejected", tool, decision.target(), "active operation concurrency limit", decision.parameterDigest());
                 return jsonResponse(HTTP_TOO_MANY_REQUESTS, error("blocked", "too many active operations"), origin);
             }
+            Future<JsonObject> future;
             try {
-                Future<JsonObject> future = dispatchExecutor.submit(() -> dispatch(tool, params));
-                JsonObject result;
-                try {
-                    result = future.get(BurpMcpSecurityConfig.REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-                } catch (TimeoutException timeout) {
-                    future.cancel(true);
-                    auditLogger.record("error", tool, decision.target(), "request timeout", decision.parameterDigest());
-                    return jsonResponse(Response.Status.REQUEST_TIMEOUT, error("timeout", "tool execution timed out"), origin);
-                }
-                auditLogger.record("allowed", tool, decision.target(), "tool call", decision.parameterDigest());
-                return jsonResponse(Response.Status.OK, privacyRedactor.redact(result).getAsJsonObject(), origin);
-            } finally {
+                future = dispatchExecutor.submit(() -> {
+                    try {
+                        JsonObject result = dispatch(tool, params);
+                        auditLogger.record("allowed", tool, decision.target(), "tool call", decision.parameterDigest());
+                        return result;
+                    } catch (RuntimeException exception) {
+                        auditLogger.record("error", tool, decision.target(), "tool call failed", decision.parameterDigest());
+                        throw exception;
+                    } finally {
+                        if (decision.active()) activeOperationSlots.release();
+                    }
+                });
+            } catch (RuntimeException exception) {
                 if (decision.active()) activeOperationSlots.release();
+                throw exception;
+            }
+            try {
+                JsonObject result = future.get(BurpMcpSecurityConfig.REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                return jsonResponse(Response.Status.OK, privacyRedactor.redact(result).getAsJsonObject(), origin);
+            } catch (TimeoutException timeout) {
+                auditLogger.record("error", tool, decision.target(), "request timeout", decision.parameterDigest());
+                return jsonResponse(Response.Status.REQUEST_TIMEOUT, error("timeout", "tool execution timed out"), origin);
             }
         } catch (Exception exception) {
             auditLogger.record("error", "", "", "request handling failed", "");
@@ -206,6 +217,17 @@ public class McpHttpServer extends NanoHTTPD {
     private static String firstNonBlank(String first, String second) {
         if (first != null && !first.isBlank()) return first;
         return second == null || second.isBlank() ? null : second;
+    }
+
+    private JsonObject policyParamsFor(String tool, JsonObject params) {
+        JsonObject policyParams = params == null ? new JsonObject() : params.deepCopy();
+        if (!("websocket_send_text".equals(tool) || "websocket_send_binary".equals(tool) || "websocket_close".equals(tool))) {
+            return policyParams;
+        }
+        if (!policyParams.has("id") || !policyParams.get("id").isJsonPrimitive()) return policyParams;
+        String target = websocketTargets.get(policyParams.get("id").getAsString());
+        if (target != null && !target.isBlank()) policyParams.addProperty("target", target);
+        return policyParams;
     }
 
     private static String version() {
@@ -1598,7 +1620,8 @@ public class McpHttpServer extends NanoHTTPD {
 
     // === FIELDS ===
     private final java.util.Map<String, ExtensionWebSocket> wsConnections = new java.util.concurrent.ConcurrentHashMap();
-    private int wsCounter = 0;
+    private final java.util.Map<String, String> websocketTargets = new java.util.concurrent.ConcurrentHashMap<>();
+    private final AtomicInteger wsCounter = new AtomicInteger();
     private volatile Registration sessionActionRegistration = null;
     private java.util.concurrent.ExecutorService threadPool = java.util.concurrent.Executors.newFixedThreadPool(4, runnable -> {
         Thread thread = new Thread(runnable, "burp-mcp-tool");
@@ -1627,27 +1650,93 @@ public class McpHttpServer extends NanoHTTPD {
             for(Object fobj:futures){try{HttpRequestResponse rr=(HttpRequestResponse)((java.util.concurrent.Future)fobj).get(); var ri=new JsonObject(); ri.addProperty("status",rr.response()!=null?rr.response().statusCode():0); ri.addProperty("length",rr.response()!=null?rr.response().bodyToString().length():0); items.add(ri);}catch(Exception ex){}}
             r.add("results",items); r.addProperty("total",items.size());
         }catch(Exception e){r.addProperty("error",e.getMessage());} return r; }
-    private JsonObject websocketCreate(JsonObject p) { JsonObject r=new JsonObject();
-        try{ boolean h=p.has("https")?p.get("https").getAsBoolean():true; int port=p.has("port")?p.get("port").getAsInt():(h?443:80);
-            var cr=api.websockets().createWebSocket(HttpService.httpService(p.get("host").getAsString(),port,h),p.has("path")?p.get("path").getAsString():"/");
-            r.addProperty("status",cr.status().toString()); cr.webSocket().ifPresent(ws->{String id="ws-"+(++wsCounter);wsConnections.put(id,ws);r.addProperty("id",id);});
-        }catch(Exception e){r.addProperty("error",e.getMessage());} return r; }
+    private JsonObject websocketCreate(JsonObject p) {
+        JsonObject r = new JsonObject();
+        try {
+            boolean https = p.has("https") ? p.get("https").getAsBoolean() : true;
+            int port = p.has("port") ? p.get("port").getAsInt() : (https ? 443 : 80);
+            String host = p.get("host").getAsString();
+            String path = p.has("path") ? p.get("path").getAsString() : "/";
+            String target = normalizedWebSocketTarget(https, host, port, path);
+            var creation = api.websockets().createWebSocket(HttpService.httpService(host, port, https), path);
+            r.addProperty("status", creation.status().toString());
+            creation.webSocket().ifPresent(webSocket -> {
+                String id = "ws-" + wsCounter.incrementAndGet();
+                wsConnections.put(id, webSocket);
+                websocketTargets.put(id, target);
+                r.addProperty("id", id);
+            });
+        } catch (Exception exception) {
+            r.addProperty("error", exception.getMessage());
+        }
+        return r;
+    }
 
-    private JsonObject websocketSendBinary(JsonObject p) { JsonObject r=new JsonObject();
-        try{ var ws=(ExtensionWebSocket)wsConnections.get(p.get("id").getAsString()); if(ws==null){r.addProperty("error","WS not found");return r;} ws.sendBinaryMessage(ByteArray.byteArray(p.get("data").getAsString().getBytes())); r.addProperty("success",true);}
-        catch(Exception e){r.addProperty("error",e.getMessage());} return r; }    private JsonObject websocketSendText(JsonObject p) { JsonObject r=new JsonObject();
-        try{ var ws=(ExtensionWebSocket)wsConnections.get(p.get("id").getAsString()); if(ws==null){r.addProperty("error","WS not found");return r;} ws.sendTextMessage(p.get("text").getAsString()); r.addProperty("success",true);}
-        catch(Exception e){r.addProperty("error",e.getMessage());} return r; }
-    private JsonObject websocketClose(JsonObject p) { JsonObject r=new JsonObject();
-        try{ var ws=(ExtensionWebSocket)wsConnections.remove(p.get("id").getAsString()); if(ws==null){r.addProperty("error","WS not found");return r;} ws.close(); r.addProperty("success",true);}
-        catch(Exception e){r.addProperty("error",e.getMessage());} return r; }
+    private static String normalizedWebSocketTarget(boolean https, String host, int port, String path) throws Exception {
+        String value = path == null || path.isBlank() ? "/" : path;
+        if (!value.startsWith("/")) value = "/" + value;
+        int queryIndex = value.indexOf('?');
+        String pathPart = queryIndex >= 0 ? value.substring(0, queryIndex) : value;
+        String queryPart = queryIndex >= 0 ? value.substring(queryIndex + 1) : null;
+        return new URI(https ? "https" : "http", null, host, port, pathPart, queryPart, null).toString();
+    }
+
+    private JsonObject websocketSendBinary(JsonObject p) {
+        JsonObject r = new JsonObject();
+        try {
+            var ws = wsConnections.get(p.get("id").getAsString());
+            if (ws == null) {
+                r.addProperty("error", "WS not found");
+                return r;
+            }
+            ws.sendBinaryMessage(ByteArray.byteArray(p.get("data").getAsString().getBytes(StandardCharsets.UTF_8)));
+            r.addProperty("success", true);
+        } catch (Exception exception) {
+            r.addProperty("error", exception.getMessage());
+        }
+        return r;
+    }
+
+    private JsonObject websocketSendText(JsonObject p) {
+        JsonObject r = new JsonObject();
+        try {
+            var ws = wsConnections.get(p.get("id").getAsString());
+            if (ws == null) {
+                r.addProperty("error", "WS not found");
+                return r;
+            }
+            ws.sendTextMessage(p.get("text").getAsString());
+            r.addProperty("success", true);
+        } catch (Exception exception) {
+            r.addProperty("error", exception.getMessage());
+        }
+        return r;
+    }
+
+    private JsonObject websocketClose(JsonObject p) {
+        JsonObject r = new JsonObject();
+        String id = p.get("id").getAsString();
+        websocketTargets.remove(id);
+        try {
+            var ws = wsConnections.remove(id);
+            if (ws == null) {
+                r.addProperty("error", "WS not found");
+                return r;
+            }
+            ws.close();
+            r.addProperty("success", true);
+        } catch (Exception exception) {
+            r.addProperty("error", exception.getMessage());
+        }
+        return r;
+    }
     private JsonObject websocketList(JsonObject p) { JsonObject r=new JsonObject(); var items=new JsonArray();
             for(String id:wsConnections.keySet()){var i=new JsonObject();i.addProperty("id",id);items.add(i);} r.add("connections",items); r.addProperty("total",items.size()); return r; }
     private JsonObject passiveIntel(JsonObject p) { JsonObject r=new JsonObject();
         try{ var f=new JsonArray(); int lim=p.has("limit")?p.get("limit").getAsInt():100; int c=0;
             for(var e:api.proxy().history()){if(c>=lim)break; String b=e.response()!=null?e.response().bodyToString():""; String all=b+" "+e.request();
             java.util.regex.Matcher m; String t=null;
-            if((m=java.util.regex.Pattern.compile("AKIA[0-9A-Z]{16}").matcher(all)).find()) t="AWS Key: "+m.group();
+            if((m=java.util.regex.Pattern.compile("AKIA[0-9A-Z]{16}").matcher(all)).find()) t="AWS Access Key ID";
             else if((m=java.util.regex.Pattern.compile("eyJ[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+").matcher(all)).find()) t="JWT";
             else if((m=java.util.regex.Pattern.compile("-----BEGIN.*PRIVATE KEY-----").matcher(all)).find()) t="Private Key";
             else if((m=java.util.regex.Pattern.compile("xox[baprs]-[0-9]{10,}-[0-9]{10,}-[a-zA-Z0-9]{24}").matcher(all)).find()) t="Slack Token";

@@ -6,7 +6,10 @@ param(
     [string] $CaseRoot,
 
     [switch] $Force,
-    [switch] $Quiet
+    [switch] $Quiet,
+    [string] $Capability = '',
+    [string[]] $Target = @(),
+    [switch] $Confirmed
 )
 $ErrorActionPreference = 'Stop'
 
@@ -27,6 +30,12 @@ if (-not (Test-Path -LiteralPath $policyPath -PathType Leaf)) {
     exit 1
 }
 . $policyPath
+$capabilityPolicyPath = Join-Path $scriptDir 'lib\CapabilityPolicy.ps1'
+if (-not (Test-Path -LiteralPath $capabilityPolicyPath -PathType Leaf)) {
+    Write-Host ("ERROR: capability policy module missing: {0}" -f $capabilityPolicyPath) -ForegroundColor Red
+    exit 1
+}
+. $capabilityPolicyPath
 
 $scopePath = Join-Path $CaseRoot 'scope.json'
 $result = Import-ScopeDocument -Path $scopePath -RequireGranted
@@ -38,6 +47,33 @@ if ($result.Valid) {
     $targets = @($scope.targets)
     if ($targets.Count -eq 0) { [void]$issues.Add('scope has no targets') }
     if (@($scope.allowedActions).Count -eq 0) { [void]$issues.Add('scope has no allowedActions') }
+}
+
+if ($issues.Count -eq 0 -and -not [string]::IsNullOrWhiteSpace($Capability)) {
+    $policy = Get-CapabilityPolicy -Capability $Capability
+    if ($null -eq $policy) {
+        [void]$issues.Add(("unknown capability: {0}" -f $Capability))
+    } else {
+        $action = [string]$policy.action
+        if (-not (Test-ScopeActionAllowed -Scope $scope -Action $action)) {
+            [void]$issues.Add(("scope does not allow action: {0}" -f $action))
+        }
+        if ($policy.network -or $policy.filesystemRead -or $policy.filesystemWrite) {
+            if (@($Target).Count -eq 0) {
+                [void]$issues.Add(("capability requires an exact target: {0}" -f $action))
+            } else {
+                foreach ($candidate in @($Target)) {
+                    if (-not (Test-ScopeTargetMatch -Scope $scope -Target $candidate -Action $action)) {
+                        [void]$issues.Add(("target is outside scope: {0}" -f $candidate))
+                    }
+                }
+            }
+        }
+        $policyResult = Test-CapabilityPolicy -Capability $Capability -Authenticated -ScopeValid:($issues.Count -eq 0) -Confirmed:$Confirmed
+        if ($policyResult.Status -ne 'allowed') {
+            [void]$issues.Add(("policy {0}: {1}" -f $policyResult.Status, $policyResult.Reason))
+        }
+    }
 }
 
 if ($issues.Count -eq 0) {

@@ -126,7 +126,7 @@ description: Routes reverse engineering, exploitation, penetration testing, malw
 
 新增 skill 时，按 `CONTRIBUTING.md` 的标准流程操作，确保：
 - 路由矩阵能正确分流
-- bootstrap 系统能自动补齐依赖
+- bootstrap 系统能在展示来源、版本和权限并取得确认后补齐依赖
 - tool-index 能反映新工具状态
 
 ## 关联资源
@@ -137,7 +137,7 @@ description: Routes reverse engineering, exploitation, penetration testing, malw
 
 ## 按需自举
 
-当 workflow 发现缺少工具时，不要直接报错。统一调用：
+当 workflow 发现缺少工具时，先展示来源、固定版本、权限和拟执行变更，并取得用户明确确认；随后再统一调用：
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File "<skill-root>\scripts\bootstrap-reverse.ps1" -Capability @('工具名') -StartServices
@@ -147,7 +147,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "<skill-root>\scripts\bootst
 
 > 清单中未登记的工具（如 unblob/EMBA/Foundry 等）`MUST` 在 skill 文档中走手动安装步骤，禁止假装可 bootstrap。
 
-自举完成后会自动刷新 `tool-index`。
+经确认的自举完成后会刷新 `tool-index`。
 
 ## 操作先例库（Precedent Files）
 

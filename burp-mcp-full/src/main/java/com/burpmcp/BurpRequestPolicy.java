@@ -161,7 +161,8 @@ final class BurpRequestPolicy {
                 "generate_csrf_poc", "extract_from_response", "payload_process", "scan_results", "scan_issue_detail",
                 "get_scope", "search_history", "compare", "export_config", "cookie_jar", "token_analysis",
                 "sequencer", "export_cert", "burp_version", "extensions_list", "websocket_list", "passive_intel",
-                "session_list_rules", "jwt_decode", "jwt_attack", "scope_gate", "privacy_mode", "audit_log");
+                "session_list_rules", "jwt_decode", "jwt_attack", "scope_gate", "privacy_mode", "audit_log",
+                "websocket_send");
         active(rules, "request.send", TargetMode.NETWORK, true, "send_request", "send_request_parallel");
         active(rules, "replay.send", TargetMode.NETWORK, true, "send_to_repeater", "repeater_send", "repeater_modify_send");
         active(rules, "intruder.run", TargetMode.NETWORK, true, "send_to_intruder", "intruder_attack", "intruder_attack_async",
@@ -174,7 +175,7 @@ final class BurpRequestPolicy {
         active(rules, "burp.config.write", TargetMode.NONE, false, "import_config", "set_upstream_proxy", "set_dns_override", "set_http2",
                 "session_create_rule", "session_remove_rule", "register_http_handler", "remove_http_handler");
         active(rules, "cookie.write", TargetMode.NETWORK, true, "cookie_jar_set");
-        active(rules, "websocket.send", TargetMode.NETWORK, true, "websocket_create", "websocket_send", "websocket_send_text",
+        active(rules, "websocket.send", TargetMode.NETWORK, true, "websocket_create", "websocket_send_text",
                 "websocket_send_binary", "websocket_close");
         active(rules, "project.write", TargetMode.FILE, true, "save_project");
         active(rules, "collaborator.generate", TargetMode.NONE, false, "collaborator_generate");

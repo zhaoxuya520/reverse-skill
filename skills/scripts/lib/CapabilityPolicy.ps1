@@ -4,7 +4,10 @@
 function Get-CapabilityPolicy {
     param([Parameter(Mandatory = $true)] [string] $Capability)
 
+    $requested = $Capability.Trim()
+    $action = if ($requested -eq 'network.request') { 'request.send' } else { $requested }
     $common = @{
+        action = $action
         readOnly = $false
         network = $false
         credentials = $false
@@ -16,12 +19,12 @@ function Get-CapabilityPolicy {
         deviceControl = $false
         sensitiveOutput = $false
     }
-    switch ($Capability) {
+    switch ($action) {
         'passive.read' {
             $common.readOnly = $true
             $common.sensitiveOutput = $true
         }
-        'network.request' {
+        'request.send' {
             $common.network = $true; $common.requiresScope = $true; $common.requiresConfirmation = $true
         }
         'replay.send' {
@@ -60,16 +63,16 @@ function Test-CapabilityPolicy {
 
     $policy = Get-CapabilityPolicy -Capability $Capability
     if ($null -eq $policy) {
-        return [pscustomobject]@{ Status = 'blocked'; Reason = 'unknown capability'; Capability = $Capability; Policy = $null }
+        return [pscustomobject]@{ Status = 'blocked'; Reason = 'unknown capability'; Capability = $Capability; Action = ''; Policy = $null }
     }
     if (-not $Authenticated) {
-        return [pscustomobject]@{ Status = 'blocked'; Reason = 'authentication required'; Capability = $Capability; Policy = $policy }
+        return [pscustomobject]@{ Status = 'blocked'; Reason = 'authentication required'; Capability = $Capability; Action = $policy.action; Policy = $policy }
     }
     if ($policy.requiresScope -and -not $ScopeValid) {
-        return [pscustomobject]@{ Status = 'blocked'; Reason = 'valid scope required'; Capability = $Capability; Policy = $policy }
+        return [pscustomobject]@{ Status = 'blocked'; Reason = 'valid scope required'; Capability = $Capability; Action = $policy.action; Policy = $policy }
     }
     if ($policy.requiresConfirmation -and -not $Confirmed) {
-        return [pscustomobject]@{ Status = 'confirmation_required'; Reason = 'user confirmation required'; Capability = $Capability; Policy = $policy }
+        return [pscustomobject]@{ Status = 'confirmation_required'; Reason = 'user confirmation required'; Capability = $Capability; Action = $policy.action; Policy = $policy }
     }
-    return [pscustomobject]@{ Status = 'allowed'; Reason = 'policy allowed'; Capability = $Capability; Policy = $policy }
+    return [pscustomobject]@{ Status = 'allowed'; Reason = 'policy allowed'; Capability = $Capability; Action = $policy.action; Policy = $policy }
 }
