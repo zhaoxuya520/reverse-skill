@@ -12,6 +12,9 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+    env:
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      PR_SUBJECT: ${{ format('[field-journal] {0}', github.event.pull_request.title) }}
     
     steps:
       - name: Checkout PR
@@ -25,7 +28,7 @@ jobs:
           set -e
           
           # 1. 只允许修改 field-journal 目录下的 .md 文件
-          CHANGED_FILES=$(gh pr diff ${{ github.event.pull_request.number }} --name-only)
+          CHANGED_FILES=$(gh pr diff "$PR_NUMBER" --name-only)
           echo "Changed files:"
           echo "$CHANGED_FILES"
           
@@ -145,16 +148,16 @@ jobs:
       - name: Auto-merge if valid
         if: steps.validate.outputs.valid == 'true'
         run: |
-          gh pr merge ${{ github.event.pull_request.number }} \
+          gh pr merge "$PR_NUMBER" \
             --auto --squash \
-            --subject "[field-journal] ${{ github.event.pull_request.title }}"
+            --subject "$PR_SUBJECT"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Comment on failure
         if: steps.validate.outputs.valid == 'false'
         run: |
-          gh pr comment ${{ github.event.pull_request.number }} \
+          gh pr comment "$PR_NUMBER" \
             --body "❌ **自动审核未通过**
 
           本 PR 未通过安全检查，无法自动合并。可能的原因：
