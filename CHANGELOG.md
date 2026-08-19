@@ -6,6 +6,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Added
+- **CI now runs three existing-but-unwired test suites** — `test-p0-friction.ps1` (P0 auth-gate / path-traversal / case-contract regression) and `test-workflow-title-safety.ps1` (workflow title-injection safety) run on the Windows leg of the `routing-tests` job under Windows PowerShell 5.1 (both spawn `powershell.exe` and assert 5.1 behaviour); `case-review/tests/test_review_case.py` (8 `unittest` cases) runs in the Linux `case-contract` job. These tests shipped in the repo but nothing executed them.
 
 ## [1.0.1] — 2026-08-08
 ### Added

@@ -41,6 +41,17 @@ jobs:
         shell: powershell
         run: ./skills/scripts/test-bootstrap-supply-chain.ps1
 
+      # Windows-only: these tests spawn powershell.exe and assert PS 5.1 behaviour.
+      - name: P0 friction regression (Windows PowerShell 5.1)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: ./skills/scripts/test-p0-friction.ps1
+
+      - name: Workflow title-injection safety (Windows PowerShell 5.1)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: ./skills/scripts/test-workflow-title-safety.ps1
+
       - name: Smoke (verify + parse + quick route)
         shell: pwsh
         run: ./skills/scripts/smoke.ps1
@@ -182,6 +193,10 @@ jobs:
       - name: Review examples/ctf-demo under strict contract
         shell: bash
         run: python3 skills/case-review/scripts/review_case.py examples/ctf-demo --verify-hashes --strict
+
+      - name: review_case.py unit tests
+        shell: bash
+        run: python3 skills/case-review/tests/test_review_case.py
 
   version-check:
     name: version consistency
