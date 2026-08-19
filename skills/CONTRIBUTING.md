@@ -149,7 +149,7 @@ description: <一句话描述适用场景和触发条件>
 
 ### 3.4 下一步菜单模式（Next-Step Menu Pattern）
 
-每个新建 skill 的工作流中 `MUST` 在每个阶段结束时提供 3-6 个编号的下一步选项，让用户选择方向。禁止在没有用户选择的情况下跨阶段推进。
+每个新建 skill 只在 **genuine decision boundary**（两个或以上 materially different、evidence-supported 分支，且用户选择会改变下一动作）提供 3-6 个编号选项。若 transition 是确定性的，`MUST` 直接继续，并按 `ops/timeline-workitem.md` 记录 `decision_delta` + `carry_forward_refs`，不要重新展开 unchanged context。
 
 格式要求：
 
@@ -169,7 +169,7 @@ description: <一句话描述适用场景和触发条件>
 5. 暂停，我先确认前面的证据
 ```
 
-在 SKILL.md 的工作流定义中，每个阶段末尾加入此模式，而不是仅在末尾出现一次。
+在 SKILL.md 中把此模式放到真正有分岔的 decision boundary；不要机械地放到每个阶段末尾。
 
 ---
 

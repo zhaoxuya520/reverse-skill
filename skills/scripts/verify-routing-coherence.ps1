@@ -465,6 +465,22 @@ $idCheck += "fastapi-in-ops-deps=false"
 $idCheck -join [Environment]::NewLine | Set-Content (Join-Path $ScratchDir 'identity-check.txt') -Encoding UTF8
 Ok 'identity-check written'
 
+# Decision-delta / genuine-decision-boundary contract
+$transitionContract = Join-Path $PackageRoot "skills/ops/timeline-workitem.md"
+if (Test-Path -LiteralPath $transitionContract) {
+    $transitionText = Get-Content -LiteralPath $transitionContract -Raw -Encoding UTF8
+    if ($transitionText -like "*decision_delta*" -and $transitionText -like "*carry_forward_refs*") { Ok "timeline transition has delta-by-reference contract" } else { Bad "timeline transition missing delta-by-reference contract" }
+    if ($transitionText -like "*authoritative state*" -and $transitionText -like "*MUST NOT*" -and $transitionText -like "*genuine decision boundary*") { Ok "timeline contract forbids unchanged context re-materialization" } else { Bad "timeline contract missing unchanged-context boundary" }
+} else { Bad "timeline-workitem.md missing" }
+$masterSkillText = Get-Content -LiteralPath (Join-Path $PackageRoot "skills/SKILL.md") -Raw -Encoding UTF8
+if ($masterSkillText -like "*genuine decision boundary*" -and $masterSkillText -like "*decision_delta*" -and $masterSkillText -like "*carry_forward_refs*") { Ok "master skill gates menus on genuine decisions" } else { Bad "master skill missing genuine decision boundary contract" }
+$routingText = Get-Content -LiteralPath (Join-Path $PackageRoot "skills/routing.md") -Raw -Encoding UTF8
+if ($routingText -like "*genuine decision boundary*" -and $routingText -notlike "*Always provide a next-step menu*") { Ok "routing ambiguity path no longer forces unconditional menu" } else { Bad "routing still forces unconditional next-step menu" }
+$contribText = Get-Content -LiteralPath (Join-Path $PackageRoot "skills/CONTRIBUTING.md") -Raw -Encoding UTF8
+if ($contribText -like "*genuine decision boundary*" -and $contribText -notlike "*每个阶段结束时提供 3-6 个编号*") { Ok "new-skill contract uses genuine decision boundaries" } else { Bad "new-skill contract still requires per-stage menus" }
+$reWorkflowText = Get-Content -LiteralPath (Join-Path $PackageRoot "skills/reverse-engineering/references/re-agent-workflow.md") -Raw -Encoding UTF8
+if ($reWorkflowText -like "*decision_delta*" -and $reWorkflowText -like "*carry_forward_refs*" -and $reWorkflowText -like "*consumer 必须先继承 refs*") { Ok "representative RE workflow consumes delta by reference" } else { Bad "representative RE workflow missing delta consumer contract" }
+
 # Issue #77 — analysis decision framework anchors (MUST run before fail gate)
 $adf = Join-Path $PackageRoot "skills/ops/analysis-decision-framework.md"
 if (Test-Path -LiteralPath $adf) { Ok "analysis-decision-framework.md present (issue #77)" } else { Bad "analysis-decision-framework.md missing (issue #77)" }

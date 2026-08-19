@@ -302,6 +302,8 @@ cat > "$CASE_ROOT/timeline.md" <<EOF
 - result_summary: $timeline_summary
 - artifacts: [scope.md, workitems.md]
 - evidence_ids: []
+- decision_delta: [case_initialized]
+- carry_forward_refs: [scope.md]
 - next: $timeline_next
 EOF
 

@@ -268,7 +268,7 @@ When the user's wording is vague, emotionally phrased, imprecise, mixed-language
 3. **Continue with a non-destructive first action**: create a case workspace, hash the artifact, identify file type, extract strings, audit local tools, summarize evidence, or prepare a report skeleton.
 4. **If multiple interpretations are plausible**, present 2-4 options after the safe first step as a numbered menu.
 5. **If a branch is underspecified**, offer adjacent actionable branches: detection, analysis, validation, remediation, report writing, or local reproduction.
-6. **Always provide a next-step menu** — never leave the user with only a dead end.
+6. **Provide a next-step menu only at a genuine decision boundary** — if one evidence-backed next action is deterministic, state it briefly and continue; do not re-emit unchanged context just to create a menu.
 
 Suggested Chinese phrasing when recovering ambiguous intent:
 

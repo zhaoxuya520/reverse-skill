@@ -159,7 +159,7 @@ Hot path only:
 6. Route not matched → propose new skill (edit routing.json + benchmark; do not hand-edit routing.md as SSoT)
 7. Read tool-index.md → confirm local tool status. If missing (first run) → template + platform-native refresh-tool-index
 8. Missing tools → platform bootstrap + refresh (Windows ps1 / Linux sh / Kali sh)
-9. Enter skill workflow → execute (timeline/workitems; Evidence→Finding→Path per ops/)
+9. Enter skill workflow → execute (timeline/workitems; Evidence→Finding→Path per ops/). At transitions, carry unchanged authoritative state by reference and emit only `decision_delta`; menus only at genuine decision boundaries.
 10. Continuously report progress (do NOT go silent)
 11. Task complete → Completion Checklist (report must include Evidence chain)
 12. Output final results
