@@ -6,15 +6,16 @@
 
 ## 统计
 
-- 真实项目数：19
+- 真实项目数：20
 - 种子参考数：17
-- 总条目数：36
-- 最近更新：2026-08-17
+- 总条目数：37
+- 最近更新：2026-08-20
 
 ## 按场景分类
 
 ### APK / Android 逆向
 
+- [2026-08-20 Flutter AOT 服务端驱动广告去除（Blutter + 等长字符串替换）](./2026-08-20_apk-flutter-banner-ad-removal.md)
 - [2026-05-15-cellular-pro-mumu-ksad-fragment-fix](./2026-05-15-cellular-pro-mumu-ksad-fragment-fix.md)
 - [[种子] seed-008_apk-okhttp-ssl-pin-bypass](./seed-008_apk-okhttp-ssl-pin-bypass.md)
 
