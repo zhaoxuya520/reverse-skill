@@ -1,11 +1,11 @@
-# 非 PE / 多格式 Agent 响应菜谱 U–AV + AW–DC
+# 非 PE / 多格式 Agent 响应菜谱 U–AV + AW–DI
 
 > 与 PE 反调试菜谱 A–T（../anti-analysis.md）并列：按**文件类型**给出「触发 → 动作一行 → Evidence」。  
 > **不是**第二套主流程。Triage 识别类型后跳转到对应 skill + 本表。  
 > 默认 **授权隔离 lab / 已授权样本与设备**。格机、BYOVD、反射注入等写**检测与取证**，不写未授权破坏/利用教程。  
 > 绕过或还原失败也 MUST 记 Evidence；禁止静默当「无害」。
 >
-> §1–§8 / U–AV = 原始规则（Issue #65）。§9–§23 / AW–DC = 扩展规则（Issue #87，去重后）。
+> §1–§8 / U–AV = 原始规则（Issue #65）。§9–§23 / AW–DI = 扩展规则（Issue #87，去重后 + 语义增强）。
 
 ## 0. 路由速查
 
@@ -13,9 +13,9 @@
 |----------|----------|----------|
 | .bat / .cmd / 批处理 | malware-analysis | §1, §19 |
 | .ps1 / PowerShell | malware-analysis | §2, §20 |
-| Office 宏 / VBA / .docm/.xlsm | malware-analysis | §3 |
+| Office 宏 / VBA / .docm/.xlsm | malware-analysis | §3 (含 DD OLE 提取) |
 | .docx/.xlsx/.pptx OOXML 外链 / DDE | malware-analysis | §10 |
-| Web/前端 JS 混淆、JSVMP | js-reverse | §4, §21 |
+| Web/前端 JS 混淆、JSVMP | js-reverse | §4, §21 (含 DE/DF) |
 | .sys / 内核驱动 | reverse-engineering/kernel-driver-reverse.md + cre | §5 |
 | .dll 侧重点 | malware-analysis / re-agent-workflow | §6（与 A–T 去重） |
 | APK / Magisk / 隐藏图标 | apk-reverse | §7–§8, §23 |
@@ -50,13 +50,14 @@
 | **X** | 多层 FromBase64String / Gzip / Compress / 嵌套 -replace | **逐层**解码；每层结果单独记；工具可选（PowerDecode 等），无工具则手工/脚本 | E-ps-decode-layer-N | P0 |
 | **Z** | 字符串倒序、碎片 + 拼接后 Invoke-Expression/IEX | 还原完整串；对 IEX 下断或脚本块日志；明文命令入 Evidence | E-ps-string-restore | P1 |
 
-## 3. VBA 宏（AA AB AC）
+## 3. VBA 宏（AA AB AC DD）
 
 | ID | 触发 | 动作（摘要） | Evidence | 优先 |
 |----|------|--------------|----------|------|
 | **AA** | olevba/OLEDump 仅见 P-Code、源码流空（VBA Stomping） | P-Code 反编译工具；不全则 Word/Excel 宏调试观察；写清限制 | E-vba-pcode | P0 |
 | **AB** | 大量 Chr() 拼接或 Base64 串，疑 shellcode/嵌套脚本 | 立即窗口/脚本还原串；解码后判类型；动态盯 CreateObject/Shell | E-vba-str-decode | P1 |
 | **AC** | 无意义 If 1=2、或 InsertLines/DeleteLines 自修改 | 静跟真分支；动态 bp 自修改 API 并 dump 改后宏 | E-vba-selfmod | P2 |
+| **DD** | olevba/oledump 检出 VBA 宏项目（vbaProject.bin）；扩展名 .docm/.xlsm/.pptm | oledump.py 检查 OLE 流结构；olevba 提取 VBA 源码检测可疑 API；检查 AutoOpen/Workbook_Open 等自动执行宏 | E-office-vba | P0 |
 
 ## 4. JavaScript（AD AE AF）→ 主路径 js-reverse
 
@@ -218,12 +219,14 @@ DLL/SYS 硬门仍：E-imports + E-exports（见 re-agent-workflow）。
 | **CN** | 三层以上编码嵌套：外层 Base64 → Gzip → XOR → 明文（超出 §2 X 的两层范围） | 递归解码到明文或无法继续；每层记中间状态；PowerDecode 自动化；每层结果入证 | E-ps-multi-decode | P0 |
 | **CO** | Set-Alias 将 IEX 映射为单字符别名；Get-ChildItem variable: 动态获取变量值 | 展开所有别名映射替换回原始命令名；AST 分析还原变量 | E-ps-alias-decode | P1 |
 
-## 21. JavaScript 高级混淆（CP CQ）→ 与 §4 AD–AF 互补
+## 21. JavaScript 高级混淆（CP CQ DE DF）→ 与 §4 AD–AF 互补
 
 | ID | 触发 | 动作（摘要） | Evidence | 优先 |
 |----|------|--------------|----------|------|
 | **CP** | JS 使用 Proxy 对象拦截属性访问 + Reflect API 动态调用方法绕过静态分析 | 识别 Proxy get/set/apply 陷阱函数；追踪 Reflect.get 实际目标；标记动态拦截行为 | E-js-proxy | P1 |
 | **CQ** | JS 含 _0x... 十六进制字符串数组 + while(!![]) 死循环 + for+switch 控制流（obfuscator.io 特征） | 识别 obfuscator.io 特征（字符串数组+死循环）；de4js / jsnice 自动反混淆；还原后代码入证 | E-js-obfuscator | P0 |
+| **DE** | JS 主体为大型字节码数组 + VM 解释器循环（多 while/switch），入口指向 eval/Function 构造器；业务逻辑完全不可读（§4 AD 的深化） | 识别 VM 入口函数跟踪 opcode→处理函数映射；浏览器动态执行 Hook eval 输出；JSimplifier AST 重构；记录 opcode 映射表 | E-jsvmp-deep | P0 |
+| **DF** | JS 含 eval 动态生成新代码并立即执行、document.write 重写页面、或 Function 构造器动态构造函数体 | Hook eval 和 Function 构造函数记录生成的代码；浏览器动态执行捕获自修改内容 | E-js-selfmod | P1 |
 
 ## 22. Xposed/LSPosed 模块分析（CR–CX）→ apk-reverse
 
@@ -239,13 +242,16 @@ DLL/SYS 硬门仍：E-imports + E-exports（见 re-agent-workflow）。
 | **CW** | 代码含 Resources 动态替换 / View 绘制拦截 / AccessibilityService 声明 | 检查 AssetManager 替换 / Resources.updateConfiguration；检查 AccessibilityService 配置；识别 UI 劫持 | E-xp-ui-hijack | P1 |
 | **CX** | AndroidManifest.xml 声明 lsposed xposedscope meta-data；或代码含包名白名单检查 | 解析 xposedscope 目标应用范围；检查动态白名单绕过（反射修改 scope）；识别全局 Hook 越权 | E-xp-scope-bypass | P1 |
 
-## 23. Magisk 模块深度分析（CY–DC）→ 与 §7 AR–AT 互补
+## 23. Magisk 模块深度分析（CY–DC, DG–DI）→ 与 §7 AR–AT 互补
 
-> §7 聚焦格机/破坏行为。本节覆盖非破坏性但可疑的模块行为：Zygisk 注入、反检测、提权、横向感染。
+> §7 聚焦格机/破坏行为。本节覆盖非破坏性但可疑的模块行为：安装脚本分析、文件释放、Zygisk 注入、反检测、持久化、提权、横向感染。
 
 | ID | 触发 | 动作（摘要） | Evidence | 优先 |
 |----|------|--------------|----------|------|
+| **DG** | Magisk 模块 ZIP 根目录含 config.sh / install.sh；META-INF/com/google/android/update-binary 为非标准安装器 | 提取 config.sh/install.sh 中 on_install/print_modname/set_permissions 函数；检查 update-binary 是否含额外载荷；标记 pm install / dd 块设备 / mount -o remount,rw 操作 | E-mg-install-script | P0 |
+| **DH** | ZIP 内含 system/ / vendor/ / data/ 目录结构；或 post-fs-data.sh / service.sh 等开机执行脚本 | 提取释放文件路径识别是否释放 APK 到 /system/priv-app/；检查 service.sh + post-fs-data.sh 内容识别开机自启/后台保活/C2 通信；标记所有写入系统分区操作 | E-mg-file-drop | P0 |
 | **CY** | 模块含 zygisk/ 目录（arm64-v8a.so 等原生库）；或 config.sh 声明 IS_ZYGISK=true | 提取 zygisk/ 原生库分析 ZygiskModule 回调（onLoad / preAppSpecialize / postAppSpecialize）；检查 JNI Hook | E-mg-zygisk | P0 |
+| **DI** | 模块脚本写入 /data/adb/service.d/ 或 /data/adb/post-fs-data.d/；或修改 crontab/init.rc（§7 AT 的深化） | 提取写入 service.d + post-fs-data.d 的脚本内容；检查卸载时自动感染其他模块的逻辑（post-uninstall.sh / 模块目录监控）；检查 magisk --remove-modules 触发保护机制 | E-mg-persistence | P0 |
 | **CZ** | 模块脚本含 resetprop 修改系统属性 / magiskhide 配置 / DenyList 操作 | 提取所有 resetprop 调用识别被修改属性（ro.debuggable / ro.build.tags 等）；检查 DenyList 隐藏自身 | E-mg-anti-detect | P0 |
 | **DA** | 模块脚本含 setenforce 0 / mount -o rw,remount /system / chmod 777 敏感目录 | 检查 SELinux 操作（setenforce/chcon/restorecon）；检查系统分区挂载 + dm-verity 禁用；标记高危提权 | E-mg-privilege | P0 |
 | **DB** | 释放 APK/脚本含 curl/wget/HTTP 客户端；或释放 APK 申请 INTERNET + READ_CONTACTS/SMS 等敏感权限 | 提取网络请求目标 URL/IP；分析释放 APK 权限声明；识别数据外传逻辑 | E-mg-c2 | P0 |
@@ -267,9 +273,9 @@ DLL/SYS 硬门仍：E-imports + E-exports（见 re-agent-workflow）。
 ```text
 □ bat/cmd → U（+ 需要时 V/W；高级 CD–CI）
 □ ps1 → X（+ Z；高级 CJ–CO）
-□ vba → AA（+ AB/AC）
+□ vba → AA + DD（+ AB/AC）
 □ office ooxml → BA（+ BB 若疑 DDE）
-□ js 强混淆 → AD 或 AE（+ AF；高级 CP/CQ）
+□ js 强混淆 → AD 或 AE（+ AF；高级 CP/CQ/DE/DF）
 □ sys → AG + AH（+ AI 若疑 BYOVD）
 □ dll → AJ + AK/AL；Delay-Load 走 R
 □ apk 破坏/隐藏 → AR/AS 或 AU（+ AT/AV）
@@ -283,5 +289,5 @@ DLL/SYS 硬门仍：E-imports + E-exports（见 re-agent-workflow）。
 □ reg → BW + BX（+ BY）
 □ vbs → CA + CB + CC（+ BZ）
 □ xposed 模块 → CR + CS + CT + CU（+ CV–CX）
-□ magisk 深度 → CY + CZ + DA（+ DB/DC）
+□ magisk 深度 → DG + DH + CY + DI + CZ + DA（+ DB/DC）
 ```
