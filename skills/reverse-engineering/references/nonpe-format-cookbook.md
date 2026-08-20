@@ -1,11 +1,11 @@
-# 非 PE / 多格式 Agent 响应菜谱 U–AV + AW–DI
+# 非 PE / 多格式 Agent 响应菜谱 U–AV + AW–DN
 
 > 与 PE 反调试菜谱 A–T（../anti-analysis.md）并列：按**文件类型**给出「触发 → 动作一行 → Evidence」。  
 > **不是**第二套主流程。Triage 识别类型后跳转到对应 skill + 本表。  
 > 默认 **授权隔离 lab / 已授权样本与设备**。格机、BYOVD、反射注入等写**检测与取证**，不写未授权破坏/利用教程。  
 > 绕过或还原失败也 MUST 记 Evidence；禁止静默当「无害」。
 >
-> §1–§8 / U–AV = 原始规则（Issue #65）。§9–§23 / AW–DI = 扩展规则（Issue #87，去重后 + 语义增强）。
+> §1–§8 / U–AV = 原始规则（Issue #65）。§9–§23 / AW–DN = 扩展规则（Issue #87，去重后 + 语义增强 + edge-case 补丁）。
 
 ## 0. 路由速查
 
@@ -13,8 +13,8 @@
 |----------|----------|----------|
 | .bat / .cmd / 批处理 | malware-analysis | §1, §19 |
 | .ps1 / PowerShell | malware-analysis | §2, §20 |
-| Office 宏 / VBA / .docm/.xlsm | malware-analysis | §3 (含 DD OLE 提取) |
-| .docx/.xlsx/.pptx OOXML 外链 / DDE | malware-analysis | §10 |
+| Office 宏 / VBA / XLM / .docm/.xlsm | malware-analysis | §3 (含 DD OLE 提取, DJ XLM 宏) |
+| .docx/.xlsx/.pptx OOXML 外链 / DDE / .rtf OLE | malware-analysis | §10 (含 DK RTF) |
 | Web/前端 JS 混淆、JSVMP | js-reverse | §4, §21 (含 DE/DF) |
 | .sys / 内核驱动 | reverse-engineering/kernel-driver-reverse.md + cre | §5 |
 | .dll 侧重点 | malware-analysis / re-agent-workflow | §6（与 A–T 去重） |
@@ -50,7 +50,7 @@
 | **X** | 多层 FromBase64String / Gzip / Compress / 嵌套 -replace | **逐层**解码；每层结果单独记；工具可选（PowerDecode 等），无工具则手工/脚本 | E-ps-decode-layer-N | P0 |
 | **Z** | 字符串倒序、碎片 + 拼接后 Invoke-Expression/IEX | 还原完整串；对 IEX 下断或脚本块日志；明文命令入 Evidence | E-ps-string-restore | P1 |
 
-## 3. VBA 宏（AA AB AC DD）
+## 3. VBA 宏 / XLM（AA AB AC DD DJ）
 
 | ID | 触发 | 动作（摘要） | Evidence | 优先 |
 |----|------|--------------|----------|------|
@@ -58,6 +58,7 @@
 | **AB** | 大量 Chr() 拼接或 Base64 串，疑 shellcode/嵌套脚本 | 立即窗口/脚本还原串；解码后判类型；动态盯 CreateObject/Shell | E-vba-str-decode | P1 |
 | **AC** | 无意义 If 1=2、或 InsertLines/DeleteLines 自修改 | 静跟真分支；动态 bp 自修改 API 并 dump 改后宏 | E-vba-selfmod | P2 |
 | **DD** | olevba/oledump 检出 VBA 宏项目（vbaProject.bin）；扩展名 .docm/.xlsm/.pptm | oledump.py 检查 OLE 流结构；olevba 提取 VBA 源码检测可疑 API；检查 AutoOpen/Workbook_Open 等自动执行宏 | E-office-vba | P0 |
+| **DJ** | .xls/.xlsm 含 Excel 4.0/XLM 宏（隐藏在单元格公式中，非 VBA 流）；olevba 检出 XLM 宏标记 | olevba --xlm 提取 XLM 宏公式；检查隐藏工作表中的 EXEC/CALL/REGISTER 函数；XLMMacroDeobfuscator 动态仿真还原 | E-office-xlm | P0 |
 
 ## 4. JavaScript（AD AE AF）→ 主路径 js-reverse
 
@@ -118,23 +119,24 @@ DLL/SYS 硬门仍：E-imports + E-exports（见 re-agent-workflow）。
 
 | ID | 触发 | 动作（摘要） | Evidence | 优先 |
 |----|------|--------------|----------|------|
-| **AW** | pdfid 检出 /JS、/JavaScript、/OpenAction、/AA、/Launch 计数 >0 | pdfid -e 统计；pdf-parser 提取可疑对象；peepdf 交互分析 + JS 仿真 | E-pdf-autoaction | P0 |
-| **AX** | pdfid 检出 /EmbeddedFile >0，或对象流含大量 FlateDecode/ASCIIHexDecode | pdf-parser 提取流数据；peepdf 解码过滤器；file 识别解码结果类型 | E-pdf-embedded | P0 |
+| **AW** | pdfid 检出 /JS、/JavaScript、/OpenAction、/AA、/Launch 计数 >0（含 hex 编码名称如 /4A#61#76#61... 的混淆计数） | pdfid -e 统计（对比 plain vs obfuscated 计数）；pdf-parser 提取可疑对象；peepdf 交互分析 + JS 仿真 | E-pdf-autoaction | P0 |
+| **AX** | pdfid 检出 /EmbeddedFile >0；对象流含 FlateDecode/ASCIIHexDecode 级联过滤器链；或 /Annot 对象中隐藏编码载荷 | pdf-parser 提取流数据；peepdf 解码多层级联过滤器（含 AES 加密流 security handler r5/r6）；检查 Annotation 对象；file 识别解码结果类型 | E-pdf-embedded | P0 |
 | **AY** | 提取的 PDF JS 含大量 eval、unescape、String.fromCharCode、atob | peepdf JS 仿真环境执行跟踪；逐层解码 Base64/Hex/ROT13；CyberChef 辅助 | E-pdf-js-deobf | P1 |
 | **AZ** | PDF 结构异常：/JBIG2Decode、XREF 表被操纵、对象编号跳跃 | pdfid -d 重命名可疑关键字；检查已知 CVE 利用模式；提取 exploit 触发条件 | E-pdf-exploit | P1 |
 
-## 10. Office OOXML / DDE（BA BB）→ 与 §3 VBA 互补
+## 10. Office OOXML / DDE / RTF（BA BB DK）→ 与 §3 VBA 互补
 
 | ID | 触发 | 动作（摘要） | Evidence | 优先 |
 |----|------|--------------|----------|------|
-| **BA** | docx/xlsx/pptx ZIP 解压后 word/_rels/ 或 xl/_rels/ 中含可疑外部关系 | 检查 *.rels 外部链接；检查 vbaData.xml；提取嵌入 OLE 对象 | E-office-ooxml | P0 |
+| **BA** | docx/xlsx/pptx ZIP 解压后 word/_rels/ 或 xl/_rels/ 中含可疑外部关系（含 remote template injection） | 检查 *.rels 外部链接；检查 vbaData.xml；提取嵌入 OLE 对象；检查协议处理器滥用（ms-msdt: / search-ms: / ms-officecmd:） | E-office-ooxml | P0 |
 | **BB** | 文档含 DDEAUTO 或 DDEEXEC 域代码，通过域执行外部命令 | olevba --dde 扫描；提取 DDE 命令参数；检查是否指向 PowerShell/外部 exe | E-office-dde | P0 |
+| **DK** | .rtf 文件含嵌入 OLE 对象（非 OOXML、非经典 OLE 复合文档） | rtfobj 提取嵌入 OLE 对象；oleobj 分析对象类型；检查 Equation Editor 漏洞利用（CVE-2017-11882 等）；file 识别提取物类型 | E-rtf-ole | P0 |
 
 ## 11. WebAssembly（BC BD BE）
 
 | ID | 触发 | 动作（摘要） | Evidence | 优先 |
 |----|------|--------------|----------|------|
-| **BC** | 文件以 \x00asm 魔术字节开头；或 JS 代码含 WebAssembly 实例化逻辑 | wasm2wat 转文本；检查 import 段识别宿主环境导入函数；wasm-decompile 生成伪代码 | E-wasm-struct | P0 |
+| **BC** | 文件以 \x00asm 魔术字节开头；或 JS 代码含 WebAssembly 实例化逻辑 | wasm2wat 转文本；检查 import 段识别宿主环境导入函数；wasm-decompile 生成伪代码；检查 Emscripten 胶水签名（__wasm_call_ctors）判断是否由 JS 编译而来 | E-wasm-struct | P0 |
 | **BD** | WASM 函数数量多但逻辑简单、函数体被拆分为微小函数；或存在无意义 block/loop 嵌套 | diswasm 评估函数最小化级别；JEB Pro / IDA WASM 插件深度分析；动态追踪执行日志 | E-wasm-obfuscation | P1 |
 | **BE** | WASM 模块通过 JS 导入/导出函数与浏览器交互，存在 WebSocket、fetch、WebGL 调用 | 同时分析 JS 胶水代码和 WASM 模块；浏览器 DevTools 追踪数据交换；提取网络通信 URL/域名 | E-wasm-c2 | P1 |
 
@@ -143,17 +145,18 @@ DLL/SYS 硬门仍：E-imports + E-exports（见 re-agent-workflow）。
 | ID | 触发 | 动作（摘要） | Evidence | 优先 |
 |----|------|--------------|----------|------|
 | **BF** | JD-GUI/jadx 打开 JAR 时类名/方法名为无意义短字符（a.a.a / _0x 前缀 / 数字类名）；或大量 while/switch 控制流混淆 | 识别混淆器类型（ProGuard / Allatori / ZKM）；Java Deobfuscator 静态反混淆；高强度时动态调试追踪关键逻辑 | E-java-obfuscation | P0 |
-| **BG** | 大量 Class.forName()、Method.invoke()、Constructor.newInstance()；导入表无害但运行时动态加载恶意类 | javap -c -v 查看反射调用细节；追踪 Class.forName 参数字符串；动态对 Method.invoke 下断 | E-java-reflection | P0 |
+| **BG** | 大量 Class.forName()、Method.invoke()、Constructor.newInstance()；或自定义 ClassLoader + defineClass() 从字节数组内存加载类；导入表无害但运行时动态加载恶意类 | javap -c -v 查看反射调用细节；追踪 Class.forName 参数字符串；检查 defineClass() 字节数组来源；动态对 Method.invoke 下断 | E-java-reflection | P0 |
 | **BH** | JAR 含 .so（Linux/Android）或 .dll（Windows）；或 System.loadLibrary() 调用 | 提取原生库文件；file 识别格式；转入 ELF/PE 独立分析流程 | E-java-native | P1 |
 | **BI** | JAR/ZIP 解压后含嵌套 JAR/WAR/EAR；/resources、/assets 中存在高熵 .dat/.bin/.img 文件 | 递归解压所有嵌套归档；熵值分析判断加密/压缩；检查 META-INF/MANIFEST.MF 和 pom.xml | E-java-nested | P1 |
 
-## 13. AutoIt（BJ BK BL）
+## 13. AutoIt（BJ BK BL DM）
 
 | ID | 触发 | 动作（摘要） | Evidence | 优先 |
 |----|------|--------------|----------|------|
-| **BJ** | PE 字符串含 AutoIt / AU3 / EA05 / EA06 签名；或资源节含 AutoIt 脚本资源 | autoit-ripper 提取编译脚本；识别编码家族（EA05 = AutoIt3.00 / EA06 = AutoIt3.26）；还原源码 | E-autoit-extract | P0 |
+| **BJ** | PE 字符串含 AutoIt / AU3 / EA05 / EA06 签名；或资源节含 AutoIt 脚本资源（注意与 AutoHotKey 区分，MITRE T1059.010 两者共用） | autoit-ripper 提取编译脚本；识别编码家族（EA05 = AutoIt3.00 / EA06 = AutoIt3.26）；EA06 头部后提取 8 字节解密密钥用于解密载荷；还原源码 | E-autoit-extract | P0 |
 | **BK** | 提取脚本含大量 StringEncrypt/_StringEncrypt；或 Execute 动态执行 + 无意义变量名 | myAutToExe 静态反编译；识别反调试技术；分析混淆后控制流 | E-autoit-deobf | P1 |
 | **BL** | 脚本含 RegWrite（注册表持久化）、FileInstall（文件释放）、InetGet（网络下载）、Run/RunWait | 标记敏感 API 调用序列；分析 InetGet URL；追踪 FileInstall 释放路径 | E-autoit-malicious | P0 |
+| **DM** | AutoIt 作为 loader 执行进程空洞注入（process hollowing）：CallWindowProc/EnumWindows 回调 + shellcode + 注入合法进程（regsvcs.exe 等），释放 .NET 载荷（DarkGate / Snake Keylogger / ArechClient2 模式） | 检查 DllCall/DllCallbackRegister 对 kernel32 注入 API 的调用链；提取 shellcode 数据；识别被注入目标进程；提取 .NET 载荷独立分析 | E-autoit-hollowing | P0 |
 
 ## 14. HTA / HTML Application（BM BN BO）
 
@@ -188,7 +191,7 @@ DLL/SYS 硬门仍：E-imports + E-exports（见 re-agent-workflow）。
 | **BX** | .reg 修改 HKCR\...\shell\open\command（文件关联）或 HKCR\CLSID\{...}\InprocServer32（DLL 注入） | 检查 shell\open\command 是否为非常规 exe；检查 InprocServer32 DLL 路径 | E-reg-hijack | P0 |
 | **BY** | .reg 修改 HKLM\...\Policies\System（UAC 级别）、EnableLUA、ConsentPromptBehaviorAdmin | 检查修改前默认安全配置；分析对 UAC 的影响；标记降级行为 | E-reg-uac-bypass | P1 |
 
-## 18. VBScript（BZ CA CB CC）
+## 18. VBScript（BZ CA CB CC DN）
 
 | ID | 触发 | 动作（摘要） | Evidence | 优先 |
 |----|------|--------------|----------|------|
@@ -196,6 +199,7 @@ DLL/SYS 硬门仍：E-imports + E-exports（见 re-agent-workflow）。
 | **CA** | 脚本含 CreateObject("WScript.Shell") / CreateObject("Shell.Application") / Scripting.FileSystemObject | 标注高危 COM 对象调用；跟踪 Run/Exec 参数；追踪 FSO 创建的文件路径 | E-vbs-com-abuse | P0 |
 | **CB** | 脚本开头 #@~^ 签名，Microsoft Script Encoder 编码（VBS 专有） | screnc-decoder 解码；无工具时动态执行 + dump 解码脚本 | E-vbs-encoded | P0 |
 | **CC** | VBA/VBScript 含 WScript.Shell.Run + cmd /c + PowerShell，后续进程注入 | 追踪 CreateObject COM 对象链；分析 Run 参数中注入特征；记录完整进程创建链 | E-vbs-inject-chain | P0 |
+| **DN** | VBScript/JScript 通过 WMI ActiveScriptEventConsumer 实现无文件持久化（无启动文件夹/注册表 Run 键） | 检查 WMI 事件订阅（__EventFilter + __FilterToConsumerBinding + ActiveScriptEventConsumer）；提取绑定脚本内容；标记无文件持久化 | E-vbs-wmi-persist | P0 |
 
 ## 19. BAT/CMD 高级混淆（CD–CI）→ 与 §1 U–W 互补
 
@@ -208,16 +212,17 @@ DLL/SYS 硬门仍：E-imports + E-exports（见 re-agent-workflow）。
 | **CH** | 主批处理通过 %1 %* 接收参数，由父进程/下载器传入混淆指令 | 检查调用上下文记录传入参数；Base64 参数解码还原；还原完整调用链 | E-bat-param-call | P1 |
 | **CI** | certutil -decode / powershell -Command / echo \| findstr 组合解码执行 | 提取 Base64/Hex 字符串解码；检查解码结果是否为可执行脚本/PE | E-bat-encoded-exec | P0 |
 
-## 20. PowerShell 高级绕过（CJ–CO）→ 与 §2 X–Z 互补
+## 20. PowerShell 高级绕过（CJ–CO, DL）→ 与 §2 X–Z 互补
 
 | ID | 触发 | 动作（摘要） | Evidence | 优先 |
 |----|------|--------------|----------|------|
-| **CJ** | [Ref].Assembly.GetType('...AmsiUtils') / amsiInitFailed / GetTypes() 等 AMSI 绕过 | 识别绕过模式（Patch / 注册表 / 环境变量）；动态确认生效；标记绕过技术类型 | E-ps-amsi | P0 |
+| **CJ** | [Ref].Assembly.GetType('...AmsiUtils') / amsiInitFailed / GetTypes() 等 AMSI 绕过（含硬件断点绕过：CPU 调试寄存器，无内存写入/VirtualProtect） | 识别绕过模式（Patch / 注册表 / 环境变量 / 硬件断点）；动态确认生效；标记绕过技术类型 | E-ps-amsi | P0 |
 | **CK** | [PSConstraintLanguage] 类型操作或通过 DefaultRunspace 修改会话状态绕过 CLM | 识别 CLM 绕过模式；标记 bypass-clm；分析绕过后执行上下文 | E-ps-clm-bypass | P0 |
 | **CL** | [ScriptBlock]::Create / $ExecutionContext.InvokeCommand 构造器；或覆盖 ScriptBlock 日志设置 | 检查脚本是否禁用日志记录；动态验证日志是否被绕过 | E-ps-sb-log-bypass | P1 |
 | **CM** | IEX (New-Object Net.WebClient).DownloadString(...) 或 [Reflection.Assembly]::Load(FromBase64...) 无文件执行 | 提取下载 URL 检查域名/IP 信誉；PS 日志捕获内存加载代码；隔离网络模拟提取载荷 | E-ps-reflect-load | P0 |
 | **CN** | 三层以上编码嵌套：外层 Base64 → Gzip → XOR → 明文（超出 §2 X 的两层范围） | 递归解码到明文或无法继续；每层记中间状态；PowerDecode 自动化；每层结果入证 | E-ps-multi-decode | P0 |
 | **CO** | Set-Alias 将 IEX 映射为单字符别名；Get-ChildItem variable: 动态获取变量值 | 展开所有别名映射替换回原始命令名；AST 分析还原变量 | E-ps-alias-decode | P1 |
+| **DL** | 脚本含 ntdll.dll EtwEventWrite 补丁（stomping）静默遥测；常与 AMSI 绕过组合使用 | 检查是否存在 EtwEventWrite 地址获取 + 内存补丁（ret 0xC3）；与 CJ AMSI 绕过同时检查；标记双绕过组合 | E-ps-etw-bypass | P0 |
 
 ## 21. JavaScript 高级混淆（CP CQ DE DF）→ 与 §4 AD–AF 互补
 
@@ -252,7 +257,7 @@ DLL/SYS 硬门仍：E-imports + E-exports（见 re-agent-workflow）。
 | **DH** | ZIP 内含 system/ / vendor/ / data/ 目录结构；或 post-fs-data.sh / service.sh 等开机执行脚本 | 提取释放文件路径识别是否释放 APK 到 /system/priv-app/；检查 service.sh + post-fs-data.sh 内容识别开机自启/后台保活/C2 通信；标记所有写入系统分区操作 | E-mg-file-drop | P0 |
 | **CY** | 模块含 zygisk/ 目录（arm64-v8a.so 等原生库）；或 config.sh 声明 IS_ZYGISK=true | 提取 zygisk/ 原生库分析 ZygiskModule 回调（onLoad / preAppSpecialize / postAppSpecialize）；检查 JNI Hook | E-mg-zygisk | P0 |
 | **DI** | 模块脚本写入 /data/adb/service.d/ 或 /data/adb/post-fs-data.d/；或修改 crontab/init.rc（§7 AT 的深化） | 提取写入 service.d + post-fs-data.d 的脚本内容；检查卸载时自动感染其他模块的逻辑（post-uninstall.sh / 模块目录监控）；检查 magisk --remove-modules 触发保护机制 | E-mg-persistence | P0 |
-| **CZ** | 模块脚本含 resetprop 修改系统属性 / magiskhide 配置 / DenyList 操作 | 提取所有 resetprop 调用识别被修改属性（ro.debuggable / ro.build.tags 等）；检查 DenyList 隐藏自身 | E-mg-anti-detect | P0 |
+| **CZ** | 模块脚本含 resetprop 修改系统属性 / magiskhide / DenyList；或集成 Shamiko（隐藏 Zygisk 本身）/ TrickyStore（篡改证书链）/ PlayIntegrityFork（伪造 Play Integrity API） | 提取所有 resetprop 调用识别被修改属性（ro.debuggable / ro.build.tags 等）；检查 DenyList 隐藏自身；识别 Shamiko/TrickyStore/PlayIntegrityFork 模块级反检测 | E-mg-anti-detect | P0 |
 | **DA** | 模块脚本含 setenforce 0 / mount -o rw,remount /system / chmod 777 敏感目录 | 检查 SELinux 操作（setenforce/chcon/restorecon）；检查系统分区挂载 + dm-verity 禁用；标记高危提权 | E-mg-privilege | P0 |
 | **DB** | 释放 APK/脚本含 curl/wget/HTTP 客户端；或释放 APK 申请 INTERNET + READ_CONTACTS/SMS 等敏感权限 | 提取网络请求目标 URL/IP；分析释放 APK 权限声明；识别数据外传逻辑 | E-mg-c2 | P0 |
 | **DC** | 脚本遍历 /data/adb/modules/ 目录、修改其他模块文件、或写入自身副本到其他模块 | 检查 module.prop 注入恶意指令；检查其他模块 service.sh 追加恶意代码；识别"寄生"逻辑 | E-mg-cross-infect | P0 |
@@ -272,9 +277,9 @@ DLL/SYS 硬门仍：E-imports + E-exports（见 re-agent-workflow）。
 
 ```text
 □ bat/cmd → U（+ 需要时 V/W；高级 CD–CI）
-□ ps1 → X（+ Z；高级 CJ–CO）
-□ vba → AA + DD（+ AB/AC）
-□ office ooxml → BA（+ BB 若疑 DDE）
+□ ps1 → X（+ Z；高级 CJ–CO + DL ETW）
+□ vba/xlm → AA + DD + DJ（+ AB/AC）
+□ office ooxml/rtf → BA + DK（+ BB 若疑 DDE）
 □ js 强混淆 → AD 或 AE（+ AF；高级 CP/CQ/DE/DF）
 □ sys → AG + AH（+ AI 若疑 BYOVD）
 □ dll → AJ + AK/AL；Delay-Load 走 R
@@ -282,12 +287,12 @@ DLL/SYS 硬门仍：E-imports + E-exports（见 re-agent-workflow）。
 □ pdf → AW + AX（+ AY/AZ）
 □ wasm → BC（+ BD/BE）
 □ jar/class → BF + BG（+ BH/BI）
-□ autoit → BJ + BL（+ BK）
+□ autoit → BJ + BL + DM（+ BK）
 □ hta → BM + BN（+ BO）
 □ wsf/jse/vbe → BP + BQ（+ BR/BS）
 □ msi → BT（+ BU/BV）
 □ reg → BW + BX（+ BY）
-□ vbs → CA + CB + CC（+ BZ）
+□ vbs → CA + CB + CC + DN（+ BZ）
 □ xposed 模块 → CR + CS + CT + CU（+ CV–CX）
 □ magisk 深度 → DG + DH + CY + DI + CZ + DA（+ DB/DC）
 ```
