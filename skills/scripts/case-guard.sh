@@ -15,7 +15,7 @@ while [[ $# -gt 0 ]]; do
     -Force|--force) FORCE=1; shift ;;
     -Quiet|--quiet) QUIET=1; shift ;;
     -h|--help) sed -n '2,6p' "$0"; exit 0 ;;
-    *) echo "Unknown arg: $1" >&2; exit 1 ;;
+    *) echo "Unknown arg: \"$1\"" >&2; exit 1 ;;
   esac
 done
 
