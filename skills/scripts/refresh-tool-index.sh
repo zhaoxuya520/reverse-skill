@@ -188,7 +188,7 @@ for entry in "${TOOLS[@]}"; do
   if [[ "$version_spec" != "none" ]]; then
     read -r ver_cmd ver_arg1 ver_arg2 <<< "$version_spec"
     if has_cmd "$ver_cmd"; then
-      version="$(run_version "$ver_cmd" ${ver_arg1:-} ${ver_arg2:-})"
+      version="$(run_version "$ver_cmd" "${ver_arg1:-}" "${ver_arg2:-}")"
     fi
   fi
 
