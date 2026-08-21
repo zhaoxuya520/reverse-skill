@@ -309,3 +309,7 @@ Special thanks to the OLLVM deobfuscation ecosystem contributors and everyone wh
 This project is intended solely for lawful security research, education, CTF competitions, and testing of systems that you own or have explicit authorization to assess.
 
 **Unauthorized access, scanning, exploitation, disruption, data acquisition, or any other use against systems without prior permission is strictly prohibited.** Users are solely responsible for complying with applicable laws, regulations, and the authorized scope of testing. The maintainers accept no liability for misuse of this project or for any resulting damage or legal consequences
+
+## Installation and download security
+
+See [Installation and Download Security Guidance](docs/UV-AND-DOWNLOAD-SECURITY.md).
