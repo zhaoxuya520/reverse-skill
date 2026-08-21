@@ -924,6 +924,16 @@ function Ensure-Capability {
             Ensure-McpServer -ServerName $definition.mcpNames[0] -ServerDefinition $serverDefinition
             return $true
         }
+        'remote-http-mcp' {
+            if (-not $definition.PSObject.Properties['mcpNames'] -or @($definition.mcpNames).Count -eq 0) {
+                throw "remote-http-mcp capability $Name is missing mcpNames in bootstrap-manifest.json."
+            }
+            if (-not $definition.PSObject.Properties['mcpUrl'] -or [string]::IsNullOrWhiteSpace([string]$definition.mcpUrl)) {
+                throw "remote-http-mcp capability $Name is missing mcpUrl in bootstrap-manifest.json."
+            }
+            Ensure-McpServer -ServerName $definition.mcpNames[0] -ServerDefinition @{ url = [string]$definition.mcpUrl }
+            return $true
+        }
         'npm-global' {
             Ensure-NodeRuntime
             $npm = Get-NodeCommandPath -Name 'npm'
