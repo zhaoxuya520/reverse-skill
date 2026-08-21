@@ -437,6 +437,9 @@ foreach ($mf in @($skillsManifest, $kaliManifest)) {
                 $fetchesExternalSource = $capMap['repoUrl'] -or $capMap['repo']
                 $hasPin = (-not $fetchesExternalSource) -or $capMap['pinnedCommit'] -or $capMap['pinnedVersion']
             }
+            'remote-http-mcp' {
+                $hasPin = (-not $capMap['repoUrl']) -and (-not $capMap['repo']) -and $capMap['pinPolicy']
+            }
             'winget-package' { $hasPin = $hasPin } # winget-latest 属于 pinPolicy
             'apt-package' { $hasPin = $true }      # 发行版仓库自带（Kali 侧）
             'docker-image' { $hasPin = $true }     # fallback 通道

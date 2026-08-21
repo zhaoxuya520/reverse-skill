@@ -102,6 +102,7 @@ python3 skills/case-review/scripts/review_case.py work/<case> --verify-hashes --
 | **R23** | 云 / 容器 / K8s | `cloud-k8s/` |
 | **R35** | 数据库安全 | `database-security/` |
 | **R25** | 取证 / 内存转储 / 时间线 | `digital-forensics/` |
+| **R42** | OSINT / 威胁情报 / 公开 X IOC 补充 | `threat-intelligence/` |
 | **R36** | 邮件 / 钓鱼分析 | `email-security/` |
 | **R29** | Wi-Fi / 无线渗透 | `wifi-wireless/` |
 | **R38** | RF / SDR 研究 | `radio-sdr/` |

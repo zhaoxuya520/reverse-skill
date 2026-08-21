@@ -181,7 +181,7 @@ Usage:
   bash skills/scripts/bootstrap-reverse.sh --list
 
 Capabilities (parity with bootstrap-reverse.ps1):
-  jadx apktool frida frida-ps idalib-mcp jshookmcp reqable-mcp anything-analyzer idapro
+  jadx apktool frida frida-ps idalib-mcp jshookmcp reqable-mcp xquik-mcp anything-analyzer idapro
   r2 rabin2 adb agent-browser ghidra-mcp seclists proxycat burpsuite-mcp
   nmap pentestswarm binwalk yara pwntools
 
@@ -202,7 +202,7 @@ EOF
 }
 
 ALL_CAPABILITIES=(
-  jadx apktool jeb-pro frida frida-ps idalib-mcp jshookmcp reqable-mcp anything-analyzer idapro
+  jadx apktool jeb-pro frida frida-ps idalib-mcp jshookmcp reqable-mcp xquik-mcp anything-analyzer idapro
   r2 rabin2 adb agent-browser ghidra-mcp seclists proxycat burpsuite-mcp
   nmap pentestswarm binwalk yara pwntools
 )
@@ -748,6 +748,20 @@ PY
   log_warn "Reqable MCP requires the separately installed Reqable desktop application and its local API."
 }
 
+ensure_xquik_mcp() {
+  local url payload
+  url=$(manifest_field xquik-mcp mcpUrl) || return 1
+  payload=$(python3 - "$url" <<'PY'
+import json, sys
+print(json.dumps({'url': sys.argv[1]}))
+PY
+)
+  write_mcp_server "xquik" "$payload"
+  if ! $LAST_CAPABILITY_REGISTRATION_REQUIRED; then
+    log_ok "xquik remote MCP registered; complete OAuth in the selected MCP client"
+  fi
+}
+
 ensure_anything_analyzer() {
   local dir="$TOOLS_ROOT/anything-analyzer"
   local repo commit
@@ -1014,6 +1028,7 @@ ensure_capability() {
     idalib-mcp) ensure_idalib_mcp ;;
     jshookmcp) ensure_jshookmcp ;;
     reqable-mcp) ensure_reqable_mcp ;;
+    xquik-mcp) ensure_xquik_mcp ;;
     anything-analyzer) ensure_anything_analyzer ;;
     idapro) ensure_idapro ;;
     r2|rabin2) ensure_r2 ;;

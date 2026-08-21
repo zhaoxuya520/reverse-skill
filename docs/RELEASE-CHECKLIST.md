@@ -9,11 +9,11 @@
 3. [ ] 同步更新 VERSION 文件为 x.y.z
 4. [ ] 里程碑版本（如 v1.0.0 / v1.1.0）同步更新 docs/RELEASE_NOTES_v<x.y.z>.md
 5. [ ] 打 tag：git tag v<x.y.z> + git push --tags
-6. [ ] 推送后确认 CI 全绿（routing 163 基准 + coherence + pin gate + version-check）
+6. [ ] 推送后确认 CI 全绿（routing 173 基准 + coherence + pin gate + version-check）
 
 ## 元数据同步（发版顺手项）
 
-- 新增/删除 bootstrap 能力 → 同步 RULES.md / RULES_zh.md / skills/SKILL.md 的能力列表（以 skills/scripts/bootstrap-manifest.json 为唯一事实源，当前 24 项）
+- 新增/删除 bootstrap 能力 → 同步 RULES.md / RULES_zh.md / skills/SKILL.md 的能力列表（以 skills/scripts/bootstrap-manifest.json 为唯一事实源，当前 25 项）
 - 新增 field-journal 条目 → 更新 skills/field-journal/_index.md 三处（场景分类 / 高频模式 / 实体倒排）与统计
 - 路由规则变更 → 只改 skills/config/routing.json（文档由生成脚本维护或至少保持一致）
 

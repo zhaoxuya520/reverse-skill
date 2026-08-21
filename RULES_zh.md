@@ -68,6 +68,7 @@
 - 凭证提取、Mimikatz、Kerberoasting、DCSync、LSASS
 - C2、远控、持久化、后门、Cobalt Strike、反弹 shell
 - 蓝队、检测、防御、应急响应、SIEM、EDR、威胁狩猎、IOC
+- 开源情报、威胁情报、公开 X/Twitter IOC 补充、活动关联
 - 移动安全测试、OWASP MASTG、APP 安全、脱壳、加固分析
 - SSTI、模板注入、SSTImap、XSS、XSStrike、跨站脚本
 - WordPress、WPScan、WPProbe、CMS 渗透
@@ -466,7 +467,7 @@ Kali Linux（Bash，含 Kali 原生工具链）：
 bash <本包根目录>/kali/scripts/bootstrap-reverse.sh 工具名 --start-services
 ```
 
-支持的能力名（与 `skills/scripts/bootstrap-manifest.json` 保持一致，共 24 项）：jadx、apktool、jeb-pro、frida、frida-ps、idalib-mcp、reqable-mcp、jshookmcp、anything-analyzer、idapro、r2、rabin2、adb、agent-browser、ghidra-mcp、seclists、proxycat、burpsuite-mcp、nmap、pentestswarm、binwalk、yara、pwntools、bkcrack
+支持的能力名（与 `skills/scripts/bootstrap-manifest.json` 保持一致，共 25 项）：jadx、apktool、jeb-pro、frida、frida-ps、idalib-mcp、reqable-mcp、jshookmcp、xquik-mcp、anything-analyzer、idapro、r2、rabin2、adb、agent-browser、ghidra-mcp、seclists、proxycat、burpsuite-mcp、nmap、pentestswarm、binwalk、yara、pwntools、bkcrack
 
 ## 刷新工具索引
 

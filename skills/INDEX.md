@@ -48,6 +48,7 @@
 | [supply-chain-security](supply-chain-security/SKILL.md) | Use for software supply-chain security assessment covering SBOM, SCA, CI/CD pipelines, container images, build integrity, dependency provenance, and vulnerab... |
 | [thick-client](thick-client/SKILL.md) | Use for authorized security testing of desktop thick clients including local storage, update channels, IPC, traffic, and client-side trust boundaries. |
 | [threat-hunting](threat-hunting/SKILL.md) | Use for blue-team threat hunting, detection engineering with Sigma/YARA, SIEM query design, and incident detection validation. |
+| [threat-intelligence](threat-intelligence/SKILL.md) | Use for authorized OSINT and cyber threat intelligence that enriches IOCs, campaigns, impersonation, scams, or threat actors from public sources. Includes bo... |
 | [wifi-wireless](wifi-wireless/SKILL.md) | Use for authorized wireless security assessment including Wi-Fi capture, WPA handshake analysis, rogue AP detection research, and lab-only deauth testing. |
 | [windows-ad](windows-ad/SKILL.md) | Use for authorized Active Directory and Windows identity attacks including Kerberos, AD CS, BloodHound paths, NTLM relay, and domain privilege escalation res... |
 
@@ -95,6 +96,7 @@ skills/reverse-engineering/SKILL.md/
 skills/supply-chain-security/SKILL.md/
 skills/thick-client/SKILL.md/
 skills/threat-hunting/SKILL.md/
+skills/threat-intelligence/SKILL.md/
 skills/wifi-wireless/SKILL.md/
 skills/windows-ad/SKILL.md/
 ```

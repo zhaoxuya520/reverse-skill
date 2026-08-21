@@ -374,6 +374,13 @@ function Get-ReverseToolCatalog {
             Fallbacks = @()
         }
         [pscustomobject]@{
+            Name = 'xquik-mcp'
+            Skill = 'threat-intelligence'
+            Purpose = '公开 X/Twitter 威胁情报采集的远程 MCP（需客户端登记与 OAuth）'
+            VersionArgs = @()
+            Fallbacks = @()
+        }
+        [pscustomobject]@{
             Name = 'agent-browser'
             Skill = 'browser-automation'
             Purpose = '浏览器自动化（Playwright）：打开页面、点击、填表、爬取、截图'
@@ -907,6 +914,9 @@ function Get-ReverseCapabilityState {
     $ready = $toolReady
     if ($definition.PSObject.Properties['mcpNames']) {
         switch ($verificationMode) {
+            'registration-only' {
+                $ready = $registered
+            }
             'service-and-registration' {
                 $ready = $registered -and $serviceOnline
             }
