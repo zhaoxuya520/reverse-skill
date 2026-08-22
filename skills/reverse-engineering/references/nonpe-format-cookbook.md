@@ -13,11 +13,9 @@
 | .ps1 / PowerShell | malware-analysis | §2 |
 | Office 宏 / VBA / .docm/.xlsm | malware-analysis | §3 |
 | Web/前端 JS 混淆、JSVMP | js-reverse | §4 |
-| .sys / 内核驱动 | 
-everse-engineering/kernel-driver-reverse.md + cre | §5 |
-| .dll 侧重点 | malware-analysis / 
-e-agent-workflow | §6（与 A–T 去重） |
-| APK / Magisk / 隐藏图标 | pk-reverse | §7–§8 |
+| .sys / 内核驱动 | reverse-engineering/kernel-driver-reverse.md + cre | §5 |
+| .dll 侧重点 | malware-analysis / re-agent-workflow | §6（与 A–T 去重） |
+| APK / Magisk / 隐藏图标 | apk-reverse | §7–§8 |
 
 Triage 文件类型为脚本/宏/JS/APK/DLL/SYS 时：完成本类型 **P0 锚点 Evidence** 后再深挖；PE 反调试仍走 A–T。
 
@@ -77,10 +75,9 @@ Triage 文件类型为脚本/宏/JS/APK/DLL/SYS 时：完成本类型 **P0 锚�
 | **AP** | 无文件映射/反射加载线索 | 内存特征、加载器行为、无路径模块；授权环境取证 | E-dll-reflective | P1 |
 | **AQ** | 仅因导出名「不像恶意」降风险 | **禁止**只凭导出名判安全；结合段权限、入口、字符串、动态行为 | E-dll-export-priority | P1 |
 
-DLL/SYS 硬门仍：E-imports + E-exports（见 
-e-agent-workflow）。
+DLL/SYS 硬门仍：E-imports + E-exports（见 re-agent-workflow）。
 
-## 7. Android 格机 / 持久化（AR AS AT）→ pk-reverse
+## 7. Android 格机 / 持久化（AR AS AT）→ apk-reverse
 
 > **仅授权样本、镜像或测试设备。** 动作是检测、提取 IOC 与持久化路径，不是实施破坏。
 
@@ -90,17 +87,16 @@ e-agent-workflow）。
 | **AS** | 循环 curl|sh / 远程拉脚本、非常规 C2 URL | 提 URL；分析下载体是否含格机命令；记临时路径 | E-android-wiper-backdoor | P0 |
 | **AT** | /data/adb/service.d、post-fs-data.d、可疑 /system/priv-app 等 | 列持久化脚本/APK；内容摘要入证 | E-android-persistence | P1 |
 
-## 8. Android 透明/隐藏图标（AU AV）→ pk-reverse
+## 8. Android 透明/隐藏图标（AU AV）→ apk-reverse
 
 | ID | 触发 | 动作（摘要） | Evidence | 优先 |
 |----|------|--------------|----------|------|
-| **AU** | LAUNCHER 图标全透明/空 label、Theme.NoDisplay、无 LAUNCHER category、组件 disabled | apt dump badging + manifest；反编译查图标像素；异常项入证 | E-android-hidden-icon-manifest | P0 |
+| **AU** | LAUNCHER 图标全透明/空 label、Theme.NoDisplay、无 LAUNCHER category、组件 disabled | aapt dump badging + manifest；反编译查图标像素；异常项入证 | E-android-hidden-icon-manifest | P0 |
 | **AV** | 已装但桌面无图标，后台流量/自启/高危权限/动态恢复图标 | pm list vs 桌面；dumpsys package；广播与 device_admin；行为入证 | E-android-hidden-icon-behavior | P1 |
 
 ## 9. 约束（全局）
 
-1. **不平行主流程**：阶段门闩仍以 
-e-agent-workflow / 各 skill 为准。  
+1. **不平行主流程**：阶段门闩仍以 re-agent-workflow / 各 skill 为准。  
 2. **Evidence 必记**：含失败、半还原、quality= 标注。  
 3. **与 A–T 去重**：PE 反调试不重复；AM→R；AJ 补 DLL 视角不推翻 TLS 火箭。  
 4. **工具缺失**：记 n/a + 手工等价，不假装已用商业套件。  
@@ -108,7 +104,7 @@ e-agent-workflow / 各 skill 为准。
 
 ## 10. P0 最小勾选（类型命中时）
 
-`	ext
+```text
 □ bat/cmd → U（+ 需要时 V/W）
 □ ps1 → X（+ Z）
 □ vba → AA（+ AB/AC）
@@ -116,4 +112,4 @@ e-agent-workflow / 各 skill 为准。
 □ sys → AG + AH（+ AI 若疑 BYOVD）
 □ dll → AJ + AK/AL；Delay-Load 走 R
 □ apk 破坏/隐藏 → AR/AS 或 AU（+ AT/AV）
-`
+```

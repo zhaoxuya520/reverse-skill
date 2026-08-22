@@ -7,6 +7,9 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 ### Fixed
+- **CI UTF-8 BOM gate** — `smoke.ps1` and `test-bootstrap-codex-encoding.ps1` have CJK literals but lost their BOM after later encoding-test commits; restore the three-byte prefix without rewriting line endings so Windows PowerShell 5.1 and the existing BOM gate both pass.
+- **nonpe cookbook truncated identifiers** — BEL (`0x07`) ate the first letter of `apk-reverse` / `aapt` / `reverse-engineering` / `re-agent-workflow` and split table rows; restore the original U–AV wording (no AW–DN expansion).
+- **scan-leaks GHA annotations** — escape CR/LF in matched leak values so a finding cannot inject extra workflow commands.
 - **Windows PowerShell 5.1 encoding** — added a UTF-8 BOM to five non-ASCII `.ps1` scripts (`skills/scripts/verify-doc-facts.ps1`, `apk-reverse/scripts/frida-run.ps1`, `apk-reverse/scripts/rebuild-sign-install.ps1`, `ida-reverse/scripts/start.ps1`, `radare2/scripts/recon.ps1`). Without a BOM, PS 5.1 parses these files as the system ANSI codepage and garbles their Chinese / em-dash string literals; `verify-doc-facts.ps1` was failing four checks under 5.1 (CI only ran it under `pwsh`, which defaults to UTF-8). CI now guards every non-ASCII `.ps1` for a BOM.
 
 ### Changed
@@ -16,6 +19,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - **IDA discovery** — `ToolDiscovery.ps1` now catalogs `idalib-mcp`, `ida-pro-mcp`, and `ida` with Program Files + per-user Python fallbacks.
 
 ### Added
+- **CI now runs two existing-but-unwired suites** — `test-p0-friction.ps1` on the Windows leg of `routing-tests` under Windows PowerShell 5.1; `case-review/tests/test_review_case.py` in the Linux `case-contract` job. `test-workflow-title-safety.ps1` was already wired.
 - `ida-reverse` watchdog / scheduled-task installer / GUI launcher / supervisor wrapper (`watchdog.ps1`, `install-autostart.ps1`, `start-gui.ps1`, `run-supervisor.py`) plus portable `LOCAL-SETUP.md`.
 
 ## [1.0.1] — 2026-08-08

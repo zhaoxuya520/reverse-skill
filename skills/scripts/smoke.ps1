@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 # reverse-skill smoke entrypoint: verify + script parse + master-route sample matrix.
 # Usage:
 #   powershell -NoProfile -ExecutionPolicy Bypass -File skills/scripts/smoke.ps1
