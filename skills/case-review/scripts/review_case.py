@@ -19,7 +19,7 @@ FINDING_HEADING = re.compile(r"^###\s+(F-[A-Za-z0-9][A-Za-z0-9_-]*)\b", re.MULTI
 PATH_HEADING = re.compile(r"^###\s+(P-[A-Za-z0-9][A-Za-z0-9_-]*)\b", re.MULTILINE)
 
 SEVERITIES = {"critical", "high", "medium", "low", "info", "n/a", "n/a_re"}
-EVIDENCE_STATUSES = {"observed", "candidate", "validated", "false_positive", "accepted_risk"}
+EVIDENCE_STATUSES = {"observed", "candidate", "validated", "false_positive", "accepted_risk", "superseded"}
 WORKITEM_STATUSES = {"pending", "in_progress", "blocked", "done", "completed", "cancelled"}
 PATH_TYPES = {"attack", "callflow", "solve"}
 NETWORK_MODES = {"offline", "lab_only", "authorized_target_only", "unrestricted_lab"}
@@ -219,7 +219,7 @@ def parse_reports(root, issues):
             for field in required:
                 if not field_value(body, field):
                     issue(issues, "error", "finding.field_missing", finding_id + " is missing " + field, relative_path(root, report_path))
-            if status not in {"candidate", "validated", "false_positive", "accepted_risk"}:
+            if status not in {"candidate", "validated", "false_positive", "accepted_risk", "superseded"}:
                 issue(issues, "error", "finding.status", finding_id + " has unsupported status", relative_path(root, report_path))
             if status == "validated" and confidence == "low":
                 issue(issues, "error", "finding.confidence", finding_id + " is validated with low confidence", relative_path(root, report_path))
@@ -306,6 +306,8 @@ def parse_evidence(root, workitems, issues, verify_hashes):
 
         severity = field_value(text, "severity").lower()
         status = field_value(text, "status").lower()
+        if status.startswith("superseded by"):
+            status = "superseded"
         repro_command = field_value(text, "repro_command")
         notes = field_value(text, "notes").lower()
         linked_workitems = ids_in(field_value(text, "linked_workitem"), WORKITEM_ID)
