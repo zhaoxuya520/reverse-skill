@@ -1,4 +1,4 @@
-﻿# reverse-skill 技能导航索引
+# reverse-skill 技能导航索引
 
 > 本文件由 `skills/scripts/extract-summaries.ps1` 自动生成，**请勿手改**。
 > 修改摘要请编辑对应模块 `SKILL.md` 的 frontmatter `description`，然后重跑脚本。
@@ -43,8 +43,9 @@
 | [pwn-chain](pwn-chain/SKILL.md) | 从逆向走到可用利用 (Working Exploit) 的全链路工程化方法。 |
 | [radare2](radare2/SKILL.md) | Use this skill whenever the user wants to analyze binaries with radare2/r2 from the command line, including reverse engineering, disassembly, function analys... |
 | [radio-sdr](radio-sdr/SKILL.md) | Use for authorized RF/SDR security research including signal identification, replay feasibility study in shielded labs, and wireless protocol analysis outsid... |
-| [dsl-vm-reverse](reverse-engineering/dsl-vm-reverse/SKILL.md) | Reverse JavaScript-based custom DSL/VM interpreters, non-standard WASM-like runtimes, and risk-control engines. Use when analyzing IIFE or switch-based opcod... |
 | [reverse-engineering](reverse-engineering/SKILL.md) | Provides reverse engineering techniques. Use when the main job is to understand how a compiled, obfuscated, packed, or virtualized target works before exploi... |
+| [Methodology & Decision Framework](reverse-engineering/decision-framework/SKILL.md) | High-level methodology and decision framework for reverse engineering when entry points are hidden or heavily obfuscated. |
+| [dsl-vm-reverse](reverse-engineering/dsl-vm-reverse/SKILL.md) | Reverse JavaScript-based custom DSL/VM interpreters, non-standard WASM-like runtimes, and risk-control engines. Use when analyzing IIFE or switch-based opcod... |
 | [supply-chain-security](supply-chain-security/SKILL.md) | Use for software supply-chain security assessment covering SBOM, SCA, CI/CD pipelines, container images, build integrity, dependency provenance, and vulnerab... |
 | [thick-client](thick-client/SKILL.md) | Use for authorized security testing of desktop thick clients including local storage, update channels, IPC, traffic, and client-side trust boundaries. |
 | [threat-hunting](threat-hunting/SKILL.md) | Use for blue-team threat hunting, detection engineering with Sigma/YARA, SIEM query design, and incident detection validation. |
@@ -55,50 +56,51 @@
 ## 目录树
 
 ```
-skills/api-security/SKILL.md/
-skills/apk-reverse/SKILL.md/
-skills/attack-chain/SKILL.md/
-skills/binary-diff/SKILL.md/
-skills/browser-automation/SKILL.md/
-skills/browser-extension-reverse/SKILL.md/
-skills/case-review/SKILL.md/
-skills/cloud-k8s/SKILL.md/
-skills/code-audit/SKILL.md/
-skills/ctf-sandbox/SKILL.md/
-skills/database-security/SKILL.md/
-skills/diagram-generator/SKILL.md/
-skills/digital-forensics/SKILL.md/
-skills/docs-generator/SKILL.md/
-skills/dotnet-reverse/SKILL.md/
-skills/edr-bypass-re/SKILL.md/
-skills/email-security/SKILL.md/
-skills/firmware-pentest/SKILL.md/
-skills/ghidra-reverse/SKILL.md/
-skills/go-rust-reverse/SKILL.md/
-skills/hardware-security/SKILL.md/
-skills/ida-reverse/SKILL.md/
-skills/identity-federation/SKILL.md/
-skills/js-reverse/SKILL.md/
-skills/llm-security/SKILL.md/
-skills/macos-reverse/SKILL.md/
-skills/malware-analysis/SKILL.md/
-skills/mobile-reverse/SKILL.md/
-skills/ot-ics/SKILL.md/
-skills/patch-diff-exploit/SKILL.md/
-skills/pentest-tools/SKILL.md/
-skills/pentest-tools/src-hunter/SKILL.md/
-skills/protocol-reverse/SKILL.md/
-skills/pwn-chain/SKILL.md/
-skills/radare2/SKILL.md/
-skills/radio-sdr/SKILL.md/
-skills/reverse-engineering/dsl-vm-reverse/SKILL.md/
-skills/reverse-engineering/SKILL.md/
-skills/supply-chain-security/SKILL.md/
-skills/thick-client/SKILL.md/
-skills/threat-hunting/SKILL.md/
-skills/threat-intelligence/SKILL.md/
-skills/wifi-wireless/SKILL.md/
-skills/windows-ad/SKILL.md/
+skills/api-security/
+skills/apk-reverse/
+skills/attack-chain/
+skills/binary-diff/
+skills/browser-automation/
+skills/browser-extension-reverse/
+skills/case-review/
+skills/cloud-k8s/
+skills/code-audit/
+skills/ctf-sandbox/
+skills/database-security/
+skills/diagram-generator/
+skills/digital-forensics/
+skills/docs-generator/
+skills/dotnet-reverse/
+skills/edr-bypass-re/
+skills/email-security/
+skills/firmware-pentest/
+skills/ghidra-reverse/
+skills/go-rust-reverse/
+skills/hardware-security/
+skills/ida-reverse/
+skills/identity-federation/
+skills/js-reverse/
+skills/llm-security/
+skills/macos-reverse/
+skills/malware-analysis/
+skills/mobile-reverse/
+skills/ot-ics/
+skills/patch-diff-exploit/
+skills/pentest-tools/
+skills/pentest-tools/
+skills/protocol-reverse/
+skills/pwn-chain/
+skills/radare2/
+skills/radio-sdr/
+skills/reverse-engineering/
+skills/reverse-engineering/
+skills/reverse-engineering/
+skills/supply-chain-security/
+skills/thick-client/
+skills/threat-hunting/
+skills/threat-intelligence/
+skills/wifi-wireless/
+skills/windows-ad/
 ```
 
 ## 路由
