@@ -149,6 +149,7 @@ jobs:
           set -euo pipefail
           bash skills/scripts/test-routing.sh
           bash skills/scripts/test-bootstrap-manifest.sh
+          bash skills/scripts/test-bash-workflow.sh
 
           scratch="$(mktemp -d)"
           trap 'rm -rf "$scratch"' EXIT
