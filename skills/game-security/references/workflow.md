@@ -1,6 +1,6 @@
 # 游戏安全工作流门闩
 
-配合 `../SKILL.md`。每阶段结束必须停在编号菜单。命中 AGS 分发表时 **MUST** 打开 `ags/*.md`（含 game-hacking），不要用本页代替。
+配合 `../SKILL.md`。每阶段结束必须停在编号菜单。命中硬跳转表时 **MUST** 立刻打开 `ags/*.md` 全文（含 game-hacking）。本页不是 AGS 完整 skill。
 
 ## Phase 1 — 引擎识别
 

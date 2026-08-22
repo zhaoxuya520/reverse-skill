@@ -1,20 +1,20 @@
 # AGS 吸收地图（KEEP 全部 10 个 agent skill）
 
-来源：[gmh5225/awesome-game-security](https://github.com/gmh5225/awesome-game-security)（MIT，Copyright 2022 gmh）。检索日：**2026-08-22**。
+来源：[gmh5225/awesome-game-security](https://github.com/gmh5225/awesome-game-security)（MIT，Copyright 2022 gmh）。
 
-PRIMARY 仍是本包 `game-security/`（路由 **R43**）。AGS 的 10 个 Claude skill **全部作为一等参考装入** `ags/`，不是 DROP，也不是 INDEX-ONLY 空指针。
+**Pin：** `gmh5225/awesome-game-security@bf403cf9e37f4c04f8c68a866fdd2a8f3054bfe2`（[ags/UPSTREAM.txt](ags/UPSTREAM.txt)）。刷新：`scripts/install-ags-refs.ps1`。
 
-等价于 AGS 侧 `npx skills add` ×10：agent 在 R43 命中后按下面的分发表打开对应文件。
+PRIMARY 仍是本包 `game-security/`（路由 **R43**）。AGS 的 10 个 Claude skill **全部作为一等参考装入** `ags/`。命中后 **MUST 硬跳转** 打开对应 `ags/*.md` 全文；`engines.md` / `anti-cheat-families.md` / `tools.md` **不是** 完整 skill。
 
 ## 10 skill KEEP 表
 
 | AGS skill（截图名） | 上游目录 | 本包落点 | 冲突优化 |
 |---------------------|----------|----------|----------|
 | anti-cheat-systems | `.claude/skills/anti-cheat` | **KEEP** [ags/anti-cheat.md](ags/anti-cheat.md) | 家族快表仍在 [anti-cheat-families.md](anti-cheat-families.md)；内核作业交接 `kernel-driver-reverse.md` / `edr-bypass-re/` |
-| dma-attack-techniques | `.claude/skills/dma-attack` | **KEEP** [ags/dma-attack.md](ags/dma-attack.md) | 全文保留；门禁只用该文件 Ethical Use + reverse-skill `case-init` |
+| dma-attack-techniques | `.claude/skills/dma-attack` | **KEEP** [ags/dma-attack.md](ags/dma-attack.md) | **SSoT** for pcileech/FPGA/IOMMU。`anti-cheat.md` DMA 段是 AGS 原文重叠，不删，冲突以本文件为准 |
 | game-engine-resources | `.claude/skills/game-engine` | **KEEP** [ags/game-engine.md](ags/game-engine.md) | dump 命令与 tool-index 仍在 [engines.md](engines.md) / [il2cpp-dump.md](il2cpp-dump.md) |
 | **game-hacking-techniques** | `.claude/skills/game-hacking` | **KEEP** [ags/game-hacking.md](ags/game-hacking.md) | 技术目录全文保留；不加额外禁令 |
-| graphics-api-hooking | `.claude/skills/graphics-api` | **KEEP** [ags/graphics-api.md](ags/graphics-api.md) | Present/DX/VK/GL/ImGui 目录保留；overlay 当威胁模型或授权实验室 |
+| graphics-api-hooking | `.claude/skills/graphics-api` | **KEEP** [ags/graphics-api.md](ags/graphics-api.md) | Present/DX/VK/GL/ImGui 全文保留 |
 | mobile-security | `.claude/skills/mobile-security` | **KEEP** [ags/mobile-security.md](ags/mobile-security.md) | APK 解包仍先 `apk-reverse/`，解完回到本表做游戏向 IL2CPP/root/Zygisk |
 | awesome-game-security-overview | `.claude/skills/overview` | **KEEP** [ags/overview.md](ags/overview.md) | 本地分发；上游 README 格式/27 个顶栏保留 |
 | game-security-research-rigor | `.claude/skills/research-rigor` | **KEEP** [ags/research-rigor.md](ags/research-rigor.md) | Observation/Finding/Attribution/Decision 映射 `ops/evidence-finding-path.md` |

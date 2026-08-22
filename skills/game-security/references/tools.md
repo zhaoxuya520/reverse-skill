@@ -1,7 +1,6 @@
 # 游戏安全工具（RE / 防御；精选）
 
-> 本页是 reverse-skill **精选工具**（路径不猜）。完整游戏 RE 工具/插件/混淆目录：[ags/reverse-engineering.md](ags/reverse-engineering.md)。链接堆按 [ags/fetch-upstream.md](ags/fetch-upstream.md) 现拉。  
-> Distill from [gmh5225/awesome-game-security](https://github.com/gmh5225/awesome-game-security) (MIT, 2026-08-22).
+> 本页 **不是** AGS 完整 skill。游戏 RE 工具/插件/混淆目录 **MUST** 打开 [ags/reverse-engineering.md](ags/reverse-engineering.md)。本页只绑 `tool-index`。链接堆按 [ags/fetch-upstream.md](ags/fetch-upstream.md) 现拉。
 
 ## 路径（reverse-skill）
 

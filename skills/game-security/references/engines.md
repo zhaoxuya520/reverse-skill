@@ -1,7 +1,6 @@
 # 游戏引擎识别（RE / 防御）
 
-> 本页是 reverse-skill **磁盘指纹 + dump 链**（绑定 tool-index）。引擎对象模型 / SDK dump 工作流补充：[ags/game-engine.md](ags/game-engine.md)。  
-> Distill from [gmh5225/awesome-game-security](https://github.com/gmh5225/awesome-game-security) (MIT, 2026-08-22).
+> 本页 **不是** AGS 完整 skill。引擎对象模型 / SDK dump **MUST** 打开 [ags/game-engine.md](ags/game-engine.md)。本页只绑磁盘指纹 + tool-index dump 命令。
 
 ## 授权（reverse-skill）
 

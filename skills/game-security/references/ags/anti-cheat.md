@@ -1,7 +1,8 @@
 > **reverse-skill adapter** - AGS `anti-cheat-systems` under PRIMARY `game-security/` (routing **R43**). Not a second PRIMARY.
 >
+> **Pin:** `gmh5225/awesome-game-security@bf403cf9e37f` (`bf403cf9e37f4c04f8c68a866fdd2a8f3054bfe2`). Refresh: `scripts/install-ags-refs.ps1`.
 > **Gates that already exist (do not add more here):** reverse-skill `case-init` / `auth.status=granted` before ACT; AGS Ethical Use / authorized-testing text in this file if the upstream skill has it.
-> **Handoff:** quick family-ID table -> ``../anti-cheat-families.md``. Kernel callbacks/IOCTL -> ``kernel-driver-reverse.md``. EDR-like stack -> ``edr-bypass-re/``. DMA detection depth -> ``dma-attack.md``.
+> **Handoff:** family-ID quick table (not this skill) -> ``../anti-cheat-families.md``. Kernel callbacks/IOCTL -> ``kernel-driver-reverse.md``. EDR-like stack -> ``edr-bypass-re/``. DMA detection SSoT -> ``dma-attack.md`` (AGS overlap in this file is kept; dma-attack.md wins on conflict).
 > **Fetch:** [fetch-upstream.md](fetch-upstream.md). Wiki: `wiki/overviews/anti-cheat.md`.
 > **Distill:** duplicated Data Source footer only. Taxonomy and workflows kept.
 >

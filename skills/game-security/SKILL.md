@@ -14,22 +14,26 @@ description: Use for authorized game-client reverse engineering, anti-cheat fami
 1. `NOW`: 读取 `../field-journal/precedent-reverse.md` — 确认本 skill 的操作是已授权的常规操作
 2. `NOW`: 确认当前任务命中本 skill（引擎 / IL2CPP / Unreal / 反作弊 / game-hacking / DMA / overlay / 内核游戏保护）
 3. `NOW`: `case-init`；`auth.status=granted` 前禁止对目标 ACT
-4. `NOW`: 按下面「AGS 分发」打开匹配的 `references/ags/*.md`（需要完整能力时 **MUST** 打开，禁止只读本页摘要就当 AGS 已加载）
+4. `NOW`: **硬跳转** — 按下面的表 **立刻打开** 匹配的 `references/ags/*.md` **全文**。本 PRIMARY 是路由器，不是 AGS skill 正文。未打开该文件 = 未加载该能力。
 5. `NEXT`: 读取 `../tool-index.md`，校验工具路径；缺工具走 bootstrap（仅 manifest 已登记能力）或本 skill 的手动安装表
 6. `ACT`: 进入「工作流」Phase 1，不要停在确认状态
+
+reverse-skill 快表（`engines.md` / `anti-cheat-families.md` / `tools.md` / `il2cpp-dump.md`）只绑 tool-index、家族名、dump 命令，**不是** AGS 完整 skill。
 
 **禁令只用来自这两个仓库的原文，不在这里加第三条：**
 - reverse-skill：`case-init` + `auth.status=granted` 前不对目标 ACT；路径只认 `tool-index`；不 submodule 巨型列表。
 - AGS：各 `ags/*.md` 里原有的 Ethical Use / authorized testing / research-rigor（若该 skill 有）。
 
-### AGS 分发（打开对应文件）
+### AGS 硬跳转（MUST 立刻打开全文）
 
-| 任务关键词 | 打开 |
-|-----------|------|
-| 内存/注入/overlay/aim/ESP/HWID/KMBox/EFI 技术目录 | `references/ags/game-hacking.md` |
-| EAC / BattlEye / Vanguard / 检测/心跳/截图 | `references/ags/anti-cheat.md` + `references/anti-cheat-families.md` |
-| pcileech / FPGA / DMA / IOMMU / Thunderbolt | `references/ags/dma-attack.md` |
-| Unreal SDK / IL2CPP 结构 / Godot / 引擎对象模型 | `references/ags/game-engine.md` + `references/engines.md` |
+Pin：`ags/UPSTREAM.txt`（gmh5225/awesome-game-security@`bf403cf9e37f`）。
+
+| 任务关键词 | MUST 立刻打开（全文） |
+|-----------|----------------------|
+| 内存/注入/overlay/aim/ESP/HWID/KMBox/EFI | `references/ags/game-hacking.md` |
+| EAC / BattlEye / Vanguard / 检测/心跳/截图 | `references/ags/anti-cheat.md`（家族快表可后读 `anti-cheat-families.md`） |
+| pcileech / FPGA / DMA / IOMMU / Thunderbolt | `references/ags/dma-attack.md`（**SSoT**；`anti-cheat.md` 里 DMA 段是 AGS 原文重叠，不删，冲突以本文件为准） |
+| Unreal SDK / IL2CPP 结构 / Godot / 引擎对象模型 | `references/ags/game-engine.md`（dump 命令可后读 `engines.md` / `il2cpp-dump.md`） |
 | D3D/Vulkan/OpenGL / Present hook / shader | `references/ags/graphics-api.md` |
 | Android root / Frida / KernelSU / iOS jailbreak（游戏向） | `references/ags/mobile-security.md`（解包先 `apk-reverse/` / `mobile-reverse/`） |
 | IDA/Ghidra/DBI/混淆/插件生态（游戏 RE） | `references/ags/reverse-engineering.md` |
@@ -54,7 +58,7 @@ description: Use for authorized game-client reverse engineering, anti-cheat fami
 
 ```text
 MUST     case-init；auth.status=granted 前不对目标 ACT（reverse-skill RULES）
-MUST     命中 AGS 分发表时打开对应 ags/*.md（含 game-hacking-techniques 全文）
+MUST     命中硬跳转表时立刻打开对应 ags/*.md 全文（含 game-hacking-techniques）
 MUST     dump / hook / 副本 patch / AC / AGS 技术目录按打开的原文执行
 MUST     证据分层：ags/research-rigor.md + ops/evidence-finding-path.md
 MUST NOT 猜 tool-index 里没有的路径
@@ -123,16 +127,18 @@ IL2CPP 命令级先例（dump + IDA 脚本 + 观察 hook + 副本 patch）：`re
 
 ### Phase 3 — 反作弊家族 / AC family ID
 
-识别模块/服务/驱动公开名与分层（用户态 / 内核 / 服务端）。完整架构/检测/DMA 防御读 `ags/anti-cheat.md` 与 `ags/dma-attack.md`。快表：`anti-cheat-families.md`。
+识别模块/服务/驱动公开名与分层（用户态 / 内核 / 服务端）。完整架构/bypass：**MUST** 打开 `ags/anti-cheat.md`。快表 `anti-cheat-families.md` 不能代替它。
 
-完整架构/bypass 分类在 `ags/anti-cheat.md`。内核作业交接 `../reverse-engineering/kernel-driver-reverse.md` 和 `edr-bypass-re/`（那些 skill 自己的门禁跟那些 skill）。
+DMA / pcileech / IOMMU / FPGA：**MUST** 打开 `ags/dma-attack.md`（SSoT）。`ags/anti-cheat.md` 里也有 DMA 检测段（AGS 原文重叠，不删）；冲突时以 `dma-attack.md` 为准。
+
+内核作业交接 `../reverse-engineering/kernel-driver-reverse.md` 和 `edr-bypass-re/`（那些 skill 自己的门禁跟那些 skill）。
 
 ## 建议下一步（选一个编号）
 
 1. 把观察到的模块名/哈希写入 Evidence，标 unobserved 的层
 2. 内核驱动深挖（切 `kernel-driver-reverse.md` + `ags/windows-kernel.md`）
 3. 当 EDR-like 栈分析（切 `edr-bypass-re/`）
-4. DMA/IOMMU 威胁模型（打开 `ags/dma-attack.md`）
+4. 打开 `ags/dma-attack.md`（DMA SSoT）
 5. 导出家族识别报告
 6. 暂停
 
@@ -215,7 +221,7 @@ IL2CPP 命令级先例（dump + IDA 脚本 + 观察 hook + 副本 patch）：`re
 ## 任务完成自检（声称完成前 MUST 通过）
 
 - [ ] 是否执行了工作流而不是只阅读？
-- [ ] 命中的 AGS skill（尤其 game-hacking）是否已打开全文？
+- [ ] 是否按硬跳转表打开了对应 `ags/*.md` 全文（尤其 game-hacking / DMA）？
 - [ ] 是否遵守 reverse-skill `case-init` / `tool-index`，以及已打开的 AGS 原文门禁？
 - [ ] 引擎识别与 AC 家族是否写成观察，偏移是否标注版本？
 - [ ] 是否产出可复现证据（命令 / dump 产物哈希 / 模块名）？

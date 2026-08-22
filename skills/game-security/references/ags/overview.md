@@ -1,7 +1,8 @@
 > **reverse-skill adapter** - AGS `awesome-game-security-overview` under PRIMARY `game-security/` (routing **R43**). Not a second PRIMARY.
 >
+> **Pin:** `gmh5225/awesome-game-security@bf403cf9e37f` (`bf403cf9e37f4c04f8c68a866fdd2a8f3054bfe2`). Refresh: `scripts/install-ags-refs.ps1`.
 > **Gates that already exist (do not add more here):** reverse-skill `case-init` / `auth.status=granted` before ACT; AGS Ethical Use / authorized-testing text in this file if the upstream skill has it.
-> **Handoff:** local dispatch is this file + ``../INDEX.md``. Do not vendor the 4250-bullet README; fetch via ``fetch-upstream.md``.
+> **Handoff:** hard-jump table is PRIMARY ``game-security/SKILL.md`` plus this file. Do not vendor the 4250-bullet README; fetch via ``fetch-upstream.md``.
 > **Fetch:** [fetch-upstream.md](fetch-upstream.md). Wiki: `wiki/overviews/overview.md`.
 > **Distill:** duplicated Data Source footer only. Taxonomy and workflows kept.
 >
@@ -77,10 +78,10 @@ Each category follows this format:
 
 When an AI agent receives a query, use this table to select the best skill:
 
-| Query topic | Primary skill | Related skills |
+| Query topic | MUST open (full skill) | Related |
 |---|---|---|
 | EAC, BattlEye, Vanguard, detection, heartbeat, screenshot | [anti-cheat.md](anti-cheat.md) | [windows-kernel.md](windows-kernel.md) |
-| pcileech, FPGA, DMA, IOMMU, Thunderbolt | [dma-attack.md](dma-attack.md) | [anti-cheat.md](anti-cheat.md) |
+| pcileech, FPGA, DMA, IOMMU, Thunderbolt | [dma-attack.md](dma-attack.md) (SSoT) | [anti-cheat.md](anti-cheat.md) |
 | Unreal SDK, Unity IL2CPP, engine structs, Godot, Lumix | [game-engine.md](game-engine.md) | [game-hacking.md](game-hacking.md) |
 | Memory hacking, injection, overlays, driver comm, HWID spoof | [game-hacking.md](game-hacking.md) | [graphics-api.md](graphics-api.md) |
 | D3D/Vulkan/OpenGL hooks, Present hook, shader interception | [graphics-api.md](graphics-api.md) | [game-hacking.md](game-hacking.md) |

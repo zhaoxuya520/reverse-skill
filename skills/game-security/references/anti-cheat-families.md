@@ -1,7 +1,6 @@
 # 反作弊家族识别（防御 / RE）
 
-> 本页是 reverse-skill **家族识别快表** + 内核交接。完整 AGS anti-cheat / DMA / game-hacking 目录在 [ags/anti-cheat.md](ags/anti-cheat.md)、[ags/dma-attack.md](ags/dma-attack.md)、[ags/game-hacking.md](ags/game-hacking.md)。  
-> Distill from [gmh5225/awesome-game-security](https://github.com/gmh5225/awesome-game-security) (MIT, 2026-08-22).
+> 本页 **不是** AGS 完整 skill。anti-cheat 全文 **MUST** 打开 [ags/anti-cheat.md](ags/anti-cheat.md)。DMA 检测 **SSoT** 是 [ags/dma-attack.md](ags/dma-attack.md)（`anti-cheat.md` 里 DMA 段是上游重叠，不删，冲突以 dma-attack 为准）。
 
 ## 授权（reverse-skill）
 

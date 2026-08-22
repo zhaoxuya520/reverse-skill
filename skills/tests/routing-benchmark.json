@@ -930,6 +930,21 @@
       "hint": "kmbox hardware input",
       "expect": "R43",
       "quick": false
+    },
+    {
+      "hint": "dll injection unity game",
+      "expect": "R43",
+      "quick": true
+    },
+    {
+      "hint": "esp overlay unreal engine",
+      "expect": "R43",
+      "quick": false
+    },
+    {
+      "hint": "sqlmap injection scan",
+      "expect": "R11",
+      "quick": true
     }
   ]
 }
