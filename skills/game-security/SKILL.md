@@ -1,6 +1,6 @@
 ---
 name: game-security
-description: Use for authorized game-client reverse engineering, anti-cheat family identification, and the full awesome-game-security technique catalog (Unity IL2CPP/Mono, Unreal, Godot, dump chains, DMA/overlay/injection/kernel threat-model). Do not use to ship live-title trainers or cheat products.
+description: Use for authorized game-client reverse engineering, anti-cheat family identification, and the full awesome-game-security technique catalog (Unity IL2CPP/Mono, Unreal, Godot, dump chains, DMA, overlay, injection, kernel).
 ---
 
 # Game Security（授权游戏客户端安全 / AGS 完整能力）
@@ -18,9 +18,9 @@ description: Use for authorized game-client reverse engineering, anti-cheat fami
 5. `NEXT`: 读取 `../tool-index.md`，校验工具路径；缺工具走 bootstrap（仅 manifest 已登记能力）或本 skill 的手动安装表
 6. `ACT`: 进入「工作流」Phase 1，不要停在确认状态
 
-**产品轨 vs 实验室（不要把后者当拒绝）：**
-- `MUST NOT` 交付线上外挂**成品**（可分发 aimbot / ESP / trainer）或对 **未授权 live 网游** 作业 FPGA/pcileech。
-- `MUST` 继续做授权/离线样本上的完整 RE：dump、IDA/Ghidra、Frida **观察 hook**、副本 patch、CE 内存结构、AC 模块/驱动逆向、以及 AGS 技术目录里的威胁模型（injection / overlay / DMA / HWID / KMBox 协议…）。
+**禁令只用来自这两个仓库的原文，不在这里加第三条：**
+- reverse-skill：`case-init` + `auth.status=granted` 前不对目标 ACT；路径只认 `tool-index`；不 submodule 巨型列表。
+- AGS：各 `ags/*.md` 里原有的 Ethical Use / authorized testing / research-rigor（若该 skill 有）。
 
 ### AGS 分发（打开对应文件）
 
@@ -43,7 +43,7 @@ description: Use for authorized game-client reverse engineering, anti-cheat fami
 - Unity IL2CPP / Mono 授权样本：元数据还原、方法名恢复、业务逻辑定位、Frida 观察、**副本** patch
 - Unreal / Godot / Source / Cocos：引擎指纹、对象模型、自有构建 SDK dump（版本相关，禁止把网上偏移当 L1）
 - 反作弊家族识别 + 授权样本上的 AC 模块/驱动逆向（交接 `kernel-driver-reverse.md` / `edr-bypass-re/`）
-- **AGS game-hacking 技术目录**（威胁模型 / 授权实验室）：RPM/WPM、injection、hook、overlay、W2S、DMA、驱动通信、HWID、stack spoof、输入模拟
+- **AGS game-hacking 技术目录**（全文 `ags/game-hacking.md`）：RPM/WPM、injection、hook、overlay、W2S、DMA、驱动通信、HWID、stack spoof、输入模拟
 - 图形 API hook 与 overlay 捕获面（`ags/graphics-api.md`）
 - DMA / PCIe / IOMMU 检测与防御（`ags/dma-attack.md`）
 - 移动游戏：IL2CPP + root/Zygisk/Frida 目录（解包后回到本 skill）
@@ -53,14 +53,13 @@ description: Use for authorized game-client reverse engineering, anti-cheat fami
 ## MUST / MUST NOT
 
 ```text
-MUST     先引擎识别再 dump，再决定 IDA/Ghidra/dnSpy/Frida 交接
-MUST     命中 AGS 分发表时打开对应 ags/*.md（含 game-hacking-techniques）
-MUST     dump / 观察 hook / 副本 patch / AC 识别 / 技术目录 都可用
-MUST     证据分层：观察 ≠ Finding ≠ 归因（ags/research-rigor.md + ops/evidence-finding-path.md）
-MUST NOT 交付线上外挂成品、对未授权 live 标题做 DMA/FPGA
-MUST NOT 把 FullEmu destW、mid-insn Capstone、Hex-Rays-on-CFF 写成 L1
-MUST NOT 猜 tool-index 里没有的路径；il2cppdumper 已在 manifest（manual）
-MUST NOT 把「授权样本 Frida/副本 patch/技术目录」误判成外挂产品而拒执行
+MUST     case-init；auth.status=granted 前不对目标 ACT（reverse-skill RULES）
+MUST     命中 AGS 分发表时打开对应 ags/*.md（含 game-hacking-techniques 全文）
+MUST     dump / hook / 副本 patch / AC / AGS 技术目录按打开的原文执行
+MUST     证据分层：ags/research-rigor.md + ops/evidence-finding-path.md
+MUST NOT 猜 tool-index 里没有的路径
+MUST NOT 用本页摘要代替 ags/*.md
+MUST NOT 在 AGS / reverse-skill 原文之外再加禁令
 ```
 
 ## 语言行为契约
@@ -108,7 +107,7 @@ MUST NOT 把「授权样本 Frida/副本 patch/技术目录」误判成外挂产
 
 - IL2CPP → Il2CppDumper / Il2CppInspectorRedux / Cpp2IL → dump.cs + script.json → IDA/Ghidra 脚本
 - Mono → dnSpyEx（`dotnet-reverse/`）
-- Unreal → 自有/授权构建上的 Dumper-7 / UE4SS **元数据恢复**（实验室可用；禁止做成线上作弊 SDK 分发物）
+- Unreal → 自有/授权构建上的 Dumper-7 / UE4SS（见 `ags/game-engine.md`）
 - 加密 metadata：在 `il2cpp_init` 附近观察解密，mmap 后 dump；禁止假装有通用解密器
 
 IL2CPP 命令级先例（dump + IDA 脚本 + 观察 hook + 副本 patch）：`references/il2cpp-dump.md`。引擎对象模型补充：`references/ags/game-engine.md`。seed-014 的 AddCoin/VerifyReceipt **改返回值**示例不要当交付默认值；定位校验、记录调用、在副本上 patch **仍是能力**。
@@ -126,7 +125,7 @@ IL2CPP 命令级先例（dump + IDA 脚本 + 观察 hook + 副本 patch）：`re
 
 识别模块/服务/驱动公开名与分层（用户态 / 内核 / 服务端）。完整架构/检测/DMA 防御读 `ags/anti-cheat.md` 与 `ags/dma-attack.md`。快表：`anti-cheat-families.md`。
 
-**分析能力不减**：授权样本上继续交接 `../reverse-engineering/kernel-driver-reverse.md` 和 `edr-bypass-re/`。`MUST NOT` 的是线上过检测**成品**，不是「不许逆向 AC」。
+完整架构/bypass 分类在 `ags/anti-cheat.md`。内核作业交接 `../reverse-engineering/kernel-driver-reverse.md` 和 `edr-bypass-re/`（那些 skill 自己的门禁跟那些 skill）。
 
 ## 建议下一步（选一个编号）
 
@@ -159,7 +158,7 @@ IL2CPP 命令级先例（dump + IDA 脚本 + 观察 hook + 副本 patch）：`re
 
 ### Phase 5 — 证据与加固建议
 
-按 `ops/evidence-finding-path.md` 与 `ags/research-rigor.md` 写 Evidence→Finding→Path。结论侧重：客户端权威是否过重、校验是否可离线伪造、AC 家族与加固建议、技术目录里的检测面。禁止把「能 hook」写成「应做外挂成品」。
+按 `ops/evidence-finding-path.md` 与 `ags/research-rigor.md` 写 Evidence→Finding→Path。
 
 ## 建议下一步（选一个编号）
 
@@ -203,7 +202,7 @@ IL2CPP 命令级先例（dump + IDA 脚本 + 观察 hook + 副本 patch）：`re
 - `references/tools.md` — 本包精选工具（路径不猜）
 - `references/ATTRIBUTION.md` — MIT / Copyright 2022 gmh
 - `references/il2cpp-dump.md` — IL2CPP dump 命令
-- `../field-journal/seed-014_unity-il2cpp-reverse.md` — 踩坑笔记（禁止抄改金币）
+- `../field-journal/seed-014_unity-il2cpp-reverse.md` — IL2CPP 踩坑笔记
 - `../ops/skill-supply-chain.md` — 禁止再拉 AGS 整库当 submodule
 
 ## 路由上下文
@@ -216,9 +215,8 @@ IL2CPP 命令级先例（dump + IDA 脚本 + 观察 hook + 副本 patch）：`re
 ## 任务完成自检（声称完成前 MUST 通过）
 
 - [ ] 是否执行了工作流而不是只阅读？
-- [ ] 命中的 AGS skill（尤其 game-hacking）是否已打开，而不是用本页摘要代替？
-- [ ] 外挂**产品**是否拒绝、实验室 dump/hook/副本 patch/技术目录是否仍执行？
+- [ ] 命中的 AGS skill（尤其 game-hacking）是否已打开全文？
+- [ ] 是否遵守 reverse-skill `case-init` / `tool-index`，以及已打开的 AGS 原文门禁？
 - [ ] 引擎识别与 AC 家族是否写成观察，偏移是否标注版本？
-- [ ] 是否基于 `tool-index` 使用真实路径，未猜 Il2CppDumper？
 - [ ] 是否产出可复现证据（命令 / dump 产物哈希 / 模块名）？
 - [ ] 是否回写 RULES Checklist / field-journal（脱敏）？

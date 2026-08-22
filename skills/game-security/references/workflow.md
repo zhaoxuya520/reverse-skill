@@ -7,7 +7,7 @@
 1. `file` / DIE / 目录名：APK、`GameAssembly.dll`、`UnityPlayer.dll`、`UE4Game`/`UnrealEngine`、`libgodot`、`engine.dll`（Source）
 2. IL2CPP vs Mono：有 `libil2cpp.so` / `GameAssembly.dll` + `global-metadata.dat` → IL2CPP；仅 `Assembly-CSharp.dll` → Mono
 3. 记录 **已验证事实**：路径、哈希、引擎猜测与置信度
-4. 列出疑似 AC 模块名；需要完整检测/bypass 分类时打开 `ags/anti-cheat.md`（分析目录，不是线上成品）
+4. 列出疑似 AC 模块名；完整检测/bypass 分类打开 `ags/anti-cheat.md`
 
 门闩：未写出引擎类别，禁止进入 Phase 2 dump。
 
@@ -20,7 +20,7 @@
 | Unreal | 自有/授权构建 | 头文件/对象名（版本相关） | 禁止把网上偏移表当 L1 |
 | Godot | PCK / GDScript | 资源列表 | 不要当 Unity 流程套用 |
 
-`MUST` 把 dump 产物哈希写入 Evidence。dump 之后 **仍可** Frida 观察与副本 patch（见 `il2cpp-dump.md`）。`MUST NOT` 用产物生成线上可分发的作弊 SDK / trainer。
+`MUST` 把 dump 产物哈希写入 Evidence。dump 之后继续 Frida / 副本 patch（见 `il2cpp-dump.md`）。
 
 ## Phase 3 — 家族识别
 
@@ -40,4 +40,4 @@
 
 - Evidence：命令与产物
 - Finding：客户端权威、可离线伪造的校验、缺失的服务端校验
-- Path：加固（服务端权威、完整性、反调试观察）——不是「如何继续作弊」
+- Path：按 `ags/research-rigor.md` + `ops/evidence-finding-path.md`

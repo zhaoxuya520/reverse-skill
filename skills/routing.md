@@ -105,9 +105,9 @@ Route tasks to the most appropriate skill module by target type, user intent, an
 | "open webpage / browser automation / fill form" | `browser-automation/SKILL.md` — Playwright |
 | "crawl page / screenshot / auto login" | `browser-automation/SKILL.md` |
 | "desktop automation / Windows automation" | `browser-automation/SKILL.md` — OpenReverse |
-| "game reverse / anti-cheat family ID / engine reverse" | `game-security/SKILL.md` — engine/AC ID + AGS 10 skills；拒绝 live-title trainer 成品 |
+| "game reverse / anti-cheat family ID / engine reverse" | `game-security/SKILL.md` — engine/AC + AGS 10 skills |
 | "Unity / IL2CPP / Mono" | `game-security/SKILL.md` + `references/il2cpp-dump.md`（seed-014 仅踩坑） |
-| "Cheat Engine / memory scan" | `game-security/SKILL.md` — authorized lab memory map; trainer 成品禁止 |
+| "Cheat Engine / memory scan" | `game-security/SKILL.md` — CE 内存映射；`case-init` 后执行 |
 | "game hacking / overlay / aimbot taxonomy / DMA / pcileech" | `game-security/SKILL.md` + `references/ags/game-hacking.md` / `dma-attack.md` |
 | "symbol migration / cross-version compare" | `binary-diff/SKILL.md` — LLM batch migration |
 | "missing PDB / old version symbols" | `binary-diff/SKILL.md` — cross-version symbol migration |
@@ -236,7 +236,7 @@ Do NOT force the user to repeatedly confirm "this is CTF/local." Carry the CTF/l
 | jshookmcp | `js-reverse/` enhancement MCP for browser/CDP/Hook/Network/SourceMap/AST |
 | agent-browser / Playwright | `browser-automation/` — browser automation |
 | OpenReverse (UIA/CUA) | `browser-automation/` — Windows desktop automation |
-| Cheat Engine / x64dbg / ReClass | `game-security/` — authorized lab memory map (seed-014); no trainer |
+| Cheat Engine / x64dbg / ReClass | `game-security/` — 内存映射（seed-014 踩坑） |
 | IL2CPP Dumper / dnSpy | `game-security/` — Unity/Mono dump chain (seed-014); Mono → `dotnet-reverse/` |
 | LLM symbol migration / BinDiff alternative | `binary-diff/` — cross-version batch migration |
 | Nmap / Masscan | `pentest-tools/` — port scan, service identification |
@@ -336,7 +336,7 @@ Game client path:
   dotnet-reverse/
   dump → Frida observe / copy-patch (il2cpp-dump.md) → IDA
   technique catalog: ags/game-hacking.md / dma-attack.md / graphics-api.md
-  MUST NOT ship live-title trainer product
+  gates: reverse-skill case-init + opened AGS skill text
 
 Web Pentest + BurpSuite MCP Path:
   browser-automation/ → auto-browse target with Burp proxy

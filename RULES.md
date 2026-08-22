@@ -98,7 +98,7 @@ Hot path only:
 
 `skills/routing.md` is an advisory 3-axis view **after** PRIMARY, not a second router.
 
-Game / Unity / IL2CPP / anti-cheat / game-hacking → PRIMARY `game-security/` (**R43**). Ten AGS skills live in `skills/game-security/references/ags/` (including game-hacking-techniques). Routing **R42** is reserved for `threat-intelligence/` (PR #108). ADF-R42 (YARA) is a third namespace. Do not collapse these three IDs. Lab dump, Frida observe, patch-on-copy, and the technique catalog stay in scope; refuse only live-title cheat products.
+Game / Unity / IL2CPP / anti-cheat / game-hacking → PRIMARY `game-security/` (**R43**). Ten AGS skills live in `skills/game-security/references/ags/` (including game-hacking-techniques). Routing **R42** is reserved for `threat-intelligence/` (PR #108). ADF-R42 (YARA) is a third namespace. Do not collapse these three IDs. Technique gates: reverse-skill `case-init` plus the Ethical Use text in the opened AGS skill. Do not add a third ban layer.
 
 ---
 

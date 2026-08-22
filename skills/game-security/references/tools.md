@@ -3,12 +3,11 @@
 > 本页是 reverse-skill **精选工具**（路径不猜）。完整游戏 RE 工具/插件/混淆目录：[ags/reverse-engineering.md](ags/reverse-engineering.md)。链接堆按 [ags/fetch-upstream.md](ags/fetch-upstream.md) 现拉。  
 > Distill from [gmh5225/awesome-game-security](https://github.com/gmh5225/awesome-game-security) (MIT, 2026-08-22).
 
-## 禁令（RFC 2119）
+## 路径（reverse-skill）
 
-- **MUST NOT** 猜工具路径或把上游 README 整份拷进本文件。
-- **MUST NOT** 产出线上 trainer **成品**。技术目录与实验室工具用法在 `ags/`。
 - **MUST NOT** 猜工具路径。缺工具 → 读 [`tool-index.md`](../../tool-index.md)；未生成则跑 `skills/scripts/refresh-tool-index.ps1`。
-- **Il2CppDumper 已登记**为 manifest 名 `il2cppdumper`（`bootstrapKind: manual`，`canAutoInstall: false`）。bootstrap **只打印** `manualInstallHint`，不会下载。Frida 注入授权样本、副本 patch **仍是能力**。
+- **Il2CppDumper 已登记**为 manifest 名 `il2cppdumper`（`bootstrapKind: manual`，`canAutoInstall: false`）。bootstrap **只打印** `manualInstallHint`。
+- 完整游戏 RE 工具/插件目录：[ags/reverse-engineering.md](ags/reverse-engineering.md)。
 
 ## 精选表
 
@@ -20,9 +19,9 @@
 | **Il2CppInspectorRedux** | 新 Unity metadata；IDA/Ghidra/BN 脚本 | 手动 |
 | **Cpp2IL** | IL2CPP → 可分析 C# / 调用图（元数据恢复） | 手动 |
 | **dnSpyEx** | Unity **Mono** `Assembly-CSharp.dll` 反编译 / IL | 手动（走 `dotnet-reverse/`） |
-| **UE4SS** | **own build** 反射 / 调试脚本 / SDK dump | 手动 |
-| **Dumper-7** | **own build** UE 反射 headers（元数据，不是 live-title cheat SDK） | 手动 |
-| **AssetStudio** / **UAssetGUI** | Unity/UE **资产检视**（资源 / uasset；不是内存外挂） | 手动 |
+| **UE4SS** | 反射 / 调试脚本 / SDK dump | 手动 |
+| **Dumper-7** | UE 反射 headers | 手动 |
+| **AssetStudio** / **UAssetGUI** | Unity/UE 资产检视 | 手动 |
 | **Detect It Easy** | 引擎 / 壳 / CLR 指纹 triage | 手动 |
 | **IDA Pro** | native `so`/`dll` 深反编译 | 能力 `idalib-mcp` / `idapro`；本体商业手动 → [`ida-reverse/`](../../ida-reverse/SKILL.md) |
 | **Ghidra** | 开源 native 深挖 | `ghidra-mcp`（本体常手动）→ [`ghidra-reverse/`](../../ghidra-reverse/SKILL.md) |
@@ -35,18 +34,11 @@
 
 ## Cheat Engine
 
-**仅** 对 **offline / owned / 书面授权** 样本做本机内存映射与结构观察。
-
-| MAY | MUST NOT |
-|-----|----------|
-| 在实验室进程里搜数值、对照 dump 的字段名、记偏移为 Observation | 生产 trainer、指针链外挂、stealth CE、“过 AC 扫描” |
-| 把 CE 当 ReClass 式结构笔记本 | 对 live 网游 / 未授权标题 attach |
-
-AC 在场时 CE 是 **对抗面**，不是绕过工具。[anti-cheat-families.md](anti-cheat-families.md)。
+`case-init` 就绪后用于内存映射与结构观察。对照 dump 字段名，偏移写成 Observation。AC 在场时对照 [anti-cheat-families.md](anti-cheat-families.md) 与 [ags/anti-cheat.md](ags/anti-cheat.md)。
 
 ## 实验室 IL2CPP hook
 
-`frida-il2cpp-bridge`：对 **自有/授权样本** 按类/方法名 hook。完整命令与观察模板见 [il2cpp-dump.md](il2cpp-dump.md)（默认 call-through；副本上翻转判断仍允许）。seed-014 只作踩坑，不要把改金币当默认交付。
+`frida-il2cpp-bridge`：按类/方法名 hook。完整命令见 [il2cpp-dump.md](il2cpp-dump.md)。seed-014 是踩坑笔记。
 
 ## 缺工具时
 

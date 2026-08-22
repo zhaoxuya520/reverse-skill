@@ -3,12 +3,11 @@
 > 本页是 reverse-skill **磁盘指纹 + dump 链**（绑定 tool-index）。引擎对象模型 / SDK dump 工作流补充：[ags/game-engine.md](ags/game-engine.md)。  
 > Distill from [gmh5225/awesome-game-security](https://github.com/gmh5225/awesome-game-security) (MIT, 2026-08-22).
 
-## 授权（RFC 2119）
+## 授权（reverse-skill）
 
 - **MUST** 在 `auth.status=granted` 且合法 `network_profile` / `offline-sample` 就绪后才 ACT（`ops/scope-contract.md`）。
-- **MUST** 把 dump 当 **元数据恢复**（类型 / 方法名 / 反射），**MUST NOT** 当 cheat SDK。
-- **MUST NOT** 把网上偏移当 L1。aimbot / overlay / DMA 等技术目录在 [ags/game-hacking.md](ags/game-hacking.md)，不要在本页假装不存在。
-- **MUST NOT** 把 thunk 的 first-20 或 mid-instruction Capstone 当函数体事实。引擎全局是 **version-specific 名字**，不是固定偏移。
+- 引擎对象模型 / SDK dump 全文：[ags/game-engine.md](ags/game-engine.md)。aimbot / overlay / DMA 全文：[ags/game-hacking.md](ags/game-hacking.md)。
+- 引擎全局是 **version-specific 名字**，不是固定偏移（AGS research-rigor）。
 
 ## 磁盘制品识别
 
@@ -25,13 +24,13 @@
 
 ## 授权样本 dump 链（元数据恢复）
 
-仅 **owned / offline-sample / 书面授权** 构建。产物是符号与类型，**不是** 外挂 SDK。
+`case-init` 就绪后按 dump 链执行。产物：符号 / 类型 / headers。
 
 | Backend | 工具 | RE 产物 |
 |---------|------|---------|
 | IL2CPP | Il2CppDumper / Il2CppInspectorRedux / Cpp2IL | DummyDll / `dump.cs` / `script.json` / `il2cpp.h` → IDA/Ghidra |
 | Mono | dnSpyEx | 托管 C# / IL → `dotnet-reverse/` |
-| Unreal **own build** | Dumper-7 / UE4SS | 反射元数据 / headers（自建调试，不是 live-title cheat SDK） |
+| Unreal | Dumper-7 / UE4SS | 反射元数据 / headers（见 `ags/game-engine.md`） |
 
 IL2CPP 实验室顺序：
 
@@ -41,14 +40,13 @@ IL2CPP 实验室顺序：
 → IDA/Ghidra 加载脚本做符号恢复 → native 深挖
 ```
 
-完整链见 [il2cpp-dump.md](il2cpp-dump.md)。seed-014 只作踩坑；**MUST NOT** 复制其中 AddCoin / VerifyReceipt / 静态 patch 成外挂的示例。
+完整链见 [il2cpp-dump.md](il2cpp-dump.md)。seed-014 是踩坑笔记，不是默认配方。
 
 ## 加密 metadata
 
 部分包加密 `global-metadata.dat`。实验室：**观察** `il2cpp_init` 附近解密；在 **mmap/read 之后** dump 已解密缓冲再喂 dumper。
 
 - **MUST** 记 Observation（谁打开文件、何时明文出现），再升 Finding。
-- **MUST NOT** 交付通用 decryptor / AntiCheatToolkit bypass kit。
 
 ## 交接
 
@@ -62,5 +60,4 @@ IL2CPP 实验室顺序：
 ## 证据边界
 
 - `GNames` / `GObjects` / `FNamePool` / `GUObjectArray`：**版本相关名字**，偏移随引擎分支 / 游戏改动。
-- **MUST NOT** 把 `quoted_VA - N` 的 mid-insn Capstone、或 e9 thunk 的 first-20 当 handler 体。
-- Observation ≠ Finding ≠ Path：`ops/evidence-finding-path.md`。
+- Observation ≠ Finding ≠ Path：`ops/evidence-finding-path.md` 与 `ags/research-rigor.md`。

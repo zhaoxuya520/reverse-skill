@@ -169,7 +169,7 @@
 | "开源情报/威胁情报/公开 X IOC 补充" | `threat-intelligence/SKILL.md` — 公开帖子仅作为待核验线索 |
 | "威胁狩猎/蓝队/检测工程" | `threat-hunting/SKILL.md` |
 | "游戏逆向/IL2CPP/Unity" | `game-security/SKILL.md` + `references/ags/`（含 game-hacking-techniques）；seed-014 仅踩坑 |
-| "game hacking/overlay/DMA/pcileech/外挂技术目录" | `game-security/SKILL.md` + `references/ags/game-hacking.md`；禁止交付 live-title trainer 成品 |
+| "game hacking/overlay/DMA/pcileech/外挂技术目录" | `game-security/SKILL.md` + `references/ags/game-hacking.md` |
 | "WiFi/无线渗透/aircrack" | `wifi-wireless/SKILL.md` |
 | "浏览器扩展/Chrome 扩展/crx" | `browser-extension-reverse/SKILL.md` |
 | "工控/OT/ICS/SCADA/PLC" | `ot-ics/SKILL.md` |

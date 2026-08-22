@@ -3,12 +3,12 @@
 > 本页是 reverse-skill **家族识别快表** + 内核交接。完整 AGS anti-cheat / DMA / game-hacking 目录在 [ags/anti-cheat.md](ags/anti-cheat.md)、[ags/dma-attack.md](ags/dma-attack.md)、[ags/game-hacking.md](ags/game-hacking.md)。  
 > Distill from [gmh5225/awesome-game-security](https://github.com/gmh5225/awesome-game-security) (MIT, 2026-08-22).
 
-## 授权与禁令（RFC 2119）
+## 授权（reverse-skill）
 
-- **MUST** `auth.status=granted` 后才对目标 ACT。本表只做 **识别**，不是绕过手册。
-- **MUST NOT** 交付线上过检测**成品**。授权样本上 **MUST** 继续做模块识别、驱动逆向交接（`kernel-driver-reverse.md` / `edr-bypass-re/`），并打开 AGS 完整目录——分析能力不减。
-- **MUST NOT** 把模块名表当 L1 归因；标题 / 构建会改名。磁盘哈希 + 服务名才是 Observation。
-- 内核深挖 **MUST** 交接：[`kernel-driver-reverse.md`](../../reverse-engineering/kernel-driver-reverse.md)。把 AC 当 **EDR-like** 分析（callback / ETW / 完整性）时用 [`edr-bypass-re/SKILL.md`](../../edr-bypass-re/SKILL.md)，**不是** 外挂绕过产品。
+- **MUST** `auth.status=granted` 后才对目标 ACT。
+- 完整 bypass / 检测目录：**MUST** 打开 [ags/anti-cheat.md](ags/anti-cheat.md)，不要用本快表代替。
+- **MUST NOT** 把模块名表当 L1 归因（AGS research-rigor + `ops/evidence-finding-path.md`）。磁盘哈希 + 服务名才是 Observation。
+- 内核深挖交接 [`kernel-driver-reverse.md`](../../reverse-engineering/kernel-driver-reverse.md)；EDR-like 栈用 [`edr-bypass-re/SKILL.md`](../../edr-bypass-re/SKILL.md)（跟那些 skill 自己的门禁）。
 
 ## 识别表（public names；随标题变化）
 
@@ -20,7 +20,7 @@
 | **FACEIT AC** | `FACEIT*.exe` / FACEIT Client；`FACEIT.sys`（标题相关） | user + kernel + platform | 竞技平台完整性 |
 | **VAC** | Steam 侧载 user-mode 模块（历史 `vac*.dll`）；无常驻独立内核 AC | user + server | 延迟 ban wave；签名扫描 |
 | **nProtect GameGuard / TenProtect** | `GameGuard.des` / `GameMon.des`；`npgg*.sys`；TenProtect：`TPHelper.exe` / `tpsys.sys` | user + kernel | 韩 / 腾讯老栈；与 ACE 分流 |
-| **Tencent ACE / AntiCheatExpert** | `ACE-*.sys`（如 `ACE-Base` / `ACE-CORE` 公开名）；`SGuard*`；`GameScan*` | user + kernel + server | 当 EDR-like 栈识别；**MUST NOT** 当 dest-cipher 菜谱 |
+| **Tencent ACE / AntiCheatExpert** | `ACE-*.sys`（如 `ACE-Base` / `ACE-CORE` 公开名）；`SGuard*`；`GameScan*` | user + kernel + server | 当 EDR-like 栈识别 |
 | **XIGNCODE3** | `xhunter1.sys`；`x3.xem` / `xcorona*.xem` | user + kernel | Wellbia；PC/移动都有部署 |
 | **PunkBuster** | `PnkBstrA.exe` / `PnkBstrB.exe`；`pbcl.dll` / `pbsv.dll` | user + server | 遗产 FPS；服务成对 |
 | **FairFight** | 无典型客户端内核驱动 | **server** | EA 统计 / 回放侧 |
@@ -29,7 +29,7 @@
 
 **MUST** 用本机 `sc query` / `fltmc` / 模块列表 / 文件哈希核验。社区别名不是 Evidence。
 
-## 分层架构（识别，不是攻击面菜谱）
+## 分层架构
 
 ```text
 [ game process ]
@@ -46,17 +46,17 @@
 
 ## DMA（完整目录在 ags/dma-attack.md）
 
-PCIe DMA 可在 OS 之下读物理内存，软件 AC 的进程内假设因此不完整。**完整** PCIe/IOMMU/pcileech/检测流水线：**MUST** 打开 [ags/dma-attack.md](ags/dma-attack.md)，不要用本段代替。防御侧索引：IOMMU / Kernel DMA Protection / ACS / 度量启动。对 **未授权 live 网游** 不要交付 FPGA/pcileech 作业成品。
+PCIe DMA 可在 OS 之下读物理内存。**完整** 目录：**MUST** 打开 [ags/dma-attack.md](ags/dma-attack.md)（含该文件 Ethical Use）。不要用本段代替。
 
 ## 内核 / EDR-like 交接
 
 | 问题 | 去哪 |
 |------|------|
 | WDM/KMDF、IOCTL、`DriverEntry`、callback 登记 | `reverse-engineering/kernel-driver-reverse.md` |
-| hook 表 / ETW / 完整性 — **分析 AC 像分析 EDR** | `edr-bypass-re/`（授权红队 / 产品评估；**MUST NOT** 产出游戏 stealth 配方） |
+| hook 表 / ETW / 完整性 — 分析 AC 像分析 EDR | `edr-bypass-re/` |
 | 引擎制品而非 AC | [engines.md](engines.md) |
 
-疑似 BYOVD：**记名 / 哈希 / 签名与调用意图**（见 kernel-driver-reverse Agent 锚点）。**MUST NOT** 写 exploit 步骤。
+疑似 BYOVD：记名 / 哈希 / 签名与调用意图（见 `kernel-driver-reverse.md` 自己的锚点）。
 
 ## 研究严谨度
 

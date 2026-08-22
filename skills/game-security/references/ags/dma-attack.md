@@ -1,10 +1,9 @@
-> **reverse-skill adapter** - AGS `dma-attack-techniques` is installed as a first-class reference under PRIMARY `game-security/` (routing **R43**). This is not a second PRIMARY and not `npx skills add`.
+> **reverse-skill adapter** - AGS `dma-attack-techniques` under PRIMARY `game-security/` (routing **R43**). Not a second PRIMARY.
 >
-> **Auth:** `case-init` + `auth.status=granted` before ACT on a target. Technique catalog / threat-model / authorized-lab RE stay in scope.
-> **Deliverable bound:** do not ship a live-title trainer / cheat product. Dump, observe-hook, copy-patch, AC RE, DMA/overlay/kernel catalogs remain required capabilities.
-> **Handoff:** defensive AC mapping -> ``anti-cheat.md``. Kernel/IOMMU ops on authorized sample -> ``windows-kernel.md`` + ``kernel-driver-reverse.md``. Live-title FPGA/pcileech against unauthorized games is out of deliverable scope.
-> **Fetch links / wiki / archive:** [fetch-upstream.md](fetch-upstream.md). Upstream wiki overview: `wiki/overviews/dma-attack.md`.
-> **Distill:** duplicated Data Source footer removed (one home in fetch-upstream.md). Taxonomy, workflows, and technique catalogs are kept.
+> **Gates that already exist (do not add more here):** reverse-skill `case-init` / `auth.status=granted` before ACT; AGS Ethical Use / authorized-testing text in this file if the upstream skill has it.
+> **Handoff:** defensive AC mapping -> ``anti-cheat.md``. Kernel/IOMMU -> ``windows-kernel.md`` + ``kernel-driver-reverse.md``.
+> **Fetch:** [fetch-upstream.md](fetch-upstream.md). Wiki: `wiki/overviews/dma-attack.md`.
+> **Distill:** duplicated Data Source footer only. Taxonomy and workflows kept.
 >
 > Source: [gmh5225/awesome-game-security](https://github.com/gmh5225/awesome-game-security) (MIT, Copyright 2022 gmh).
 ---

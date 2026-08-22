@@ -1,10 +1,9 @@
-> **reverse-skill adapter** - AGS `mobile-security` is installed as a first-class reference under PRIMARY `game-security/` (routing **R43**). This is not a second PRIMARY and not `npx skills add`.
+> **reverse-skill adapter** - AGS `mobile-security` under PRIMARY `game-security/` (routing **R43**). Not a second PRIMARY.
 >
-> **Auth:** `case-init` + `auth.status=granted` before ACT on a target. Technique catalog / threat-model / authorized-lab RE stay in scope.
-> **Deliverable bound:** do not ship a live-title trainer / cheat product. Dump, observe-hook, copy-patch, AC RE, DMA/overlay/kernel catalogs remain required capabilities.
+> **Gates that already exist (do not add more here):** reverse-skill `case-init` / `auth.status=granted` before ACT; AGS Ethical Use / authorized-testing text in this file if the upstream skill has it.
 > **Handoff:** unpack first -> ``apk-reverse/`` (Android) or ``mobile-reverse/`` (iOS), then return here for game-specific IL2CPP/root/Zygisk catalog. Dump chain -> ``../il2cpp-dump.md``.
-> **Fetch links / wiki / archive:** [fetch-upstream.md](fetch-upstream.md). Upstream wiki overview: `wiki/overviews/mobile-security.md`.
-> **Distill:** duplicated Data Source footer removed (one home in fetch-upstream.md). Taxonomy, workflows, and technique catalogs are kept.
+> **Fetch:** [fetch-upstream.md](fetch-upstream.md). Wiki: `wiki/overviews/mobile-security.md`.
+> **Distill:** duplicated Data Source footer only. Taxonomy and workflows kept.
 >
 > Source: [gmh5225/awesome-game-security](https://github.com/gmh5225/awesome-game-security) (MIT, Copyright 2022 gmh).
 ---

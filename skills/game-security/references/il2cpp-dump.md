@@ -1,6 +1,6 @@
 # IL2CPP 完整链（授权 / 离线样本）
 
-本页恢复 seed-014 的 **dump → 符号 → 观察 → 副本验证** 能力。禁止当默认交付的只有：把 `AddCoin` 改成 99999、把 `VerifyReceipt` 改成恒 `true`、做成线上 trainer。
+本页是 seed-014 的 **dump → 符号 → hook → 副本验证** 命令链。seed-014 里的 AddCoin / VerifyReceipt 数字是那次实验笔记，不是默认配方。
 
 路径只认 `tool-index.md` 的 `il2cppdumper`（manifest：**manual**，`canAutoInstall: false`）。
 
@@ -63,7 +63,7 @@ frida-compile hook.ts -o hook.js
 frida -U -f <pkg> -l hook.js --no-pause
 ```
 
-用户明确要求在 **副本/模拟器** 上验证「翻转判断」时：改的是副本，Evidence 写偏移与原字节，原文件保留。禁止做成可分发 trainer。
+在 **副本/模拟器** 上验证翻转判断时：改副本，Evidence 写偏移与原字节，原文件保留（reverse-skill 副本 patch 惯例）。
 
 ## 6. 实验室副本 patch（能力保留）
 
