@@ -148,7 +148,7 @@ P-TI-001: 可复现查询和验证路径
 
 ## 路由上下文
 
-**上游**: MASTER R42
+**上游**: MASTER R44
 
 **下游**: 检测与阻断 → `threat-hunting/`；样本 → `malware-analysis/`；邮件 → `email-security/`；案件保全 → `digital-forensics/`
 

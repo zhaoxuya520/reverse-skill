@@ -72,7 +72,7 @@
 
 | 路由规则 | 回归基准 | 核心 Skill | CI 平台 | 客户端模型 |
 |---:|---:|---:|---|---|
-| 43 条（R0–R42） | 173 条用例 | 44 个已跟踪模块 | Windows + Ubuntu | 平台无关 |
+| 43 条（R0–R44） | 173 条用例 | 44 个已跟踪模块 | Windows + Ubuntu | 平台无关 |
 
 路由核心由单一结构化配置驱动，通过跨平台 CI 验证，并与各客户端的可选适配层保持分离。
 
@@ -167,7 +167,7 @@ git clone https://github.com/zhaoxuya520/reverse-skill.git
 | [skills/routing.md](skills/routing.md) | 路由矩阵（场景 → Skill） |
 | [skills/SKILL.md](skills/SKILL.md) | 总控入口 |
 | [skills/INDEX.md](skills/INDEX.md) | 自动生成的平台无关 Skill 导航索引 |
-| [skills/config/routing.json](skills/config/routing.json) | 路由单一事实源（43 条规则，R0–R42） |
+| [skills/config/routing.json](skills/config/routing.json) | 路由单一事实源（43 条规则，R0–R44） |
 | [skills/tool-index.md](skills/tool-index.md) | 本机工具索引（自动生成） |
 | [skills/scripts/master-route.ps1](skills/scripts/master-route.ps1) | 一键分诊 |
 | [skills/scripts/case-init.ps1](skills/scripts/case-init.ps1) | 作战 case 目录（scope/timeline） |

@@ -212,7 +212,7 @@
         { "must": "threat.?hunt|detection.?engineer|blue.?team|sigma.?rule|\\bsigma\\b|威胁.?狩猎|检测.?工程|蓝队.?狩猎|检测.?规则" }
       ]
     },
-    "R42": {
+    "R44": {
       "label": "Threat intelligence / OSINT",
       "skill": "threat-intelligence/SKILL.md",
       "keywords": [
@@ -324,7 +324,7 @@
   "priority": [
     "R4", "R1", "R2", "R3", "R30", "R31", "R33", "R5", "R9", "R21",
     "R22", "R6", "R7", "R8", "R34", "R28", "R17", "R16", "R18", "R24",
-    "R37", "R23", "R35", "R25", "R42", "R36", "R29", "R38", "R32", "R26", "R27",
+    "R37", "R23", "R35", "R25", "R44", "R36", "R29", "R38", "R32", "R26", "R27",
     "R10", "R11", "R12", "R13", "R14", "R15", "R19", "R40", "R20", "R39", "R41", "R0"
   ]
 }
