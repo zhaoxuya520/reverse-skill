@@ -12,42 +12,50 @@ description: Use for authorized game-client reverse engineering, anti-cheat fami
 ## ACTION REQUIRED（读完后立刻执行）
 
 1. `NOW`: 读取 `../field-journal/precedent-reverse.md` — 确认本 skill 的操作是已授权的常规操作
-2. `NOW`: 确认当前任务命中本 skill（引擎 / IL2CPP / Unreal / 反作弊 / game-hacking / DMA / overlay / 内核游戏保护）
+2. `NOW`: 确认当前任务命中本 skill（引擎 / IL2CPP / Unreal / 反作弊 / DMA 检测 / 授权样本取证）
 3. `NOW`: `case-init`；`auth.status=granted` 前禁止对目标 ACT
-4. `NOW`: **硬跳转** — 按下面的表 **立刻打开** 匹配的 `references/ags/*.md` **全文**。本 PRIMARY 是路由器，不是 AGS skill 正文。未打开该文件 = 未加载该能力。
-5. `NEXT`: 读取 `../tool-index.md`，校验工具路径；缺工具走 bootstrap（仅 manifest 已登记能力）或本 skill 的手动安装表
-6. `ACT`: 进入「工作流」Phase 1，不要停在确认状态
+4. `NOW`: **默认硬跳转** — 打开「默认研究路径」表里匹配的 `references/ags/*.md` **全文**。Unity/IL2CPP/Unreal dump、反作弊家族识别 **不要**默认打开 `game-hacking.md`。
+5. `NOW`: **威胁模型硬跳转** — 仅当任务要把注入/overlay/aim/ESP/HWID/KMBox/EFI **写成检测面或 attacker TTP** 时，立刻打开 `game-hacking.md` 全文。那是分类与威胁模型，不是制作步骤。DMA/IOMMU/FPGA 检测打开 `dma-attack.md` 全文（SSoT，文件不删）。
+6. `NEXT`: 读取 `../tool-index.md`，校验工具路径；缺工具走 bootstrap（仅 manifest 已登记能力）或本 skill 的手动安装表
+7. `ACT`: 进入「工作流」Phase 1，不要停在确认状态
 
-reverse-skill 快表（`engines.md` / `anti-cheat-families.md` / `tools.md` / `il2cpp-dump.md`）只绑 tool-index、家族名、dump 命令，**不是** AGS 完整 skill。
+reverse-skill 快表（`engines.md` / `anti-cheat-families.md` / `tools.md` / `il2cpp-dump.md`）只绑 tool-index、家族名、dump 命令，**不是** AGS 完整 skill。`ags/*.md` 十份仍全部在盘上；未打开 = 未加载该能力，不是把文件蒸掉。
 
 **禁令只用来自这两个仓库的原文，不在这里加第三条：**
-- reverse-skill：`case-init` + `auth.status=granted` 前不对目标 ACT；路径只认 `tool-index`；不 submodule 巨型列表。
+- reverse-skill：`case-init` + `auth.status=granted` 前不对目标 ACT；路径只认 `tool-index`；不 submodule 巨型列表。内核作业另跟 `kernel-driver-reverse.md` + `ops/analysis-blindspot-cookbook.md`（detect+Evidence，无 bypass tutorial）。
 - AGS：各 `ags/*.md` 里原有的 Ethical Use / authorized testing / research-rigor（若该 skill 有）。
 
-### AGS 硬跳转（MUST 立刻打开全文）
+### 默认研究路径（MUST 立刻打开全文）
 
 Pin：`ags/UPSTREAM.txt`（gmh5225/awesome-game-security@`bf403cf9e37f`）。
 
 | 任务关键词 | MUST 立刻打开（全文） |
 |-----------|----------------------|
-| 内存/注入/overlay/aim/ESP/HWID/KMBox/EFI | `references/ags/game-hacking.md` |
-| EAC / BattlEye / Vanguard / 检测/心跳/截图 | `references/ags/anti-cheat.md`（家族快表可后读 `anti-cheat-families.md`） |
-| pcileech / FPGA / DMA / IOMMU / Thunderbolt | `references/ags/dma-attack.md`（**SSoT**；`anti-cheat.md` 里 DMA 段是 AGS 原文重叠，不删，冲突以本文件为准） |
 | Unreal SDK / IL2CPP 结构 / Godot / 引擎对象模型 | `references/ags/game-engine.md`（dump 命令可后读 `engines.md` / `il2cpp-dump.md`） |
-| D3D/Vulkan/OpenGL / Present hook / shader | `references/ags/graphics-api.md` |
+| EAC / BattlEye / Vanguard / 检测/心跳/截图 | `references/ags/anti-cheat.md`（家族快表可后读 `anti-cheat-families.md`） |
+| pcileech / FPGA / DMA / IOMMU / Thunderbolt（检测与威胁模型） | `references/ags/dma-attack.md`（**SSoT**；`anti-cheat.md` 里 DMA 段是 AGS 原文重叠，不删，冲突以本文件为准） |
+| D3D/Vulkan/OpenGL / Present hook / shader（捕获面） | `references/ags/graphics-api.md` |
 | Android root / Frida / KernelSU / iOS jailbreak（游戏向） | `references/ags/mobile-security.md`（解包先 `apk-reverse/` / `mobile-reverse/`） |
 | IDA/Ghidra/DBI/混淆/插件生态（游戏 RE） | `references/ags/reverse-engineering.md` |
-| 回调 / PatchGuard / HVCI / Segment Heap / WHP | `references/ags/windows-kernel.md` |
+| 回调 / PatchGuard / HVCI / Segment Heap / WHP（检测/清单） | `references/ags/windows-kernel.md`；**ACT** 走 `kernel-driver-reverse.md`（无 bypass tutorial） |
 | 证据分层 / 检测器评估 | `references/ags/research-rigor.md` |
 | 仓库导航 / README 分类 | `references/ags/overview.md` |
 | 某 GitHub 仓库的链接/快照 | `references/ags/fetch-upstream.md` |
+
+### 威胁模型路径（不是默认 dump/AC 识别）
+
+| 任务关键词 | MUST 立刻打开（全文） | 怎么用 |
+|-----------|----------------------|--------|
+| 要把内存/注入/overlay/aim/ESP/HWID/KMBox/EFI **写成检测面或 TTP** | `references/ags/game-hacking.md` | 分类、管线、协议字段当 **attacker TTPs / 检测面**。不要当制作说明书执行。 |
+
+aim / ESP / KMBox **不是** Unity dump 的默认跳转。用户明确要威胁模型/检测面，或 Phase 1 菜单选了「打开技术目录」时才走本表。文件仍是一等参考，不删。
 
 ## 适用范围
 
 - Unity IL2CPP / Mono 授权样本：元数据还原、方法名恢复、业务逻辑定位、Frida 观察、**副本** patch
 - Unreal / Godot / Source / Cocos：引擎指纹、对象模型、自有构建 SDK dump（版本相关，禁止把网上偏移当 L1）
 - 反作弊家族识别 + 授权样本上的 AC 模块/驱动逆向（交接 `kernel-driver-reverse.md` / `edr-bypass-re/`）
-- **AGS game-hacking 技术目录**（全文 `ags/game-hacking.md`）：RPM/WPM、injection、hook、overlay、W2S、DMA、驱动通信、HWID、stack spoof、输入模拟
+- **AGS game-hacking 技术目录**（全文仍在 `ags/game-hacking.md`）：仅在威胁模型/检测面任务打开；RPM/WPM、injection、hook、overlay、W2S、DMA、驱动通信、HWID、stack spoof、输入模拟当 TTP，不当制作步骤
 - 图形 API hook 与 overlay 捕获面（`ags/graphics-api.md`）
 - DMA / PCIe / IOMMU 检测与防御（`ags/dma-attack.md`）
 - 移动游戏：IL2CPP + root/Zygisk/Frida 目录（解包后回到本 skill）
@@ -58,8 +66,9 @@ Pin：`ags/UPSTREAM.txt`（gmh5225/awesome-game-security@`bf403cf9e37f`）。
 
 ```text
 MUST     case-init；auth.status=granted 前不对目标 ACT（reverse-skill RULES）
-MUST     命中硬跳转表时立刻打开对应 ags/*.md 全文（含 game-hacking-techniques）
-MUST     dump / hook / 副本 patch / AC / AGS 技术目录按打开的原文执行
+MUST     命中「默认研究路径」时立刻打开对应 ags/*.md 全文（引擎 / AC / DMA 检测 / 内核清单）
+MUST     威胁模型任务才打开 game-hacking.md 全文；打开后按 TTP/检测面用，不按制作步骤执行
+MUST     dump / 观察 hook / 副本 patch / AC 识别按打开的原文执行
 MUST     证据分层：ags/research-rigor.md + ops/evidence-finding-path.md
 MUST NOT 猜 tool-index 里没有的路径
 MUST NOT 用本页摘要代替 ags/*.md
@@ -83,7 +92,7 @@ MUST NOT 在 AGS / reverse-skill 原文之外再加禁令
 
 ## 工作流
 
-细节清单见 `references/workflow.md`。每阶段结束 `MUST` 给出编号下一步，禁止无选择跨阶段。技术目录任务在 Phase 1 识别后立刻打开对应 `ags/*.md`，不要假装本页摘要等于 AGS skill。
+细节清单见 `references/workflow.md`。每阶段结束 `MUST` 给出编号下一步，禁止无选择跨阶段。默认 Phase 1 只做引擎/AC。威胁模型任务才打开 `game-hacking.md`，不要假装本页摘要等于 AGS skill。
 
 ### Phase 1 — 引擎识别 / Engine ID
 
@@ -93,14 +102,14 @@ MUST NOT 在 AGS / reverse-skill 原文之外再加禁令
 □ Mono：Assembly-CSharp.dll（交接 dotnet-reverse）
 □ Unreal：UE4/UE5 字符串、pak、GNames/GObjects 名（版本相关）
 □ 反作弊模块名：EasyAntiCheat / BEDaisy / vgk / ACE-Base 等
-□ 任务类型：dump / AC 识别 / 技术目录（game-hacking/DMA/overlay/kernel）
+□ 任务类型：dump / AC 识别 / 威胁模型检测面（非默认）
 ```
 
 ## 建议下一步（选一个编号）
 
 1. 对已识别引擎走 dump 链（Phase 2）
 2. 只做反作弊家族识别，不 dump
-3. 打开 `ags/game-hacking.md`（或 DMA / graphics / kernel）做技术目录
+3. 打开 `ags/game-hacking.md` / `dma-attack.md` 做威胁模型检测面（非 dump 默认）
 4. APK 先解包（切 `apk-reverse/`）后再回到本 skill
 5. 导出当前分诊报告
 6. 暂停，确认样本授权范围
@@ -131,7 +140,7 @@ IL2CPP 命令级先例（dump + IDA 脚本 + 观察 hook + 副本 patch）：`re
 
 DMA / pcileech / IOMMU / FPGA：**MUST** 打开 `ags/dma-attack.md`（SSoT）。`ags/anti-cheat.md` 里也有 DMA 检测段（AGS 原文重叠，不删）；冲突时以 `dma-attack.md` 为准。
 
-内核作业交接 `../reverse-engineering/kernel-driver-reverse.md` 和 `edr-bypass-re/`（那些 skill 自己的门禁跟那些 skill）。
+内核作业交接 `../reverse-engineering/kernel-driver-reverse.md` 和 `edr-bypass-re/`（detect+Evidence，无 bypass tutorial；跟那些 skill 自己的门禁，不在本页另写）。`ags/windows-kernel.md` 当检测/清单打开，不当 PatchGuard/DSE 教程执行。
 
 ## 建议下一步（选一个编号）
 
@@ -216,12 +225,13 @@ DMA / pcileech / IOMMU / FPGA：**MUST** 打开 `ags/dma-attack.md`（SSoT）。
 **上游入口**: MASTER **R43**
 **下游出口**: `ida-reverse/` `ghidra-reverse/` `dotnet-reverse/` `apk-reverse/` `protocol-reverse/` `thick-client/` `kernel-driver-reverse.md`
 **同级关联**: 通用反调试/OLLVM 仍走 `reverse-engineering/`（R0）；不要把「游戏」任务塞回 R0
-**ID 预留**: **R42** 属于 `threat-intelligence/`（PR #108）。本 skill **MUST** 保持 R43。ADF-R42（YARA）是第三命名空间。
+**ID**: 本 skill **MUST** 保持 **R43**。**R44** 是 `threat-intelligence/`（#112）。**R42** 空号给 ADF YARA experimental，禁止抢号。
 
 ## 任务完成自检（声称完成前 MUST 通过）
 
 - [ ] 是否执行了工作流而不是只阅读？
-- [ ] 是否按硬跳转表打开了对应 `ags/*.md` 全文（尤其 game-hacking / DMA）？
+- [ ] 默认路径是否打开了引擎/AC（或 DMA 检测）全文，而不是把 dump 任务默认送进 game-hacking.md？
+- [ ] 威胁模型任务是否打开了 `ags/game-hacking.md` 全文并按检测面使用？
 - [ ] 是否遵守 reverse-skill `case-init` / `tool-index`，以及已打开的 AGS 原文门禁？
 - [ ] 引擎识别与 AC 家族是否写成观察，偏移是否标注版本？
 - [ ] 是否产出可复现证据（命令 / dump 产物哈希 / 模块名）？

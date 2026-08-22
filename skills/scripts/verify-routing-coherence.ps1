@@ -50,13 +50,25 @@ if (Test-Path -LiteralPath $routingJson) {
     if ($missingPrio.Count -eq 0 -and $extraPrio.Count -eq 0) { Ok 'routing.json priority covers all routes (1:1)' } else { Bad "routing.json priority mismatch: missing=$($missingPrio -join ',') extra=$($extraPrio -join ',')" }
     $r42 = $rj.routes.PSObject.Properties['R42']
     if ($r42) {
-        if ($r42.Value.skill -ne 'threat-intelligence/SKILL.md') {
-            Bad ("R42 is reserved for threat-intelligence/SKILL.md (PR #108); found {0}" -f $r42.Value.skill)
-        } else {
-            Ok 'R42 namespace: threat-intelligence'
-        }
+        Bad ("R42 must stay unused (ADF YARA experimental); threat-intel is R44, game-security is R43; found {0}" -f $r42.Value.skill)
     } else {
-        Ok 'R42 unused (reserved for threat-intelligence; game-security uses R43)'
+        Ok 'R42 unused (ADF YARA experimental; threat-intel is R44; game-security is R43)'
+    }
+    $r43 = $rj.routes.PSObject.Properties['R43']
+    if ($r43) {
+        if ($r43.Value.skill -ne 'game-security/SKILL.md') {
+            Bad ("R43 must be game-security/SKILL.md; found {0}" -f $r43.Value.skill)
+        } else {
+            Ok 'R43 namespace: game-security'
+        }
+    }
+    $r44 = $rj.routes.PSObject.Properties['R44']
+    if ($r44) {
+        if ($r44.Value.skill -ne 'threat-intelligence/SKILL.md') {
+            Bad ("R44 must be threat-intelligence/SKILL.md; found {0}" -f $r44.Value.skill)
+        } else {
+            Ok 'R44 namespace: threat-intelligence'
+        }
     }
     $masterText = Get-Content -LiteralPath $masterDoc -Raw -Encoding UTF8
     $masterIds = [regex]::Matches($masterText, '(?m)^\s*\|\s*\*\*(R\d+)\*\*') | ForEach-Object { $_.Groups[1].Value }

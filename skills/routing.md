@@ -108,7 +108,7 @@ Route tasks to the most appropriate skill module by target type, user intent, an
 | "game reverse / anti-cheat family ID / engine reverse" | `game-security/SKILL.md` — engine/AC + AGS 10 skills |
 | "Unity / IL2CPP / Mono" | `game-security/SKILL.md` + `references/il2cpp-dump.md`（seed-014 仅踩坑） |
 | "Cheat Engine / memory scan" | `game-security/SKILL.md` — CE 内存映射；`case-init` 后执行 |
-| "game hacking / overlay / aimbot taxonomy / DMA / pcileech" | `game-security/SKILL.md` + `references/ags/game-hacking.md` / `dma-attack.md` |
+| "game hacking / overlay / aimbot taxonomy / DMA / pcileech" | `game-security/SKILL.md` — threat-model path opens `ags/game-hacking.md` / `dma-attack.md` as detection surfaces; not the default for Unity dump |
 | "symbol migration / cross-version compare" | `binary-diff/SKILL.md` — LLM batch migration |
 | "missing PDB / old version symbols" | `binary-diff/SKILL.md` — cross-version symbol migration |
 | "bindiff / function offset migration" | `binary-diff/SKILL.md` — binary diff |

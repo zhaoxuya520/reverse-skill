@@ -9,7 +9,7 @@
 3. [ ] 同步更新 VERSION 文件为 x.y.z
 4. [ ] 里程碑版本（如 v1.0.0 / v1.1.0）同步更新 docs/RELEASE_NOTES_v<x.y.z>.md
 5. [ ] 打 tag：git tag v<x.y.z> + git push --tags
-6. [ ] 推送后确认 CI 全绿（routing 181 基准 + coherence + pin gate + version-check）
+6. [ ] 推送后确认 CI 全绿（routing 188 基准 + coherence + pin gate + version-check）
 
 ## 元数据同步（发版顺手项）
 
