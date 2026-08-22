@@ -310,3 +310,7 @@ GitHub Actions 会在 Windows 与 Ubuntu 上执行同一套核心检查。
 ## 安裝與下載安全
 
 請參閱[安裝與下載安全指引](docs/UV-AND-DOWNLOAD-SECURITY_zh.md)。
+
+## 社群問題、快速開始與分類
+
+請參閱[快速開始指南](docs/QUICKSTART_zh.md)與[社群 Issue 分類說明](docs/COMMUNITY-ISSUE-TRIAGE.md)。安裝與壓縮檔安全細節仍見[安裝與下載安全指引](docs/UV-AND-DOWNLOAD-SECURITY_zh.md)。
