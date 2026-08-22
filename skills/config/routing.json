@@ -6,7 +6,9 @@
     "scoring": "每条关键字规则命中后计入候选集；按 priority 数组顺序取『命中分数最高』的为 PRIMARY；分数并列时 priority 靠前者胜出；未命中任何规则时回退 fallbackId。",
     "maintainers": [
       "skills/MASTER-ROUTING.md 中的优先级表与此文件 priority 字段一一对应",
-      "skills/scripts/verify-routing-coherence.ps1 会校验二者一致性"
+      "skills/scripts/verify-routing-coherence.ps1 会校验二者一致性",
+      "R42 预留给 threat-intelligence/SKILL.md（fork PR #108 / ADF 文档也写了这条约定）。本文件 MUST NOT 把 R42 分给 game-security 或其他 PRIMARY。游戏安全用 R43。",
+      "路由 R* 与 ops/analysis-decision-framework.md 的 ADF-R* 分属两套命名空间。ADF R42 = YARA experimental，不是本表 R42"
     ]
   },
   "routes": {
@@ -311,18 +313,29 @@
         { "must": "\\bctf\\b|awd|靶场|比赛.?题", "exclude": "pwn|rop|栈溢出|堆溢出|ret2" }
       ]
     },
+    "R43": {
+      "label": "Game security (engine reverse / anti-cheat / AGS catalog)",
+      "skill": "game-security/SKILL.md",
+      "keywords": [
+        { "must": "unity|il2cpp|unreal.?engine|\\bue4\\b|\\bue5\\b|虚幻.?引擎|godot|游戏.?逆向|game.?reverse|anti-?cheat|反作弊|battleye|easyanticheat|vanguard|nprotect|tenprotect|gameguard|libil2cpp|global-metadata|il2cppdumper|cheat.?engine|gnames|gobjects|faceit.?ac|anticheat.?expert|ace-base", "exclude": "osint|threat.?intelligence|\\bcti\\b|开源.?情报|威胁.?情报", "note": "授权游戏客户端/引擎/反作弊；PRIMARY 默认引擎+AC；R43 本 skill，R44 threat-intel，R42 空号 ADF" },
+        { "must": "game.?hack|game.?hacking|aimbot|wallhack|triggerbot|pcileech|pcie.?dma|dma.?attack|dma.?cheat|present.?hook|imgui.?overlay|hwid.?spoof|kmbox|box.?esp|skeleton.?esp", "exclude": "osint|threat.?intelligence|\\bcti\\b|开源.?情报|威胁.?情报", "note": "仍路由 R43；PRIMARY 把这些当威胁模型/检测面打开 ags 全文，不当制作步骤" },
+        { "must": "directx|\\bd3d(9|11|12)?\\b|dxgi|vulkan|opengl", "mustAll": ["game|unity|unreal|cheat|overlay|hook|anti-?cheat|il2cpp"], "exclude": "osint|threat.?intelligence", "note": "图形 API hook 仅在游戏语境归 R43" },
+        { "must": "\\binject(ion|ed)?\\b|manual.?map|dll.?hijack", "mustAll": ["game|unity|unreal|cheat|il2cpp|anti-?cheat|外挂"], "exclude": "sql|osint|threat.?intelligence", "note": "injection/manual-map 仅在游戏语境归 R43" },
+        { "must": "\\besp\\b|overlay", "mustAll": ["game|unity|unreal|cheat|il2cpp|anti-?cheat|dxgi|directx|imgui"], "exclude": "osint|threat.?intelligence", "note": "ESP/overlay 仅在游戏语境归 R43" }
+      ]
+    },
     "R0": {
       "label": "General reverse-engineering",
       "skill": "reverse-engineering/SKILL.md",
       "keywords": [
-        { "must": "ollvm|anti-?debug|unicorn|angr|gdb|deobfuscat|控制流平坦|反调试|unity|il2cpp|游戏.?逆向|game.?reverse|anti-?cheat|反作弊", "note": "Unity/游戏逆向归通用逆向 (seed-014)" },
-        { "must": "frida", "exclude": "\\bapk\\b|smali|jadx|android|安卓", "note": "APK 语境下 frida 归 R1" },
-        { "must": "reverse|逆向", "exclude": "apk|js.?reverse|ios|mobile|\\.net|firmware|malware|安卓|固件|恶意|protocol|ghidra|extension|macos|mach|golang|rust|工控|厚客户端|取证|协议|扩展", "note": "泛逆向兜底；命中更具体域时让位" }
+        { "must": "ollvm|anti-?debug|unicorn|angr|gdb|deobfuscat|控制流平坦|反调试", "note": "通用反调试/OLLVM；Unity/IL2CPP/反作弊已迁 R43" },
+        { "must": "frida", "exclude": "\\bapk\\b|smali|jadx|android|安卓|il2cpp|unity|godot|unreal|game.?hack|aimbot", "note": "APK 语境归 R1；游戏引擎/技术目录归 R43" },
+        { "must": "reverse|逆向", "exclude": "apk|js.?reverse|ios|mobile|\\.net|firmware|malware|安卓|固件|恶意|protocol|ghidra|extension|macos|mach|golang|rust|工控|厚客户端|取证|协议|扩展|unity|il2cpp|游戏|unreal|anti-?cheat|反作弊|godot|cheat.?engine|game.?hack|pcileech|dma.?attack|aimbot", "note": "泛逆向兜底；游戏/AC/AGS 目录让位 R43" }
       ]
     }
   },
   "priority": [
-    "R4", "R1", "R2", "R3", "R30", "R31", "R33", "R5", "R9", "R21",
+    "R4", "R1", "R2", "R3", "R30", "R31", "R33", "R5", "R43", "R9", "R21",
     "R22", "R6", "R7", "R8", "R34", "R28", "R17", "R16", "R18", "R24",
     "R37", "R23", "R35", "R25", "R44", "R36", "R29", "R38", "R32", "R26", "R27",
     "R10", "R11", "R12", "R13", "R14", "R15", "R19", "R40", "R20", "R39", "R41", "R0"

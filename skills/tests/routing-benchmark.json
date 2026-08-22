@@ -738,7 +738,7 @@
     },
     {
       "hint": "unity 游戏 逆向",
-      "expect": "R0",
+      "expect": "R43",
       "quick": false
     },
     {
@@ -870,6 +870,81 @@
       "hint": "Twitter marketing sentiment for our product",
       "expect": "R0",
       "quick": false
+    },
+    {
+      "hint": "anti-cheat EasyAntiCheat analysis",
+      "expect": "R43",
+      "quick": true
+    },
+    {
+      "hint": "il2cpp dump global-metadata",
+      "expect": "R43",
+      "quick": false
+    },
+    {
+      "hint": "unreal engine GNames reverse",
+      "expect": "R43",
+      "quick": false
+    },
+    {
+      "hint": "反作弊 BattlEye 家族识别",
+      "expect": "R43",
+      "quick": false
+    },
+    {
+      "hint": "apk il2cpp dump libil2cpp.so",
+      "expect": "R1",
+      "quick": false
+    },
+    {
+      "hint": "dnspy unity Assembly-CSharp",
+      "expect": "R5",
+      "quick": false
+    },
+    {
+      "hint": "anti-debug EasyAntiCheat",
+      "expect": "R43",
+      "quick": false
+    },
+    {
+      "hint": "godot 游戏 逆向",
+      "expect": "R43",
+      "quick": false
+    },
+    {
+      "hint": "game hacking techniques overlay",
+      "expect": "R43",
+      "quick": true
+    },
+    {
+      "hint": "pcileech DMA attack threat model",
+      "expect": "R43",
+      "quick": true
+    },
+    {
+      "hint": "DirectX Present hook game overlay",
+      "expect": "R43",
+      "quick": false
+    },
+    {
+      "hint": "kmbox hardware input",
+      "expect": "R43",
+      "quick": false
+    },
+    {
+      "hint": "dll injection unity game",
+      "expect": "R43",
+      "quick": true
+    },
+    {
+      "hint": "esp overlay unreal engine",
+      "expect": "R43",
+      "quick": false
+    },
+    {
+      "hint": "sqlmap injection scan",
+      "expect": "R11",
+      "quick": true
     }
   ]
 }

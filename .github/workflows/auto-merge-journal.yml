@@ -33,13 +33,15 @@ jobs:
           echo "Changed files:"
           echo "$CHANGED_FILES"
           
-          # 严格白名单：只允许 field-journal 下的 .md 文件
+          # Mixed PRs (journal + anything else) are not auto-merge candidates.
+          # Skip with success so this workflow does not fail CI on feature PRs
+          # that happen to touch seed/precedent files.
           INVALID_FILES=$(echo "$CHANGED_FILES" | grep -v '^skills/field-journal/.*\.md$' || true)
           if [ -n "$INVALID_FILES" ]; then
-            echo "❌ BLOCKED: PR 修改了非 field-journal 文件"
+            echo "SKIP: not a field-journal-only PR; auto-merge does not apply"
             echo "$INVALID_FILES"
-            echo "valid=false" >> $GITHUB_OUTPUT
-            exit 1
+            echo "valid=skip" >> $GITHUB_OUTPUT
+            exit 0
           fi
           
           # 不允许修改 CONTRIBUTE-BACK.md 和 _template.md（系统文件）
@@ -156,13 +158,13 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Comment on failure
-        if: steps.validate.outputs.valid == 'false'
+        if: failure() && steps.validate.outputs.valid == 'false'
         run: |
           gh pr comment "$PR_NUMBER" \
             --body "❌ **自动审核未通过**
 
-          本 PR 未通过安全检查，无法自动合并。可能的原因：
-          - 修改了 field-journal 以外的文件
+          本 PR 未通过 field-journal 安全检查，无法自动合并。可能的原因：
+          - 修改了 CONTRIBUTE-BACK.md / _template.md 等系统文件
           - 内容包含可疑的 prompt injection 特征
           - 内容包含未脱敏的 API key/token
           - 单个文件超过 50KB

@@ -3,7 +3,8 @@
 > **SSoT role**: Decision-quality / evidence-sufficiency / agent-bias cookbook for reverse-skill agents.
 > **Not** a second master analysis workflow. Obey `re-agent-workflow.md`, feasibility gate (#73), IAT iron rule (#72), A-T / U-AV cookbooks, and `evidence-finding-path.md` first.
 > Rule IDs **R1-R51** keep the reporter numbering (**no R15**; includes **R50/R51**). Do not renumber.
-> **Namespace:** these are **ADF-*** overlay IDs. They are **not** `routing.json` PRIMARY ids (R1=APK, R6=IDA, …). Say "ADF-R1" when speaking. Load this file at Synthesis / stuck-loop only.
+> **Namespace:** these are **ADF-*** overlay IDs. They are **not** `routing.json` PRIMARY ids. Say "ADF-R1" when speaking. Load this file at Synthesis / stuck-loop only.
+> Collision map (do **not** merge IDs): routing **R42** = `threat-intelligence/` (PR #108, reserved on this branch); routing **R43** = `game-security/`; **ADF-R42** = YARA experimental; **ADF-R43** = plan deadlock → replan.
 
 ## 0. How to use
 
@@ -106,7 +107,7 @@ Effort band + A-T pointers -> `E-anti-adversarial` (**no** A-T table copy).
 | R34 | SHOULD journal stale note; **no** 90-day auto engine |
 | R36 | archive feedback one-liner |
 | R38-R40 | pointer -> llm-security only |
-| R42 | YARA/detections experimental until benign validation |
+| R42 | YARA/detections experimental until benign validation. **ADF-R42 only** — not routing R42 (`threat-intelligence/`, PR #108) and not game-security R43 |
 | R45-R49 | route cloud-k8s / firmware / pentest-pwn / code-audit; limit confidence if missing context |
 
 ### Downgrades (not Agent runtime MUST)

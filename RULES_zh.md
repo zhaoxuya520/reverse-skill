@@ -70,6 +70,7 @@
 - 蓝队、检测、防御、应急响应、SIEM、EDR、威胁狩猎、IOC
 - 开源情报、威胁情报、公开 X/Twitter IOC 补充、活动关联
 - 移动安全测试、OWASP MASTG、APP 安全、脱壳、加固分析
+- 游戏逆向、反作弊、Unity、IL2CPP、Unreal、Cheat Engine、game hacking、DMA（PRIMARY R43；AGS 10 skill 在 references/ags/）
 - SSTI、模板注入、SSTImap、XSS、XSStrike、跨站脚本
 - WordPress、WPScan、WPProbe、CMS 渗透
 - AdaptixC2、C2 框架、对抗模拟、红队模拟、Atomic Red Team
@@ -467,7 +468,7 @@ Kali Linux（Bash，含 Kali 原生工具链）：
 bash <本包根目录>/kali/scripts/bootstrap-reverse.sh 工具名 --start-services
 ```
 
-支持的能力名（与 `skills/scripts/bootstrap-manifest.json` 保持一致，共 25 项）：jadx、apktool、jeb-pro、frida、frida-ps、idalib-mcp、reqable-mcp、jshookmcp、xquik-mcp、anything-analyzer、idapro、r2、rabin2、adb、agent-browser、ghidra-mcp、seclists、proxycat、burpsuite-mcp、nmap、pentestswarm、binwalk、yara、pwntools、bkcrack
+支持的能力名（与 `skills/scripts/bootstrap-manifest.json` 保持一致，共 26 项）：jadx、apktool、jeb-pro、frida、frida-ps、idalib-mcp、reqable-mcp、jshookmcp、xquik-mcp、anything-analyzer、idapro、r2、rabin2、adb、agent-browser、ghidra-mcp、seclists、proxycat、burpsuite-mcp、nmap、pentestswarm、binwalk、yara、pwntools、bkcrack、il2cppdumper
 
 ## 刷新工具索引
 
@@ -527,6 +528,7 @@ bash <本包根目录>/kali/scripts/refresh-tool-index.sh
 - 符号迁移、bindiff、跨版本、PDB 缺失
 - API 安全测试、GraphQL 安全、JWT 攻击、供应链安全
 - iOS 逆向、移动安全、MSTG、Objection、SSL Pinning
+- 游戏逆向、反作弊、Unity、IL2CPP、Unreal、Cheat Engine、game hacking、game-security（PRIMARY R43；10 个 AGS skill 在 references/ags/；R42 预留威胁情报；门禁=case-init + AGS 原文）
 - YARA、恶意软件分析、IOC、沙箱
 - Agent 不干活、AI 懒、跳过步骤、只读不干、Prompt 工程
 - AI 反编译、LLM 逆向、神经反编译

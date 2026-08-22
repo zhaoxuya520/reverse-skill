@@ -96,6 +96,7 @@ bash skills/scripts/refresh-tool-index.sh
 |---|---|
 | APK / Android 分析 | `skills/apk-reverse/`、`skills/mobile-reverse/` |
 | 二进制逆向 | `skills/ida-reverse/`、`skills/radare2/`、`skills/reverse-engineering/` |
+| 游戏客户端 / Unity IL2CPP / 反作弊识别 | `skills/game-security/`（R43；R42 预留威胁情报） |
 | JS 参数 / 前端签名分析 | `skills/js-reverse/` |
 | HTTP 抓包 / 请求重放 | BurpSuite MCP、anything-analyzer、browser automation |
 | CTF / 安全竞赛 | `CTF-Sandbox-Orchestrator/` |

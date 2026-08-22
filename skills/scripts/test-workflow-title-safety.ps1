@@ -25,6 +25,13 @@ Check ($text -match '(?m)^\s+PR_SUBJECT:\s*\$\{\{\s*format\(') 'PR subject is co
 Check ($text -match '(?ms)gh pr merge "\$PR_NUMBER".*--subject "\$PR_SUBJECT"') 'merge command quotes the PR number and subject'
 Check ($text -notmatch '(?m)--subject[^\r\n]*github\.event\.pull_request\.title') 'PR title is not interpolated into the merge command'
 Check ($text -notmatch '(?m)gh pr (?:diff|merge|comment)\s+\$\{\{') 'GitHub CLI commands do not embed event expressions'
+# 'field-journal' contains the letters 'fi', so do not slice the INVALID_FILES
+# branch with a non-greedy .*?fi regex.
+Check ($text -match '(?s)if \[ -n "\$INVALID_FILES" \]; then.*?echo "SKIP: not a field-journal-only PR; auto-merge does not apply".*?echo "valid=skip" >> \$GITHUB_OUTPUT\s+exit 0') 'mixed (non-journal) PRs skip auto-merge with valid=skip'
+Check ($text -match '(?s)if \[ -n "\$INVALID_FILES" \]; then.*?exit 0\s+fi') 'mixed PRs exit 0 so the job stays green'
+Check ($text -notmatch '(?s)if \[ -n "\$INVALID_FILES" \]; then.{0,400}exit 1') 'mixed PRs must not fail the job with exit 1'
+Check ($text -match "steps\.validate\.outputs\.valid == 'true'") 'auto-merge still requires valid=true'
+Check ($text -match "failure\(\).*steps\.validate\.outputs\.valid == 'false'") 'failure comment runs only on journal safety failures'
 
 $maliciousTitle = '$(Write-Host injected) `' + [Environment]::NewLine + '"quoted"; Get-ChildItem > should-not-run'
 $subject = '[field-journal] ' + $maliciousTitle

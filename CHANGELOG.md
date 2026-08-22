@@ -7,9 +7,11 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 ### Added
-- **CI runs remaining unwired suites** — 	est-p0-friction.ps1 on the Windows leg of outing-tests (Windows PowerShell 5.1); case-review/tests/test_review_case.py in the Linux case-contract job. 	est-workflow-title-safety.ps1 was already wired.
+- **CI runs remaining unwired suites** — test-p0-friction.ps1 on the Windows leg of routing-tests (Windows PowerShell 5.1); case-review/tests/test_review_case.py in the Linux case-contract job. test-workflow-title-safety.ps1 was already wired.
+- **R43 `game-security/`** — [gmh5225/awesome-game-security](https://github.com/gmh5225/awesome-game-security) (MIT, Copyright 2022 gmh) 10 agent skills on disk under `ags/`. PRIMARY **default** is engine ID, IL2CPP dump/observe/copy-patch, anti-cheat family identification, DMA **detection**. `game-hacking.md` stays first-class but opens only on threat-model/detection-surface tasks (TTP taxonomy, not a build guide). Wiki/archive/README bullets still fetch-from-upstream. **R44** is `threat-intelligence/` (#112). **R42** stays unused (ADF YARA). `il2cppdumper` is a manual bootstrap capability.
 
 ### Fixed
+- **Journal auto-merge CI** — mixed PRs that touch `skills/field-journal/**` plus other files skip `validate-and-merge` instead of failing the job (`valid=skip`). Feature PRs are no longer marked red by the journal-only auto-merge workflow.
 - **Windows PowerShell 5.1 encoding** — added a UTF-8 BOM to five non-ASCII `.ps1` scripts (`skills/scripts/verify-doc-facts.ps1`, `apk-reverse/scripts/frida-run.ps1`, `apk-reverse/scripts/rebuild-sign-install.ps1`, `ida-reverse/scripts/start.ps1`, `radare2/scripts/recon.ps1`). Without a BOM, PS 5.1 parses these files as the system ANSI codepage and garbles their Chinese / em-dash string literals; `verify-doc-facts.ps1` was failing four checks under 5.1 (CI only ran it under `pwsh`, which defaults to UTF-8). CI now guards every non-ASCII `.ps1` for a BOM.
 
 ### Changed

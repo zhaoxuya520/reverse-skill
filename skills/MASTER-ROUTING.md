@@ -75,6 +75,8 @@ python3 skills/case-review/scripts/review_case.py work/<case> --verify-hashes --
 ## 优先级（高 → 低）
 
 > 顺序必须与 `config/routing.json` 的 `priority` 数组一致。改路由只改 JSON，再改本表。`verify-routing-coherence.ps1` 会解析本表。
+>
+> **ID：** 游戏安全是 **R43**。威胁情报是 **R44**（#112）。`R42` 空号给 `ops/analysis-decision-framework.md` 的 ADF-R42（YARA experimental）。禁止把这三套混成一个号。
 
 | ID | 条件 | PRIMARY |
 |----|------|---------|
@@ -86,6 +88,7 @@ python3 skills/case-review/scripts/review_case.py work/<case> --verify-hashes --
 | **R31** | macOS / Mach-O | `macos-reverse/` |
 | **R33** | Go / Rust 二进制 | `go-rust-reverse/` |
 | **R5** | .NET / dnSpy / de4dot / ConfuserEx | `dotnet-reverse/` |
+| **R43** | Unity / IL2CPP / Unreal / 反作弊 / 授权游戏安全（AGS 10 skill 在盘上；默认引擎+AC） | `game-security/` |
 | **R9** | 恶意样本 / YARA / 沙箱 | `malware-analysis/` |
 | **R21** | 协议 / Protobuf / PCAP 协议 | `protocol-reverse/` |
 | **R22** | Ghidra / 开源反编译 | `ghidra-reverse/` |
@@ -129,6 +132,7 @@ python3 skills/case-review/scripts/review_case.py work/<case> --verify-hashes --
 | 任务 | 处理 |
 |------|------|
 | 纯 CTF 多类型编排 | PRIMARY `ctf-sandbox/` → sidecar `../CTF-Sandbox-Orchestrator/` |
+| 游戏客户端 / Unity / IL2CPP / 反作弊 | PRIMARY **R43** `game-security/`（10 个 AGS skill 在 `references/ags/`）。默认引擎识别 + AC 家族 + 授权取证。威胁模型/检测面才打开 `ags/game-hacking.md`。**R44** 是 threat-intel。门禁：reverse-skill `case-init` + 已打开 AGS 原文 |
 
 ## 读序
 

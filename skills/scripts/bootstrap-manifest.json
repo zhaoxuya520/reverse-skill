@@ -347,6 +347,14 @@
       "verifyCommand": "bkcrack",
       "releaseTag": "v1.8.1",
       "preferApiDigest": true
+    },
+    {
+      "name": "il2cppdumper",
+      "bootstrapKind": "manual",
+      "docsUrl": "https://github.com/Perfare/Il2CppDumper",
+      "canAutoInstall": false,
+      "verifyCommand": "Il2CppDumper",
+      "manualInstallHint": "Download Il2CppDumper from Perfare/Il2CppDumper GitHub Releases (Il2CppInspectorRedux is an alternative). Put Il2CppDumper.exe on PATH or in %USERPROFILE%\\Tools\\Il2CppDumper\\, then run refresh-tool-index.ps1. Do not auto-download."
     }
   ]
 }

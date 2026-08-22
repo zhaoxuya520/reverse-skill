@@ -157,7 +157,8 @@ catch (CustomException e) {
 
 ## 与 reverse-engineering 的边界
 
-- **IL2CPP / NativeAOT** → 编译成 native，没有 CLR 元数据 → 走 `reverse-engineering/`（IDA/r2），本 skill 仅做识别
+- **IL2CPP** → 编译成 native，没有 CLR 元数据 → 走 `game-security/` + seed-014（再交接 IDA/r2）
+- **NativeAOT** → 走 `reverse-engineering/`（IDA/r2），本 skill 仅做识别
 - **托管 .NET**（标准 C# exe/dll、Mono/Unity 托管层、Xamarin）→ 本 skill
 - **混合（native loader + .NET payload）** → loader 部分走 `reverse-engineering/`，dump 出 .NET payload 后切本 skill
 

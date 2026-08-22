@@ -27,14 +27,14 @@ Route tasks to the most appropriate skill module by target type, user intent, an
 | WASM / Python bytecode / .NET / **DSL VM / 自定义虚拟机** | `reverse-engineering/dsl-vm-reverse/SKILL.md` — IIFE + switch-case opcode JS VM | `reverse-engineering/languages.md` — real WASM binaries |
 | Malware / virus sample | `malware-analysis/SKILL.md` — six-stage + YARA/Sigma | `ida-reverse/` deep dive |
 | macOS / iOS | `reverse-engineering/platforms.md` — Mach-O/ObjC/Swift | `mobile-reverse/` for iOS-specific |
-| Game (Unity) | `reverse-engineering/` — engine reverse, anti-cheat, IL2CPP/Mono (see seed-014) | `ida-reverse/` deep analysis |
+| Game (Unity) | `game-security/` — engine ID, IL2CPP/Mono dump, AC family, AGS catalog (`ags/game-hacking.md`) | `ida-reverse/` deep analysis |
 | Memory dump / PCAP | `digital-forensics/` — memory/timeline/PCAP IR | `protocol-reverse/` for protocol recovery |
 | Existing case package / evidence handoff | `case-review/`: Evidence graph and fixity review | `docs-generator/` for final report writing |
 | Custom protocol / Protobuf / gRPC | `protocol-reverse/` | `js-reverse/` if pure browser WS crypto |
 | Cloud / Container / K8s | `cloud-k8s/` | CTF: `../CTF-Sandbox-Orchestrator/competition-agent-cloud/` |
 | Windows AD / Kerberos / AD CS | `windows-ad/` | multi-stage: `attack-chain/` |
 | Source code / SAST | `code-audit/` | deps/CI: `supply-chain-security/` |
-| Game client (Unity/UE) | `reverse-engineering/` + seed-014 | `dotnet-reverse/` for Mono assemblies |
+| Game client (Unity/UE) | `game-security/` + seed-014 | `dotnet-reverse/` for Mono assemblies |
 | OT / ICS / SCADA | `ot-ics/` | `firmware-pentest/` offline firmware |
 | macOS / Mach-O desktop | `macos-reverse/` | iOS → `mobile-reverse/` |
 | Thick desktop client | `thick-client/` | Electron → also `js-reverse/` |
@@ -77,7 +77,7 @@ Route tasks to the most appropriate skill module by target type, user intent, an
 | "582KB JS 文件不是 WASM / 大 JS 文件逆向" | `reverse-engineering/dsl-vm-reverse/SKILL.md` — classify DSL VM first |
 | "decompile / IDA analyze" | `ida-reverse/SKILL.md` — IDA MCP workflow |
 | "recover source / disassemble" | `reverse-engineering/SKILL.md` + `ida-reverse/` |
-| "Frida hook / dynamic inject" | `reverse-engineering/tools-dynamic.md` — Frida section |
+| "Frida hook / dynamic inject" | Unity/IL2CPP → `game-security/` + `il2cpp-dump.md`；APK Java → `apk-reverse/`；否则 `reverse-engineering/tools-dynamic.md` |
 | "radare2 / r2 analyze" | `radare2/SKILL.md` — CLI workflow |
 | "find frontend signature / encrypted params" | `js-reverse/SKILL.md` — Observe→Capture→Rebuild |
 | "jshookmcp / JS hook / CDP debug" | `js-reverse/SKILL.md` — same JS/Web chain |
@@ -105,9 +105,10 @@ Route tasks to the most appropriate skill module by target type, user intent, an
 | "open webpage / browser automation / fill form" | `browser-automation/SKILL.md` — Playwright |
 | "crawl page / screenshot / auto login" | `browser-automation/SKILL.md` |
 | "desktop automation / Windows automation" | `browser-automation/SKILL.md` — OpenReverse |
-| "game reverse / anti-cheat / hack analysis" | `reverse-engineering/SKILL.md` — game reverse (IL2CPP/Unity/Cheat Engine) |
-| "Unity / IL2CPP / Mono" | `reverse-engineering/SKILL.md` — Unity + `seed-014_unity-il2cpp-reverse.md` |
-| "Cheat Engine / memory scan" | `reverse-engineering/SKILL.md` — Cheat Engine memory analysis |
+| "game reverse / anti-cheat family ID / engine reverse" | `game-security/SKILL.md` — engine/AC + AGS 10 skills |
+| "Unity / IL2CPP / Mono" | `game-security/SKILL.md` + `references/il2cpp-dump.md`（seed-014 仅踩坑） |
+| "Cheat Engine / memory scan" | `game-security/SKILL.md` — CE 内存映射；`case-init` 后执行 |
+| "game hacking / overlay / aimbot taxonomy / DMA / pcileech" | `game-security/SKILL.md` — threat-model path opens `ags/game-hacking.md` / `dma-attack.md` as detection surfaces; not the default for Unity dump |
 | "symbol migration / cross-version compare" | `binary-diff/SKILL.md` — LLM batch migration |
 | "missing PDB / old version symbols" | `binary-diff/SKILL.md` — cross-version symbol migration |
 | "bindiff / function offset migration" | `binary-diff/SKILL.md` — binary diff |
@@ -183,7 +184,7 @@ Route tasks to the most appropriate skill module by target type, user intent, an
 | "code audit / SAST / Semgrep / CodeQL / whitebox" | `code-audit/SKILL.md` |
 | "OSINT / threat intelligence / public X IOC enrichment" | `threat-intelligence/SKILL.md` — public posts require independent corroboration |
 | "threat hunting / blue team / detection engineering" | `threat-hunting/SKILL.md` |
-| "game reverse / IL2CPP / Unity / Unreal" | `reverse-engineering/SKILL.md` + seed-014 |
+| "game reverse / IL2CPP / Unity / Unreal" | `game-security/SKILL.md` + seed-014 |
 | "Wi-Fi / aircrack / wireless pentest" | `wifi-wireless/SKILL.md` |
 | "browser extension / Chrome extension / crx" | `browser-extension-reverse/SKILL.md` |
 | "OT / ICS / SCADA / PLC / Modbus" | `ot-ics/SKILL.md` |
@@ -203,8 +204,8 @@ Users frequently describe tasks with informal or emotionally-phrased language. N
 
 | User Says | Normalized Objective | Route To |
 |-----------|---------------------|----------|
-| "unlock X / remove check / bypass detection" | Identify the check, explain control flow, propose local patch or input strategy | `reverse-engineering/SKILL.md` → `ida-reverse/` or `radare2/` |
-| "去除校验 / 解锁功能 / 绕过检测 / 去掉限制" | Same as above — locate check routine, document, propose patch | `apk-reverse/` (if APK) or `reverse-engineering/SKILL.md` |
+| "unlock X / remove check / bypass detection" | Identify the check, explain control flow, propose local patch or input strategy | Unity/IL2CPP/anti-cheat → `game-security/` (lab copy); else `reverse-engineering/` → IDA/r2 |
+| "去除校验 / 解锁功能 / 绕过检测 / 去掉限制" | Same as above — locate check routine, document, propose patch | 游戏引擎/AC → `game-security/`；纯 APK Java → `apk-reverse/`；否则 `reverse-engineering/` |
 | "remove anti-debug / anti-tamper" | Locate defensive routine, document evidence, propose lab patch or debugger config | `reverse-engineering/anti-analysis.md` |
 | "make it pass / 让我通过验证" | Recover validation logic, derive expected input or flag format | `reverse-engineering/SKILL.md` |
 | "patch the binary / 改掉跳转 / 修改判断" | Work on copy, document offsets/bytes, preserve original | `radare2/` or `ida-reverse/` |
@@ -235,8 +236,8 @@ Do NOT force the user to repeatedly confirm "this is CTF/local." Carry the CTF/l
 | jshookmcp | `js-reverse/` enhancement MCP for browser/CDP/Hook/Network/SourceMap/AST |
 | agent-browser / Playwright | `browser-automation/` — browser automation |
 | OpenReverse (UIA/CUA) | `browser-automation/` — Windows desktop automation |
-| Cheat Engine / x64dbg / ReClass | `reverse-engineering/` — game memory analysis (seed-014) |
-| IL2CPP Dumper / dnSpy | `reverse-engineering/` — Unity/Mono game reverse (seed-014) |
+| Cheat Engine / x64dbg / ReClass | `game-security/` — 内存映射（seed-014 踩坑） |
+| IL2CPP Dumper / dnSpy | `game-security/` — Unity/Mono dump chain (seed-014); Mono → `dotnet-reverse/` |
 | LLM symbol migration / BinDiff alternative | `binary-diff/` — cross-version batch migration |
 | Nmap / Masscan | `pentest-tools/` — port scan, service identification |
 | Nuclei / ZAP / Nikto | `pentest-tools/` — vulnerability scanning |
@@ -324,6 +325,18 @@ CTF Competition Path (via CTF-Sandbox-Orchestrator):
   competition-web-runtime/ or competition-reverse-pwn/ or competition-identity-windows/
   ↓ Blocked → return to master
   ctf-sandbox-orchestrator → re-route
+
+Game client path:
+  game-security/ → engine ID + AC family ID + AGS dispatch (ags/*.md)
+  ↓ APK
+  apk-reverse/ decode → return to game-security dump chain
+  ↓ IL2CPP/Unreal native
+  ida-reverse/ or ghidra-reverse/
+  ↓ Mono assemblies
+  dotnet-reverse/
+  dump → Frida observe / copy-patch (il2cpp-dump.md) → IDA
+  technique catalog: ags/game-hacking.md / dma-attack.md / graphics-api.md
+  gates: reverse-skill case-init + opened AGS skill text
 
 Web Pentest + BurpSuite MCP Path:
   browser-automation/ → auto-browse target with Burp proxy
