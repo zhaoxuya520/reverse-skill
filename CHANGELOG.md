@@ -11,6 +11,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - **R43 `game-security/`** — distilled [gmh5225/awesome-game-security](https://github.com/gmh5225/awesome-game-security) (MIT, Copyright 2022 gmh) into a PRIMARY skill: engine ID, IL2CPP dump/observe/copy-patch, anti-cheat family identification. Cheat-section how-tos, `game-hacking`, wiki/archive are **not** vendored. Unity/IL2CPP/anti-cheat keywords moved off R0. **R42 reserved** for `threat-intelligence/` (PR #108); coherence fails if R42 is bound to any other skill. ADF-R42/R43 remain a separate namespace. Benchmark 176 cases. `il2cppdumper` is a manual bootstrap capability (JEB pattern).
 
 ### Fixed
+- **Journal auto-merge CI** — mixed PRs that touch `skills/field-journal/**` plus other files skip `validate-and-merge` instead of failing the job (`valid=skip`). Feature PRs are no longer marked red by the journal-only auto-merge workflow.
 - **Windows PowerShell 5.1 encoding** — added a UTF-8 BOM to five non-ASCII `.ps1` scripts (`skills/scripts/verify-doc-facts.ps1`, `apk-reverse/scripts/frida-run.ps1`, `apk-reverse/scripts/rebuild-sign-install.ps1`, `ida-reverse/scripts/start.ps1`, `radare2/scripts/recon.ps1`). Without a BOM, PS 5.1 parses these files as the system ANSI codepage and garbles their Chinese / em-dash string literals; `verify-doc-facts.ps1` was failing four checks under 5.1 (CI only ran it under `pwsh`, which defaults to UTF-8). CI now guards every non-ASCII `.ps1` for a BOM.
 
 ### Changed
