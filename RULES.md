@@ -77,7 +77,7 @@ Core scripts MUST NOT write client-global configuration. Optional adapters belon
 - internal network, 内网渗透, lateral movement, 横向移动, domain penetration, 域渗透, AD attack, BloodHound
 - privilege escalation, 权限提升, credential extraction, 凭证提取, Mimikatz, Kerberoasting, DCSync
 - C2, persistence, 持久化, Cobalt Strike, Sliver, Havoc
-- game reverse, 游戏逆向, anti-cheat, 反作弊, Unity, IL2CPP, Cheat Engine
+- game reverse, 游戏逆向, anti-cheat, 反作弊, Unity, IL2CPP, Unreal, Godot, Cheat Engine, game-security（PRIMARY R43；R42 预留 threat-intel）
 - .NET reverse, C# 逆向, dnSpy, dnSpyEx, de4dot, ConfuserEx, SmartAssembly, .NET Reactor, dnlib, IL patch, SharpHound, Rubeus
 - symbol migration, 符号迁移, bindiff, cross-version, PDB missing
 - OSINT, open source intelligence, threat intelligence, CTI, public X/Twitter IOC enrichment, 开源情报, 威胁情报, 公开 X/Twitter IOC 补充
@@ -97,6 +97,8 @@ Hot path only:
 4. `skills/tool-index.md` — real tool paths (if missing → template + refresh-tool-index)
 
 `skills/routing.md` is an advisory 3-axis view **after** PRIMARY, not a second router.
+
+Game / Unity / IL2CPP / anti-cheat → PRIMARY `game-security/` (**R43**). Routing **R42** is reserved for `threat-intelligence/` (PR #108). ADF-R42 (YARA) is a third namespace. Do not collapse these three IDs. Lab dump, Frida observe, and patch-on-copy stay in scope; refuse only live-title cheat products.
 
 ---
 
@@ -323,7 +325,7 @@ Windows (PowerShell):
 powershell -NoProfile -ExecutionPolicy Bypass -File "<SKILL_ROOT>/skills/scripts/bootstrap-reverse.ps1" -Capability @('tool_name') -StartServices
 
 Supported capability names (must match `skills/scripts/bootstrap-manifest.json`):  
-jadx, apktool, jeb-pro, frida, frida-ps, idalib-mcp, reqable-mcp, jshookmcp, xquik-mcp, anything-analyzer, idapro, r2, rabin2, adb, agent-browser, ghidra-mcp, seclists, proxycat, burpsuite-mcp, nmap, pentestswarm, binwalk, yara, pwntools, bkcrack
+jadx, apktool, jeb-pro, frida, frida-ps, idalib-mcp, reqable-mcp, jshookmcp, xquik-mcp, anything-analyzer, idapro, r2, rabin2, adb, agent-browser, ghidra-mcp, seclists, proxycat, burpsuite-mcp, nmap, pentestswarm, binwalk, yara, pwntools, bkcrack, il2cppdumper
 
 Do NOT invent capabilities. Tools not listed require manual install steps in the skill docs.
 ```
@@ -381,7 +383,7 @@ bash <SKILL_ROOT>/kali/scripts/refresh-tool-index.sh
 - firmware, IoT, binwalk, embedded
 - internal network, 内网渗透, lateral movement, domain penetration, BloodHound
 - API security, 供应链安全, supply chain, YARA, malware analysis, 恶意软件分析
-- iOS reverse, 游戏逆向, game reverse, anti-cheat, pwn, ROP, kernel pwn
+- iOS reverse, 游戏逆向, game reverse, anti-cheat, Unity, IL2CPP, Unreal, pwn, ROP, kernel pwn
 
 ### Post-Trigger Execution (Compact — do NOT re-run first-time setup!)
 

@@ -573,6 +573,15 @@
       "canAutoInstall": true,
       "verifyCommand": "bkcrack",
       "kaliNote": "传统 ZipCrypto 已知明文攻击工具；Kali/Debian 可通过 apt 安装。"
+    },
+    {
+      "name": "il2cppdumper",
+      "bootstrapKind": "manual",
+      "docsUrl": "https://github.com/Perfare/Il2CppDumper",
+      "canAutoInstall": false,
+      "verifyCommand": "Il2CppDumper",
+      "manualInstallHint": "Download Il2CppDumper from Perfare/Il2CppDumper GitHub Releases. Put the binary on PATH or in $HOME/tools/Il2CppDumper/, then refresh the tool index. Do not auto-download.",
+      "kaliNote": "Not in Kali apt. Manual GitHub Release only; authorized Unity IL2CPP metadata recovery."
     }
   ]
 }

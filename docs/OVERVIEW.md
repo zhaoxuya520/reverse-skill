@@ -96,6 +96,7 @@ The repository is not tied to one client. Its core assets are `RULES.md`, `skill
 |---|---|
 | APK / Android analysis | `skills/apk-reverse/`, `skills/mobile-reverse/` |
 | Binary reverse engineering | `skills/ida-reverse/`, `skills/radare2/`, `skills/reverse-engineering/` |
+| Game client / Unity IL2CPP / anti-cheat ID | `skills/game-security/` (R43; R42 reserved for threat-intel) |
 | Frontend JS signing / parameter analysis | `skills/js-reverse/` |
 | HTTP traffic / request replay | BurpSuite MCP, anything-analyzer, browser automation |
 | CTF / security competitions | `CTF-Sandbox-Orchestrator/` |

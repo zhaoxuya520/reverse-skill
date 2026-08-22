@@ -402,6 +402,17 @@ function Get-ReverseToolCatalog {
             )
         }
         [pscustomobject]@{
+            Name = 'il2cppdumper'
+            Skill = 'game-security'
+            Purpose = 'Unity IL2CPP 元数据还原（授权样本；手动安装）'
+            VersionArgs = @()
+            Fallbacks = @(
+                [pscustomobject]@{ Type = 'command'; Value = 'Il2CppDumper' },
+                [pscustomobject]@{ Type = 'command'; Value = 'il2cppdumper' },
+                [pscustomobject]@{ Type = 'path'; Value = (Join-Path $userProfile 'Tools\Il2CppDumper\Il2CppDumper.exe') }
+            )
+        }
+        [pscustomobject]@{
             Name = 'jeb-pro'
             Skill = 'apk-reverse'
             Purpose = 'JEB Pro 商业 Android / ARM 反编译器（需用户自备有效许可证）'

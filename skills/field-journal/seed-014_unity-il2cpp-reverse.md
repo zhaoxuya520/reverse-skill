@@ -1,5 +1,7 @@
 # [种子] Unity IL2CPP 游戏逆向 → 还原元数据 + 修改逻辑
 
+> PRIMARY：`game-security/`（**R43**）。下文 AddCoin / VerifyReceipt / 改金币示例是历史实验室笔记，**MUST NOT** 当外挂交付物。路由号 **R42** 预留 threat-intel，不要改回去。
+
 ## 场景分类
 游戏安全 / 移动逆向
 
@@ -94,7 +96,8 @@ IDA 静态 patch：
 
 ## 对本包的改进建议
 
-- `reverse-engineering/SKILL.md` 已覆盖 Unity，但缺 IL2CPP **完整工作链** 案例
+- PRIMARY 现为 `game-security/`（R43；R42 预留 threat-intel）；本条目仍是 IL2CPP dump 先例
+- `MUST NOT` 把下文 AddCoin / VerifyReceipt hook 示例当作外挂交付物
 - `reverse-engineering/references/il2cpp-cheatsheet.md` 单独成文：dump 工具对比、frida-bridge 模板、加密 metadata 处理
 - bootstrap manifest 增加 frida-il2cpp-bridge
 
@@ -123,7 +126,7 @@ IDA 静态 patch：
 ## 进化动作
 - [ ] reverse-engineering/references 增加 il2cpp 完整章节
 - [ ] bootstrap-manifest 加入 frida-il2cpp-bridge / Il2CppInspectorRedux
-- [x] 路由矩阵已含 Unity / IL2CPP
+- [x] 路由矩阵已含 Unity / IL2CPP（2026-08：PRIMARY 从 R0 迁到 R43 `game-security/`；R42 预留 threat-intel）
 
 ## 环境信息
 - Windows / macOS（运行 Il2CppDumper 用），目标设备 Android arm64

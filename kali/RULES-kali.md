@@ -12,6 +12,7 @@
 
 - APK、Android 逆向、反编译、smali、jadx、apktool、Frida、Hook
 - 二进制分析、IDA、radare2、r2、反汇编、逆向工程、RE、还原源码、源码还原、逆向还原
+- 游戏逆向、反作弊、Unity、IL2CPP、Unreal、Cheat Engine（授权实验室；非外挂产品）
 - 前端签名、加密参数、JS 逆向、jshookmcp、CDP、SourceMap
 - 抓包、HTTP 捕获、请求重放、anything-analyzer
 - CTF、Pwn、Web 渗透、漏洞利用、提权

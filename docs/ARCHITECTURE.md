@@ -48,6 +48,7 @@ flowchart LR
         IDA[ida-reverse<br/>IDA Pro]
         R2[radare2<br/>CLI 分析]
         RE[reverse-engineering<br/>通用方法论]
+        GameSec[game-security<br/>引擎/反作弊识别]
         BinDiff[binary-diff<br/>符号迁移]
         PatchDiff[patch-diff-exploit<br/>N-day 武器化]
     end

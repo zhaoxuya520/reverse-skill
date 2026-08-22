@@ -537,7 +537,7 @@ def char_at(n, offset):
 - **IL 优先**：关键判断与 patch 用 IL 编辑器而非 C# 反编译器（避免编译器生成代码重编译失真）
 - 红队 Sharp* 工具（Rubeus/SharpHound）分析 → [`../dotnet-reverse/references/sharp-tools.md`](../dotnet-reverse/references/sharp-tools.md)
 
-**边界：** IL2CPP / NativeAOT 编译产物是 native（无 CLR），不走 dnSpy → 走 `ida-reverse/` / `radare2/`（见 [seed-014](../field-journal/seed-014_unity-il2cpp-reverse.md)）。Codegate 2013 两阶段 XOR+AES-CBC 模式见 [tools.md](tools.md#net-analysis) `.NET Analysis` 段。
+**边界：** IL2CPP 编译产物是 native（无 CLR），不走 dnSpy → `game-security/` + [seed-014](../field-journal/seed-014_unity-il2cpp-reverse.md)，深挖再交接 `ida-reverse/` / `radare2/`。NativeAOT 仍走 `ida-reverse/` / `radare2/`。Codegate 2013 两阶段 XOR+AES-CBC 模式见 [tools.md](tools.md#net-analysis) `.NET Analysis` 段。
 
 ---
 

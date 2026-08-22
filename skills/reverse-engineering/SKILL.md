@@ -90,6 +90,7 @@ r2pm -ci r2ghidra   # Native Ghidra decompiler for radare2
 - Web app with a small client helper → `js-reverse/`
 - Real malware / C2 / packing → `malware-analysis/`
 - Multi-type CTF contest packaging → `ctf-sandbox/` (sidecar orchestrator)
+- Unity / IL2CPP / Unreal / anti-cheat family ID → `game-security/` (not a cheat product track)
 
 ## Problem-Solving Workflow
 
@@ -198,8 +199,9 @@ Use [field-notes.md](field-notes.md) after the first round of triage when you kn
 - 需要绕过反调试 → `anti-analysis.md`
 - 遇到特定语言（Go/Rust/Python/WASM）→ `languages*.md`
 - 遇到 CTF 模式 → `patterns*.md`
+- Unity / IL2CPP / Unreal / 反作弊家族 → `game-security/`（R43；不是外挂产品轨）
 
-**同级关联模块**: `apk-reverse/`（APK 定位到 .so 时可切回本模块的 Frida/radare2 分支）
+**同级关联模块**: `apk-reverse/`（APK 定位到 .so 时可切回本模块的 Frida/radare2 分支）；游戏客户端 → `game-security/`
 
 
 ## 任务完成自检（声称完成前 MUST 通过）

@@ -36,7 +36,7 @@
 - OkHttp 自定义 CertificatePinner SSL Pinning 绕过 → Frida 脚本 hook `check$okhttp3`
 - 抖音系/快手系 APK 反 Frida 检测 → 改名 frida-server + 换端口 + spawn 模式
 - 加固 APK（360/腾讯/梆梆）→ 先 dump dex（DexDump/Frida-dexdump）再用 jadx
-- Unity IL2CPP → Il2CppDumper 解析 global-metadata.dat → Frida hook il2cpp 方法
+- Unity IL2CPP → PRIMARY `game-security/`（R43）：Il2CppDumper 解析 global-metadata.dat → Frida 观察 hook（call-through）→ 授权设备上对**副本** patch。路由 R42 预留 threat-intel，不要改号
 - Flutter APK → 找 libapp.so → 用 reFlutter/Doldrums 解析 snapshot
 - 签名校验绕不过 → smali 中注释掉 `checkSign` 调用 → 重打包
 

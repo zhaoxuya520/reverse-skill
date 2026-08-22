@@ -48,6 +48,16 @@ if (Test-Path -LiteralPath $routingJson) {
     $missingPrio = @($routeIds | Where-Object { $_ -notin @($rj.priority) })
     $extraPrio = @($rj.priority | Where-Object { $_ -notin $routeIds })
     if ($missingPrio.Count -eq 0 -and $extraPrio.Count -eq 0) { Ok 'routing.json priority covers all routes (1:1)' } else { Bad "routing.json priority mismatch: missing=$($missingPrio -join ',') extra=$($extraPrio -join ',')" }
+    $r42 = $rj.routes.PSObject.Properties['R42']
+    if ($r42) {
+        if ($r42.Value.skill -ne 'threat-intelligence/SKILL.md') {
+            Bad ("R42 is reserved for threat-intelligence/SKILL.md (PR #108); found {0}" -f $r42.Value.skill)
+        } else {
+            Ok 'R42 namespace: threat-intelligence'
+        }
+    } else {
+        Ok 'R42 unused (reserved for threat-intelligence; game-security uses R43)'
+    }
     $masterText = Get-Content -LiteralPath $masterDoc -Raw -Encoding UTF8
     $masterIds = [regex]::Matches($masterText, '(?m)^\s*\|\s*\*\*(R\d+)\*\*') | ForEach-Object { $_.Groups[1].Value }
     $jsonPrio = @($rj.priority)
