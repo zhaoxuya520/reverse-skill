@@ -314,10 +314,12 @@
       ]
     },
     "R43": {
-      "label": "Game security (engine reverse / anti-cheat ID)",
+      "label": "Game security (engine reverse / anti-cheat / AGS catalog)",
       "skill": "game-security/SKILL.md",
       "keywords": [
-        { "must": "unity|il2cpp|unreal.?engine|\\bue4\\b|\\bue5\\b|虚幻.?引擎|godot|游戏.?逆向|game.?reverse|anti-?cheat|反作弊|battleye|easyanticheat|vanguard|nprotect|tenprotect|gameguard|libil2cpp|global-metadata|il2cppdumper|cheat.?engine|gnames|gobjects|faceit.?ac|anticheat.?expert|ace-base", "exclude": "osint|threat.?intelligence|\\bcti\\b|开源.?情报|威胁.?情报", "note": "授权游戏客户端/引擎/反作弊家族识别；外挂产品轨由 skill 拒绝；R42 预留 threat-intel，禁止抢号" }
+        { "must": "unity|il2cpp|unreal.?engine|\\bue4\\b|\\bue5\\b|虚幻.?引擎|godot|游戏.?逆向|game.?reverse|anti-?cheat|反作弊|battleye|easyanticheat|vanguard|nprotect|tenprotect|gameguard|libil2cpp|global-metadata|il2cppdumper|cheat.?engine|gnames|gobjects|faceit.?ac|anticheat.?expert|ace-base", "exclude": "osint|threat.?intelligence|\\bcti\\b|开源.?情报|威胁.?情报", "note": "授权游戏客户端/引擎/反作弊；技术目录在 skill 内执行；R42 预留 threat-intel，禁止抢号" },
+        { "must": "game.?hack|game.?hacking|aimbot|wallhack|triggerbot|pcileech|pcie.?dma|dma.?attack|dma.?cheat|present.?hook|imgui.?overlay|hwid.?spoof|kmbox|box.?esp|skeleton.?esp", "exclude": "osint|threat.?intelligence|\\bcti\\b|开源.?情报|威胁.?情报", "note": "AGS game-hacking / DMA / overlay 技术目录；成品交付由 skill 约束，不是路由 miss" },
+        { "must": "directx|\\bd3d(9|11|12)?\\b|dxgi|vulkan|opengl", "mustAll": ["game|unity|unreal|cheat|overlay|hook|anti-?cheat|il2cpp"], "exclude": "osint|threat.?intelligence", "note": "图形 API hook 仅在游戏语境归 R43" }
       ]
     },
     "R0": {
@@ -325,8 +327,8 @@
       "skill": "reverse-engineering/SKILL.md",
       "keywords": [
         { "must": "ollvm|anti-?debug|unicorn|angr|gdb|deobfuscat|控制流平坦|反调试", "note": "通用反调试/OLLVM；Unity/IL2CPP/反作弊已迁 R43" },
-        { "must": "frida", "exclude": "\\bapk\\b|smali|jadx|android|安卓|il2cpp|unity|godot", "note": "APK 语境归 R1；游戏引擎语境归 R43" },
-        { "must": "reverse|逆向", "exclude": "apk|js.?reverse|ios|mobile|\\.net|firmware|malware|安卓|固件|恶意|protocol|ghidra|extension|macos|mach|golang|rust|工控|厚客户端|取证|协议|扩展|unity|il2cpp|游戏|unreal|anti-?cheat|反作弊|godot|cheat.?engine", "note": "泛逆向兜底；游戏/AC 让位 R43" }
+        { "must": "frida", "exclude": "\\bapk\\b|smali|jadx|android|安卓|il2cpp|unity|godot|unreal|game.?hack|aimbot", "note": "APK 语境归 R1；游戏引擎/技术目录归 R43" },
+        { "must": "reverse|逆向", "exclude": "apk|js.?reverse|ios|mobile|\\.net|firmware|malware|安卓|固件|恶意|protocol|ghidra|extension|macos|mach|golang|rust|工控|厚客户端|取证|协议|扩展|unity|il2cpp|游戏|unreal|anti-?cheat|反作弊|godot|cheat.?engine|game.?hack|pcileech|dma.?attack|aimbot", "note": "泛逆向兜底；游戏/AC/AGS 目录让位 R43" }
       ]
     }
   },

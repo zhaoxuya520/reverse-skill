@@ -88,7 +88,7 @@ python3 skills/case-review/scripts/review_case.py work/<case> --verify-hashes --
 | **R31** | macOS / Mach-O | `macos-reverse/` |
 | **R33** | Go / Rust 二进制 | `go-rust-reverse/` |
 | **R5** | .NET / dnSpy / de4dot / ConfuserEx | `dotnet-reverse/` |
-| **R43** | Unity / IL2CPP / Unreal / 反作弊家族（授权游戏安全，非外挂产品） | `game-security/` |
+| **R43** | Unity / IL2CPP / Unreal / 反作弊 / AGS 技术目录（授权游戏安全） | `game-security/` |
 | **R9** | 恶意样本 / YARA / 沙箱 | `malware-analysis/` |
 | **R21** | 协议 / Protobuf / PCAP 协议 | `protocol-reverse/` |
 | **R22** | Ghidra / 开源反编译 | `ghidra-reverse/` |
@@ -132,7 +132,7 @@ python3 skills/case-review/scripts/review_case.py work/<case> --verify-hashes --
 | 任务 | 处理 |
 |------|------|
 | 纯 CTF 多类型编排 | PRIMARY `ctf-sandbox/` → sidecar `../CTF-Sandbox-Orchestrator/` |
-| 游戏客户端 / Unity / IL2CPP / 反作弊 | PRIMARY **R43** `game-security/`（dump/观察 hook/副本 patch 保留）。**R42** 预留 threat-intel。线上外挂成品拒绝 |
+| 游戏客户端 / Unity / IL2CPP / 反作弊 / game-hacking | PRIMARY **R43** `game-security/`（10 个 AGS skill 在 `references/ags/`，含 game-hacking-techniques）。**R42** 预留 threat-intel。线上外挂成品拒绝，技术目录不删 |
 
 ## 读序
 

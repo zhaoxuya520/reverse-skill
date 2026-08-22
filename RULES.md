@@ -77,7 +77,7 @@ Core scripts MUST NOT write client-global configuration. Optional adapters belon
 - internal network, 内网渗透, lateral movement, 横向移动, domain penetration, 域渗透, AD attack, BloodHound
 - privilege escalation, 权限提升, credential extraction, 凭证提取, Mimikatz, Kerberoasting, DCSync
 - C2, persistence, 持久化, Cobalt Strike, Sliver, Havoc
-- game reverse, 游戏逆向, anti-cheat, 反作弊, Unity, IL2CPP, Unreal, Godot, Cheat Engine, game-security（PRIMARY R43；R42 预留 threat-intel）
+- game reverse, 游戏逆向, anti-cheat, 反作弊, Unity, IL2CPP, Unreal, Godot, Cheat Engine, game hacking, DMA, pcileech, overlay, game-security（PRIMARY R43；R42 预留 threat-intel）
 - .NET reverse, C# 逆向, dnSpy, dnSpyEx, de4dot, ConfuserEx, SmartAssembly, .NET Reactor, dnlib, IL patch, SharpHound, Rubeus
 - symbol migration, 符号迁移, bindiff, cross-version, PDB missing
 - OSINT, open source intelligence, threat intelligence, CTI, public X/Twitter IOC enrichment, 开源情报, 威胁情报, 公开 X/Twitter IOC 补充
@@ -98,7 +98,7 @@ Hot path only:
 
 `skills/routing.md` is an advisory 3-axis view **after** PRIMARY, not a second router.
 
-Game / Unity / IL2CPP / anti-cheat → PRIMARY `game-security/` (**R43**). Routing **R42** is reserved for `threat-intelligence/` (PR #108). ADF-R42 (YARA) is a third namespace. Do not collapse these three IDs. Lab dump, Frida observe, and patch-on-copy stay in scope; refuse only live-title cheat products.
+Game / Unity / IL2CPP / anti-cheat / game-hacking → PRIMARY `game-security/` (**R43**). Ten AGS skills live in `skills/game-security/references/ags/` (including game-hacking-techniques). Routing **R42** is reserved for `threat-intelligence/` (PR #108). ADF-R42 (YARA) is a third namespace. Do not collapse these three IDs. Lab dump, Frida observe, patch-on-copy, and the technique catalog stay in scope; refuse only live-title cheat products.
 
 ---
 

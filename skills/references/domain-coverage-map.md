@@ -11,7 +11,7 @@
 | 移动 iOS | `mobile-reverse/` | |
 | 二进制深挖 | `ida-reverse/` `radare2/` `ghidra-reverse/` | Ghidra = 开源主路径 |
 | 通用 RE / 反调试 / OLLVM | `reverse-engineering/` | |
-| 游戏客户端 / 反作弊识别 | `game-security/` | 蒸馏自 awesome-game-security；非外挂产品 |
+| 游戏客户端 / 反作弊 / AGS 技术目录 | `game-security/` | 10 个 AGS skill 在 `references/ags/`；非 live-title trainer 成品 |
 | .NET | `dotnet-reverse/` | |
 | 前端 JS / 签名 | `js-reverse/` | |
 | 浏览器扩展 | `browser-extension-reverse/` | |
@@ -53,7 +53,7 @@
 
 | 域 | 策略 |
 |----|------|
-| 纯游戏外挂开发 | **不是产品方向**；PRIMARY `game-security/` 拒绝产品轨。授权样本走 dump 链 + seed-014 |
+| 纯游戏外挂**成品**（live-title trainer） | 不是交付物；PRIMARY `game-security/` 仍执行 AGS 技术目录 + dump/hook/副本 patch。链接堆 fetch 上游，不 vendor |
 | 深度汽车/航空认证级 | 可外链；本包仅有 RF/OT 入口级 |
 | 纯 GRC/合规长文 | 不替代专业 GRC 工具；可写报告模板引用 |
 | 800+ ATT&CK 微 skill | 用本表 + ATT&CK 可选标签（Finding 字段） |

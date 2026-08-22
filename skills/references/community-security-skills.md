@@ -16,7 +16,7 @@
 | [mukul975/Anthropic-Cybersecurity-Skills](https://github.com/mukul975/Anthropic-Cybersecurity-Skills) | **800+** skill · ATT&CK/NIST 映射 | **框架映射**与领域目录可参考，不宜整库依赖 | 体量过大、维护与投毒面巨大 |
 | [Eyadkelleh/awesome-skills-security](https://github.com/Eyadkelleh/awesome-claude-skills-security) | SecLists 打包为 agent skills | 字典/payload 入口 | 与 seclists bootstrap 重叠 |
 | [securityfortech/awesome-security-skills](https://github.com/securityfortech/awesome-security-skills) | 安全 skill 精选列表 | 发现新 skill 的索引 | 列表型，需逐个审计 |
-| [gmh5225/awesome-game-security](https://github.com/gmh5225/awesome-game-security) | ~4250 链接 + 10 个 agent skill（2026-08-22） | **已蒸馏**为 `game-security/`（引擎识别 / dump 链 / AC 家族）。Cheat 节与 game-hacking **不并入** | 外挂 how-to 面大；禁止 submodule |
+| [gmh5225/awesome-game-security](https://github.com/gmh5225/awesome-game-security) | ~4250 链接 + 10 个 agent skill（2026-08-22） | **10 个 skill KEEP** 在 `game-security/references/ags/`（含 game-hacking-techniques）。README/wiki/archive **fetch** 不 vendor | 禁止 submodule 整库；live-title trainer 成品仍拒 |
 | [VoltAgent/awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) | 1000+ 跨厂商 skill 索引 | 发现官方/社区 skill | 非安全专用 |
 | [anthropics/claude-code-security-review](https://github.com/anthropics/claude-code-security-review) | PR 安全审查 GitHub Action | 可对标我们 docs/报告侧「变更审计」场景 | CI 产品，不是 RE 路由 |
 | [agentskills.io](https://agentskills.io) | Agent Skills 开放标准 | frontmatter/目录约定对齐 | 标准本身无攻防内容 |
@@ -74,7 +74,7 @@
 | 产物 | 路径 |
 |------|------|
 | RE 四阶段 | `reverse-engineering/references/re-agent-workflow.md` |
-| 游戏安全蒸馏 | `game-security/` + `game-security/references/INDEX.md` |
+| 游戏安全（AGS 10 skill） | `game-security/` + `game-security/references/ags/` + `INDEX.md` |
 | 授权侦察 | `pentest-tools/references/recon-pipeline.md` |
 | 攻击链门闩 | `attack-chain/references/lifecycle-checklist.md` |
 | Skill 供应链 | `ops/skill-supply-chain.md` |

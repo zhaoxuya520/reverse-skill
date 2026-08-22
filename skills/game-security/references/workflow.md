@@ -1,13 +1,13 @@
 # 游戏安全工作流门闩
 
-配合 `../SKILL.md`。每阶段结束必须停在编号菜单。
+配合 `../SKILL.md`。每阶段结束必须停在编号菜单。命中 AGS 分发表时 **MUST** 打开 `ags/*.md`（含 game-hacking），不要用本页代替。
 
 ## Phase 1 — 引擎识别
 
 1. `file` / DIE / 目录名：APK、`GameAssembly.dll`、`UnityPlayer.dll`、`UE4Game`/`UnrealEngine`、`libgodot`、`engine.dll`（Source）
 2. IL2CPP vs Mono：有 `libil2cpp.so` / `GameAssembly.dll` + `global-metadata.dat` → IL2CPP；仅 `Assembly-CSharp.dll` → Mono
 3. 记录 **已验证事实**：路径、哈希、引擎猜测与置信度
-4. 列出疑似 AC 模块名（不打开 bypass 文档）
+4. 列出疑似 AC 模块名；需要完整检测/bypass 分类时打开 `ags/anti-cheat.md`（分析目录，不是线上成品）
 
 门闩：未写出引擎类别，禁止进入 Phase 2 dump。
 

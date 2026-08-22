@@ -27,7 +27,7 @@ Route tasks to the most appropriate skill module by target type, user intent, an
 | WASM / Python bytecode / .NET / **DSL VM / 自定义虚拟机** | `reverse-engineering/dsl-vm-reverse/SKILL.md` — IIFE + switch-case opcode JS VM | `reverse-engineering/languages.md` — real WASM binaries |
 | Malware / virus sample | `malware-analysis/SKILL.md` — six-stage + YARA/Sigma | `ida-reverse/` deep dive |
 | macOS / iOS | `reverse-engineering/platforms.md` — Mach-O/ObjC/Swift | `mobile-reverse/` for iOS-specific |
-| Game (Unity) | `game-security/` — engine ID, IL2CPP/Mono dump, anti-cheat family ID (see seed-014) | `ida-reverse/` deep analysis |
+| Game (Unity) | `game-security/` — engine ID, IL2CPP/Mono dump, AC family, AGS catalog (`ags/game-hacking.md`) | `ida-reverse/` deep analysis |
 | Memory dump / PCAP | `digital-forensics/` — memory/timeline/PCAP IR | `protocol-reverse/` for protocol recovery |
 | Existing case package / evidence handoff | `case-review/`: Evidence graph and fixity review | `docs-generator/` for final report writing |
 | Custom protocol / Protobuf / gRPC | `protocol-reverse/` | `js-reverse/` if pure browser WS crypto |
@@ -105,9 +105,10 @@ Route tasks to the most appropriate skill module by target type, user intent, an
 | "open webpage / browser automation / fill form" | `browser-automation/SKILL.md` — Playwright |
 | "crawl page / screenshot / auto login" | `browser-automation/SKILL.md` |
 | "desktop automation / Windows automation" | `browser-automation/SKILL.md` — OpenReverse |
-| "game reverse / anti-cheat family ID / engine reverse" | `game-security/SKILL.md` — engine/AC ID (refuse 外挂产品轨) |
+| "game reverse / anti-cheat family ID / engine reverse" | `game-security/SKILL.md` — engine/AC ID + AGS 10 skills；拒绝 live-title trainer 成品 |
 | "Unity / IL2CPP / Mono" | `game-security/SKILL.md` + `references/il2cpp-dump.md`（seed-014 仅踩坑） |
-| "Cheat Engine / memory scan" | `game-security/SKILL.md` — authorized lab memory map only, no trainer |
+| "Cheat Engine / memory scan" | `game-security/SKILL.md` — authorized lab memory map; trainer 成品禁止 |
+| "game hacking / overlay / aimbot taxonomy / DMA / pcileech" | `game-security/SKILL.md` + `references/ags/game-hacking.md` / `dma-attack.md` |
 | "symbol migration / cross-version compare" | `binary-diff/SKILL.md` — LLM batch migration |
 | "missing PDB / old version symbols" | `binary-diff/SKILL.md` — cross-version symbol migration |
 | "bindiff / function offset migration" | `binary-diff/SKILL.md` — binary diff |
@@ -326,7 +327,7 @@ CTF Competition Path (via CTF-Sandbox-Orchestrator):
   ctf-sandbox-orchestrator → re-route
 
 Game client path:
-  game-security/ → engine ID + AC family ID
+  game-security/ → engine ID + AC family ID + AGS dispatch (ags/*.md)
   ↓ APK
   apk-reverse/ decode → return to game-security dump chain
   ↓ IL2CPP/Unreal native
@@ -334,7 +335,8 @@ Game client path:
   ↓ Mono assemblies
   dotnet-reverse/
   dump → Frida observe / copy-patch (il2cpp-dump.md) → IDA
-  MUST NOT ship live-title trainer / overlay ESP / live DMA
+  technique catalog: ags/game-hacking.md / dma-attack.md / graphics-api.md
+  MUST NOT ship live-title trainer product
 
 Web Pentest + BurpSuite MCP Path:
   browser-automation/ → auto-browse target with Burp proxy

@@ -1,12 +1,12 @@
 # 游戏安全工具（RE / 防御；精选）
 
-> reverse-skill 是 **skill 路由器**，不是外挂产品轨。纯游戏外挂开发 **不是** 产品方向。  
-> Distill from [gmh5225/awesome-game-security](https://github.com/gmh5225/awesome-game-security) (MIT, 2026-08-22). 上游 README 是 ~356KB 链接堆；本包 **不** vendor ~4250 条。Cheat 区 **MUST NOT** 复制。
+> 本页是 reverse-skill **精选工具**（路径不猜）。完整游戏 RE 工具/插件/混淆目录：[ags/reverse-engineering.md](ags/reverse-engineering.md)。链接堆按 [ags/fetch-upstream.md](ags/fetch-upstream.md) 现拉。  
+> Distill from [gmh5225/awesome-game-security](https://github.com/gmh5225/awesome-game-security) (MIT, 2026-08-22).
 
 ## 禁令（RFC 2119）
 
-- **MUST NOT** 列出 unknowncheats aimbot 仓库、DMA 板卡、overlay ESP 框架、“undetected cheat engine”。
-- **MUST NOT** 产出线上 trainer / aimbot / ESP / live DMA 作业步骤。
+- **MUST NOT** 猜工具路径或把上游 README 整份拷进本文件。
+- **MUST NOT** 产出线上 trainer **成品**。技术目录与实验室工具用法在 `ags/`。
 - **MUST NOT** 猜工具路径。缺工具 → 读 [`tool-index.md`](../../tool-index.md)；未生成则跑 `skills/scripts/refresh-tool-index.ps1`。
 - **Il2CppDumper 已登记**为 manifest 名 `il2cppdumper`（`bootstrapKind: manual`，`canAutoInstall: false`）。bootstrap **只打印** `manualInstallHint`，不会下载。Frida 注入授权样本、副本 patch **仍是能力**。
 

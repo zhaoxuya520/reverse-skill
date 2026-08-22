@@ -1,12 +1,12 @@
 # 反作弊家族识别（防御 / RE）
 
-> reverse-skill 是 **skill 路由器**，不是外挂产品轨。纯游戏外挂开发 **不是** 产品方向。  
-> Distill from [gmh5225/awesome-game-security](https://github.com/gmh5225/awesome-game-security) (MIT, 2026-08-22). **MUST NOT** 复制 AGS Bypass Categories、DMA 作业流水线、KMBox VID/PID 攻击菜谱。
+> 本页是 reverse-skill **家族识别快表** + 内核交接。完整 AGS anti-cheat / DMA / game-hacking 目录在 [ags/anti-cheat.md](ags/anti-cheat.md)、[ags/dma-attack.md](ags/dma-attack.md)、[ags/game-hacking.md](ags/game-hacking.md)。  
+> Distill from [gmh5225/awesome-game-security](https://github.com/gmh5225/awesome-game-security) (MIT, 2026-08-22).
 
 ## 授权与禁令（RFC 2119）
 
 - **MUST** `auth.status=granted` 后才对目标 ACT。本表只做 **识别**，不是绕过手册。
-- **MUST NOT** 写线上过检测成品 / stealth CE / live DMA 作业步骤。授权样本上 **MUST** 继续做模块识别、驱动逆向交接（`kernel-driver-reverse.md` / `edr-bypass-re/`）——分析能力不减。
+- **MUST NOT** 交付线上过检测**成品**。授权样本上 **MUST** 继续做模块识别、驱动逆向交接（`kernel-driver-reverse.md` / `edr-bypass-re/`），并打开 AGS 完整目录——分析能力不减。
 - **MUST NOT** 把模块名表当 L1 归因；标题 / 构建会改名。磁盘哈希 + 服务名才是 Observation。
 - 内核深挖 **MUST** 交接：[`kernel-driver-reverse.md`](../../reverse-engineering/kernel-driver-reverse.md)。把 AC 当 **EDR-like** 分析（callback / ETW / 完整性）时用 [`edr-bypass-re/SKILL.md`](../../edr-bypass-re/SKILL.md)，**不是** 外挂绕过产品。
 
@@ -44,9 +44,9 @@
 
 可选第四层：平台虚拟化 / HVCI / 启动度量。有无该层是 **Observation**，不是“已击败内核”。
 
-## DMA（threat-model INDEX-ONLY）
+## DMA（完整目录在 ags/dma-attack.md）
 
-PCIe DMA exists; do not operationalize FPGA/pcileech against live titles. 外部设备可在 OS 之下读物理内存，软件 AC 的进程内假设因此不完整。防御侧索引：IOMMU / Kernel DMA Protection / ACS / 度量启动。AGS Cheat>DMA、donor 克隆、BAR 探针流水线、KMBox VID/PID **MUST NOT** 当攻击配方复制。授权实验室只建威胁模型，不写执行步骤。
+PCIe DMA 可在 OS 之下读物理内存，软件 AC 的进程内假设因此不完整。**完整** PCIe/IOMMU/pcileech/检测流水线：**MUST** 打开 [ags/dma-attack.md](ags/dma-attack.md)，不要用本段代替。防御侧索引：IOMMU / Kernel DMA Protection / ACS / 度量启动。对 **未授权 live 网游** 不要交付 FPGA/pcileech 作业成品。
 
 ## 内核 / EDR-like 交接
 

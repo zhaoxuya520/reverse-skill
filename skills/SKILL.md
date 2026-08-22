@@ -52,7 +52,7 @@ description: Routes reverse engineering, exploitation, penetration testing, malw
 | **API 安全测试** | `api-security/` | REST/GraphQL/WebSocket 全协议：BOLA/IDOR、JWT/OAuth 攻击、10 阶段方法论 |
 | **供应链安全** | `supply-chain-security/` | SBOM/SCA/CI-CD 管道：依赖扫描、容器安全、构建完整性、漏洞可达性验证 |
 | **移动逆向工程** | `mobile-reverse/` | Android + iOS：Frida/Objection 动态插桩、SSL Pinning/Root/越狱检测绕过、OWASP MASTG |
-| **游戏安全** | `game-security/` | 授权游戏客户端：引擎识别、IL2CPP/Unreal dump、反作弊家族识别（非外挂产品） |
+| **游戏安全** | `game-security/` | 授权游戏客户端：引擎识别、IL2CPP/Unreal dump、反作弊、AGS 10 skill（含 game-hacking-techniques） |
 | **恶意软件分析** | `malware-analysis/` | 样本分析六阶段、YARA/Sigma、反分析检测、沙箱编排 |
 | **DSL 虚拟机逆向** | `reverse-engineering/dsl-vm-reverse/` | JS 自定义指令集 VM（IIFE + switch-case opcode）；风控/验证码引擎等 |
 | **作战契约 ops** | `ops/` | Scope / 证据链 / 角色 / 时间线 / 身份 / skill 供应链安全 |

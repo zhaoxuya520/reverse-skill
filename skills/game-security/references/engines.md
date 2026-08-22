@@ -1,13 +1,13 @@
 # 游戏引擎识别（RE / 防御）
 
-> reverse-skill 是 **skill 路由器**，不是外挂产品轨。纯游戏外挂开发 **不是** 产品方向。  
-> Distill from [gmh5225/awesome-game-security](https://github.com/gmh5225/awesome-game-security) (MIT, 2026-08-22). Cheat 区 ~2757 链接 **MUST NOT** 复制。
+> 本页是 reverse-skill **磁盘指纹 + dump 链**（绑定 tool-index）。引擎对象模型 / SDK dump 工作流补充：[ags/game-engine.md](ags/game-engine.md)。  
+> Distill from [gmh5225/awesome-game-security](https://github.com/gmh5225/awesome-game-security) (MIT, 2026-08-22).
 
 ## 授权（RFC 2119）
 
 - **MUST** 在 `auth.status=granted` 且合法 `network_profile` / `offline-sample` 就绪后才 ACT（`ops/scope-contract.md`）。
 - **MUST** 把 dump 当 **元数据恢复**（类型 / 方法名 / 反射），**MUST NOT** 当 cheat SDK。
-- **MUST NOT** 写 aimbot / ESP / injection / manual map / DMA FPGA / overlay / trainer 步骤。
+- **MUST NOT** 把网上偏移当 L1。aimbot / overlay / DMA 等技术目录在 [ags/game-hacking.md](ags/game-hacking.md)，不要在本页假装不存在。
 - **MUST NOT** 把 thunk 的 first-20 或 mid-instruction Capstone 当函数体事实。引擎全局是 **version-specific 名字**，不是固定偏移。
 
 ## 磁盘制品识别

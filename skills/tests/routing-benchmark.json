@@ -910,6 +910,26 @@
       "hint": "godot 游戏 逆向",
       "expect": "R43",
       "quick": false
+    },
+    {
+      "hint": "game hacking techniques overlay",
+      "expect": "R43",
+      "quick": true
+    },
+    {
+      "hint": "pcileech DMA attack threat model",
+      "expect": "R43",
+      "quick": true
+    },
+    {
+      "hint": "DirectX Present hook game overlay",
+      "expect": "R43",
+      "quick": false
+    },
+    {
+      "hint": "kmbox hardware input",
+      "expect": "R43",
+      "quick": false
     }
   ]
 }
