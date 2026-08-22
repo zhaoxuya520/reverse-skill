@@ -1,5 +1,5 @@
 ---
-title: Methodology & Decision Framework
+name: Methodology & Decision Framework
 description: High-level methodology and decision framework for reverse engineering when entry points are hidden or heavily obfuscated.
 ---
 # Methodology & Decision Framework
