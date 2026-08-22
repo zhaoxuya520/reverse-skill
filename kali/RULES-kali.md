@@ -169,7 +169,7 @@ bash kali/scripts/bootstrap-reverse.sh jadx frida gef ghidra-mcp
 bash kali/scripts/bootstrap-reverse.sh sstimap xsstrike wpprobe nuclei
 ```
 
-支持的全部能力名：jadx、apktool、frida、idalib-mcp、jshookmcp、anything-analyzer、idapro、r2、rabin2、adb、agent-browser、ghidra-mcp、nmap、sqlmap、hashcat、hydra、gobuster、ffuf、msfconsole、nuclei、seclists、proxycat、mcp-kali-server、metasploitmcp、hexstrike-ai、pentestswarm、adaptixc2、atomic-operator、sstimap、xsstrike、wpprobe、fluxion、gef、evil-winrm-py、coercer、netexec、responder、crackmapexec、bloodhound、certipy、wfuzz、aircrack-ng
+支持的全部能力名：jadx、apktool、frida、idalib-mcp、jshookmcp、xquik-mcp、anything-analyzer、idapro、r2、rabin2、adb、agent-browser、ghidra-mcp、nmap、sqlmap、hashcat、hydra、gobuster、ffuf、msfconsole、nuclei、seclists、proxycat、mcp-kali-server、metasploitmcp、hexstrike-ai、pentestswarm、adaptixc2、atomic-operator、sstimap、xsstrike、wpprobe、fluxion、gef、evil-winrm-py、coercer、netexec、responder、crackmapexec、bloodhound、certipy、wfuzz、aircrack-ng
 
 ## 刷新工具索引
 

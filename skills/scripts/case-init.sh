@@ -39,7 +39,7 @@ while [[ $# -gt 0 ]]; do
     -h|--help) sed -n '2,8p' "$0"; exit 0 ;;
     *)
       if [[ -z "$HINT" && "$1" != -* ]]; then HINT="$1"; shift
-      else echo "Unknown arg: $1" >&2; exit 2; fi
+      else echo "Unknown arg: \"$1\"" >&2; exit 2; fi
       ;;
   esac
 done
@@ -302,6 +302,8 @@ cat > "$CASE_ROOT/timeline.md" <<EOF
 - result_summary: $timeline_summary
 - artifacts: [scope.md, workitems.md]
 - evidence_ids: []
+- decision_delta: [case_initialized]
+- carry_forward_refs: [scope.md]
 - next: $timeline_next
 EOF
 

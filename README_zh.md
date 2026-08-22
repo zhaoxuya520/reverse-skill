@@ -72,7 +72,7 @@
 
 | 路由规则 | 回归基准 | 核心 Skill | CI 平台 | 客户端模型 |
 |---:|---:|---:|---|---|
-| 41 条（R0–R40） | 163 条用例 | 42 个已跟踪模块 | Windows + Ubuntu | 平台无关 |
+| 43 条（R0–R42） | 173 条用例 | 44 个已跟踪模块 | Windows + Ubuntu | 平台无关 |
 
 路由核心由单一结构化配置驱动，通过跨平台 CI 验证，并与各客户端的可选适配层保持分离。
 
@@ -167,12 +167,12 @@ git clone https://github.com/zhaoxuya520/reverse-skill.git
 | [skills/routing.md](skills/routing.md) | 路由矩阵（场景 → Skill） |
 | [skills/SKILL.md](skills/SKILL.md) | 总控入口 |
 | [skills/INDEX.md](skills/INDEX.md) | 自动生成的平台无关 Skill 导航索引 |
-| [skills/config/routing.json](skills/config/routing.json) | 路由单一事实源（41 条规则，R0–R40） |
+| [skills/config/routing.json](skills/config/routing.json) | 路由单一事实源（43 条规则，R0–R42） |
 | [skills/tool-index.md](skills/tool-index.md) | 本机工具索引（自动生成） |
 | [skills/scripts/master-route.ps1](skills/scripts/master-route.ps1) | 一键分诊 |
 | [skills/scripts/case-init.ps1](skills/scripts/case-init.ps1) | 作战 case 目录（scope/timeline） |
 | [skills/case-review/](skills/case-review/) | 只读 Evidence 图审查与 artifact fixity 校验 |
-| [skills/scripts/test-routing.ps1](skills/scripts/test-routing.ps1) | 163 条路由回归基准 |
+| [skills/scripts/test-routing.ps1](skills/scripts/test-routing.ps1) | 173 条路由回归基准 |
 | [skills/scripts/verify-routing-coherence.ps1](skills/scripts/verify-routing-coherence.ps1) | 结构一致性与供应链版本固定门禁 |
 | [skills/ops/](skills/ops/) | Scope / 证据链 / 角色 / 时间线 / skill 供应链安全 |
 | [skills/references/community-security-skills.md](skills/references/community-security-skills.md) | 社区安全 skill 生态对照（借鉴不并库） |
@@ -180,7 +180,7 @@ git clone https://github.com/zhaoxuya520/reverse-skill.git
 ### 修改后验证
 
 ```powershell
-# 路由回归（163 条）
+# 路由回归（173 条）
 powershell -NoProfile -ExecutionPolicy Bypass -File skills/scripts/test-routing.ps1
 # 结构一致性 + 供应链版本固定门禁
 powershell -NoProfile -ExecutionPolicy Bypass -File skills/scripts/verify-routing-coherence.ps1
@@ -306,3 +306,7 @@ GitHub Actions 会在 Windows 与 Ubuntu 上执行同一套核心检查。
 本项目仅限用于合法的安全研究、教育、CTF 竞赛，以及对自有系统或已获得明确授权的目标进行测试。
 
 **严禁在未经授权的情况下访问、扫描、利用、干扰目标或获取数据。** 使用者须自行确保其行为符合适用法律法规及授权范围；因滥用本项目造成的任何损失或法律责任，均由使用者自行承担，项目维护者不承担相关责任。
+
+## 安装、社区与下载安全
+
+见 [快速开始](docs/QUICKSTART_zh.md)、[安装与下载安全指引](docs/UV-AND-DOWNLOAD-SECURITY_zh.md) 和 [社区 Issue 分类](docs/COMMUNITY-ISSUE-TRIAGE.md)。

@@ -70,7 +70,7 @@ User task
 
 | Routing rules | Regression benchmark | Core skill modules | CI platforms | Client model |
 |---:|---:|---:|---|---|
-| 41 (R0–R40) | 163 cases | 42 tracked modules | Windows + Ubuntu | Client-neutral |
+| 43 (R0–R42) | 173 cases | 44 tracked modules | Windows + Ubuntu | Client-neutral |
 
 The routing core is driven by one structured configuration, validated by cross-platform CI, and kept separate from optional client adapters.
 
@@ -169,12 +169,12 @@ Platform-specific docs:
 | [skills/routing.md](skills/routing.md) | Task → skill routing matrix |
 | [skills/SKILL.md](skills/SKILL.md) | Master entry point |
 | [skills/INDEX.md](skills/INDEX.md) | Auto-generated, client-neutral skill navigation index |
-| [skills/config/routing.json](skills/config/routing.json) | **Routing single source of truth** (41 rules, R0–R40) |
+| [skills/config/routing.json](skills/config/routing.json) | **Routing single source of truth** (43 rules, R0–R42) |
 | [skills/tool-index.md](skills/tool-index.md) | Local tool status (auto-generated) |
 | [skills/scripts/master-route.ps1](skills/scripts/master-route.ps1) | One-shot PRIMARY triage (reads routing.json) |
 | [skills/scripts/case-init.ps1](skills/scripts/case-init.ps1) | Case dir: scope / timeline / workitems |
 | [skills/case-review/](skills/case-review/) | Read-only Evidence graph review and artifact fixity checks |
-| [skills/scripts/test-routing.ps1](skills/scripts/test-routing.ps1) | Routing regression runner (163 benchmark cases) |
+| [skills/scripts/test-routing.ps1](skills/scripts/test-routing.ps1) | Routing regression runner (173 benchmark cases) |
 | [skills/scripts/verify-routing-coherence.ps1](skills/scripts/verify-routing-coherence.ps1) | Structure + supply-chain pin gate checks |
 | [skills/scripts/extract-summaries.ps1](skills/scripts/extract-summaries.ps1) | Regenerates INDEX.md from skill frontmatter |
 | [AGENTS.md](AGENTS.md) | Platform-neutral repository instructions |
@@ -183,7 +183,7 @@ Platform-specific docs:
 ### Testing (run after any routing/config change)
 
 ```powershell
-# 1. Routing regression — 163 (hint → expected PRIMARY) cases, fails CI on any mismatch
+# 1. Routing regression — 173 (hint → expected PRIMARY) cases, fails CI on any mismatch
 powershell -NoProfile -ExecutionPolicy Bypass -File skills/scripts/test-routing.ps1
 # 2. Structure coherence + supply-chain pin gate (unpinned auto-install fails)
 powershell -NoProfile -ExecutionPolicy Bypass -File skills/scripts/verify-routing-coherence.ps1
@@ -308,4 +308,8 @@ Special thanks to the OLLVM deobfuscation ecosystem contributors and everyone wh
 
 This project is intended solely for lawful security research, education, CTF competitions, and testing of systems that you own or have explicit authorization to assess.
 
-**Unauthorized access, scanning, exploitation, disruption, data acquisition, or any other use against systems without prior permission is strictly prohibited.** Users are solely responsible for complying with applicable laws, regulations, and the authorized scope of testing. The maintainers accept no liability for misuse of this project or for any resulting damage or legal consequences
+**Unauthorized access, scanning, exploitation, disruption, data acquisition, or any other use against systems without prior permission is strictly prohibited.** Users are solely responsible for complying with applicable laws, regulations, and the authorized scope of testing. The maintainers accept no liability for misuse of this project or for any resulting damage or legal consequences.
+
+## Installation, community, and download security
+
+See [Quick Start](docs/QUICKSTART_zh.md), [Installation and Download Security](docs/UV-AND-DOWNLOAD-SECURITY.md), and [Community Issue Triage](docs/COMMUNITY-ISSUE-TRIAGE.md).

@@ -64,6 +64,16 @@ else {
     if ($scope -match 'ready_for_act:\s*true') { Ok 'scope ready_for_act true' } else { Bad 'scope ready_for_act not true' }
 }
 
+# 2b) transition handoff is delta-by-reference: scope holds full state; timeline does not duplicate unchanged target context
+$timelinePath = Join-Path $caseRoot 'timeline.md'
+if (-not (Test-Path $timelinePath)) { Bad "timeline.md missing at $timelinePath" }
+else {
+    $timelineText = Get-Content $timelinePath -Raw -Encoding UTF8
+    if ($timelineText -match '(?m)^- decision_delta:\s*\[case_initialized\]\s*$') { Ok 'timeline decision_delta initialized' } else { Bad 'timeline decision_delta missing' }
+    if ($timelineText -match '(?m)^- carry_forward_refs:\s*\[scope\.md\]\s*$') { Ok 'timeline carries authoritative scope by reference' } else { Bad 'timeline carry_forward_refs missing' }
+    if ($timelineText -notmatch [regex]::Escape('https://app.example.invalid/')) { Ok 'timeline does not duplicate unchanged target context' } else { Bad 'timeline duplicated target context from scope' }
+}
+
 # 3) bare case-init still pending defaults
 $bareName = 'p0-bare-' + (Get-Date -Format 'HHmmss')
 & $HostExe -NoProfile -ExecutionPolicy Bypass -File $ci -CaseName $bareName -PackageRoot $PackageRoot 2>&1 | Out-Null

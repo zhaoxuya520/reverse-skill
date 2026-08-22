@@ -147,6 +147,19 @@
       "pinnedVersion": "0.3.4"
     },
     {
+      "name": "xquik-mcp",
+      "bootstrapKind": "remote-http-mcp",
+      "mcpNames": [
+        "xquik"
+      ],
+      "mcpUrl": "https://xquik.com/mcp",
+      "docsUrl": "https://docs.xquik.com/mcp/overview",
+      "canAutoInstall": true,
+      "pinPolicy": "remote-service-no-local-install",
+      "verificationMode": "registration-only",
+      "note": "Registers the first-party remote MCP URL only. OAuth is completed in the MCP client. No local package, bridge, or credential is installed."
+    },
+    {
       "name": "anything-analyzer",
       "bootstrapKind": "local-http-mcp",
       "repoUrl": "https://github.com/Mouseww/anything-analyzer",

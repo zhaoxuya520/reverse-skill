@@ -42,6 +42,7 @@
 | **REST / GraphQL / WebSocket API** | `api-security/SKILL.md` — 10 阶段方法论 | `pentest-tools/SKILL.md` — 基础 Web 渗透 |
 | **软件供应链 / SBOM / SCA** | `supply-chain-security/SKILL.md` — 六层治理框架 | `pentest-tools/SKILL.md` — 依赖扫描工具 |
 | **恶意软件 / 病毒样本** | `malware-analysis/SKILL.md` — 六阶段分析 + YARA/Sigma | `reverse-engineering/SKILL.md` — 仅通用逆向 / `ida-reverse/` 深度分析 |
+| **公开来源威胁情报 / OSINT** | `threat-intelligence/SKILL.md` — IOC 补充与活动关联 | 公开 X/Twitter 帖子必须由独立来源核验 |
 
 ## 按用户意图
 
@@ -164,6 +165,7 @@
 | "域渗透/BloodHound/Certipy/Kerberoast" | `windows-ad/SKILL.md` |
 | "取证/Volatility/内存转储" | `digital-forensics/SKILL.md` |
 | "代码审计/SAST/Semgrep" | `code-audit/SKILL.md` |
+| "开源情报/威胁情报/公开 X IOC 补充" | `threat-intelligence/SKILL.md` — 公开帖子仅作为待核验线索 |
 | "威胁狩猎/蓝队/检测工程" | `threat-hunting/SKILL.md` |
 | "游戏逆向/IL2CPP/Unity" | `reverse-engineering/SKILL.md` + seed-014 |
 | "WiFi/无线渗透/aircrack" | `wifi-wireless/SKILL.md` |

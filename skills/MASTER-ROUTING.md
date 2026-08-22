@@ -75,6 +75,8 @@ python3 skills/case-review/scripts/review_case.py work/<case> --verify-hashes --
 ## 优先级（高 → 低）
 
 > 顺序必须与 `config/routing.json` 的 `priority` 数组一致。改路由只改 JSON，再改本表。`verify-routing-coherence.ps1` 会解析本表。
+>
+> 路由 `R*` 与 `ops/analysis-decision-framework.md` 的 ADF-R* 是两套命名空间。本表 **R42** = OSINT / 威胁情报；ADF R42 = YARA/detections experimental。禁止混用。
 
 | ID | 条件 | PRIMARY |
 |----|------|---------|
@@ -102,6 +104,7 @@ python3 skills/case-review/scripts/review_case.py work/<case> --verify-hashes --
 | **R23** | 云 / 容器 / K8s | `cloud-k8s/` |
 | **R35** | 数据库安全 | `database-security/` |
 | **R25** | 取证 / 内存转储 / 时间线 | `digital-forensics/` |
+| **R42** | OSINT / 威胁情报 / 公开 X IOC 补充 | `threat-intelligence/` |
 | **R36** | 邮件 / 钓鱼分析 | `email-security/` |
 | **R29** | Wi-Fi / 无线渗透 | `wifi-wireless/` |
 | **R38** | RF / SDR 研究 | `radio-sdr/` |

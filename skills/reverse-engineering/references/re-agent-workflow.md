@@ -12,6 +12,17 @@
 □ 角色：cre（ops/role-map）
 ```
 
+## 0.1 Transition handoff（decision delta）
+
+阶段之间不重新注入完整 case context。`scope.md` / `workitems.md` / Evidence 保持 authoritative；`timeline.md` 只承载 transition delta：
+
+1. stage/turn 结束时只写真正改变后续动作的 `decision_delta`；无变化写 `[]`。
+2. unchanged route/auth/scope/network profile/tool state/hypothesis 只放 `carry_forward_refs`，consumer 依引用读取，不重新 serialize / emit。
+3. `decision_delta` 不是完整 state；consumer 必须先继承 refs，再应用 delta。
+4. 只有两个或以上 evidence-supported 分支会导致不同下一动作时才停在 next-step menu；确定性 gate 直接推进。
+
+例：Triage 完成且唯一合法下一步是 Static 时，transition 只需 `decision_delta: [phase=triage->static]` + `carry_forward_refs: [scope.md, evidence/E-triage.md]`。
+
 ## 0.5 用户指令可行性门闩（Issue #65）
 
 **原则**：服从用户**目标**，不盲从用户**步骤顺序**。跳步前必须说明前提并请确认；确认后的强制步骤必须做，且诚实标注 Evidence 质量。

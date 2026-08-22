@@ -45,6 +45,8 @@ assert by_tool['reqable-mcp']['available'] is False, 'npx must not masquerade as
 by_cap = {c['name']: c for c in data['capabilities']}
 assert by_cap['jshookmcp']['ready'] is False
 assert by_cap['reqable-mcp']['ready'] is False
+assert by_cap['xquik-mcp']['mcp_registered'] is False
+assert by_cap['xquik-mcp']['ready'] is False
 PY
 
 cat > "$CODEX_CFG" <<'EOF'
@@ -82,6 +84,38 @@ python3 - "$CLAUDE_CFG" <<'PY'
 import json, sys
 data = json.load(open(sys.argv[1], encoding='utf-8'))
 assert 'jshook' in data.get('mcpServers', {})
+PY
+
+rm -f "$CLAUDE_CFG" "$CODEX_CFG"
+xquik_default_out="$(bash "$BOOTSTRAP" xquik-mcp --skip-refresh)"
+[[ "$xquik_default_out" == *'"status":"registration-required"'* || "$xquik_default_out" == *'"status": "registration-required"'* ]]
+[[ ! -e "$CLAUDE_CFG" ]]
+[[ ! -e "$CODEX_CFG" ]]
+
+xquik_codex_out="$(bash "$BOOTSTRAP" xquik-mcp --skip-refresh --mcp-host=codex)"
+[[ "$xquik_codex_out" == *'"status":"ready"'* || "$xquik_codex_out" == *'"status": "ready"'* ]]
+[[ ! -e "$CLAUDE_CFG" ]]
+grep -Eq '^\[mcp_servers\.xquik\]$' "$CODEX_CFG"
+grep -Eq '^url = "https://xquik\.com/mcp"$' "$CODEX_CFG"
+
+bash "$REFRESH" "$MD" "$JSON" >/dev/null
+python3 - "$JSON" <<'PY'
+import json, sys
+data = json.load(open(sys.argv[1], encoding='utf-8'))
+cap = {c['name']: c for c in data['capabilities']}['xquik-mcp']
+assert cap['mcp_registered'] is True
+assert cap['ready'] is True, 'registered remote MCP should be ready for OAuth'
+PY
+
+rm -f "$CLAUDE_CFG" "$CODEX_CFG"
+xquik_claude_out="$(bash "$BOOTSTRAP" xquik-mcp --skip-refresh --mcp-host=claude)"
+[[ "$xquik_claude_out" == *'"status":"ready"'* || "$xquik_claude_out" == *'"status": "ready"'* ]]
+[[ -f "$CLAUDE_CFG" ]]
+[[ ! -e "$CODEX_CFG" ]]
+python3 - "$CLAUDE_CFG" <<'PY'
+import json, sys
+data = json.load(open(sys.argv[1], encoding='utf-8'))
+assert data['mcpServers']['xquik']['url'] == 'https://xquik.com/mcp'
 PY
 
 echo 'client-neutral Bash bootstrap/discovery regression passed'

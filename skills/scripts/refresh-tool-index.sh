@@ -98,6 +98,7 @@ install_hint() {
     macos:binwalk) echo "brew: brew install binwalk" ;;
     macos:yara) echo "brew: brew install yara" ;;
     macos:pwntools) echo "pipx: pipx install pwntools" ;;
+    linux:xquik-mcp|macos:xquik-mcp) echo "remote MCP: register https://xquik.com/mcp in the selected host, then complete OAuth" ;;
     *) echo "see PLATFORMS.md and docs/platforms/${PLATFORM}.md" ;;
   esac
 }
@@ -131,6 +132,7 @@ TOOLS=(
   "seclists|pentest-tools|Security wordlists|none|none|$HOME/tools/SecLists;/usr/share/seclists"
   "jshookmcp|js-reverse|JS/CDP/Hook MCP capability (requires registration + npx runtime)|none|none|"
   "reqable-mcp|pentest-tools|Reqable MCP capability (requires registration + npx runtime)|none|none|"
+  "xquik-mcp|threat-intelligence|Remote public X threat-intelligence MCP (requires registration + OAuth)|none|none|"
   "jeb-pro|apk-reverse|Commercial Android/ARM decompiler (manual licensed install)|jeb,jeb_wincon|jeb --version|$HOME/tools/JEB/jeb;$HOME/JEB/jeb;/opt/jeb/jeb"
   "anything-analyzer|browser-automation|Browser/HTTP analyzer MCP project|none|none|$HOME/tools/anything-analyzer;$REPO_ROOT/../anything-analyzer"
   "burp-mcp-full|burp-mcp|Local Burp MCP extension and stdio bridge|none|none|$REPO_ROOT/burp-mcp-full/mcp-bridge.js"
@@ -188,7 +190,10 @@ for entry in "${TOOLS[@]}"; do
   if [[ "$version_spec" != "none" ]]; then
     read -r ver_cmd ver_arg1 ver_arg2 <<< "$version_spec"
     if has_cmd "$ver_cmd"; then
-      version="$(run_version "$ver_cmd" ${ver_arg1:-} ${ver_arg2:-})"
+      args=()
+      [[ -n "${ver_arg1}" ]] && args+=("$ver_arg1")
+      [[ -n "${ver_arg2}" ]] && args+=("$ver_arg2")
+      version="$(run_version "$ver_cmd" "${args[@]}")"
     fi
   fi
 
@@ -312,7 +317,9 @@ for cap in capabilities:
     runtime_ready = bool(tool_available.get('npx', False)) if bootstrap_kind == 'npm-mcp' else tool_ready
 
     if mcp_names:
-        if verification_mode == 'service-and-registration':
+        if verification_mode == 'registration-only':
+            ready = registered
+        elif verification_mode == 'service-and-registration':
             ready = registered and service_online
         elif verification_mode == 'service-or-registration':
             ready = registered or service_online

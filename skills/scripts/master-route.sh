@@ -18,7 +18,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     *)
       if [[ -z "$HINT" && "$1" != -* ]]; then HINT="$1"; shift
-      else echo "Unknown arg: $1" >&2; exit 2; fi
+      else echo "Unknown arg: \"$1\"" >&2; exit 2; fi
       ;;
   esac
 done

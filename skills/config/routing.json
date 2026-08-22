@@ -6,7 +6,8 @@
     "scoring": "每条关键字规则命中后计入候选集；按 priority 数组顺序取『命中分数最高』的为 PRIMARY；分数并列时 priority 靠前者胜出；未命中任何规则时回退 fallbackId。",
     "maintainers": [
       "skills/MASTER-ROUTING.md 中的优先级表与此文件 priority 字段一一对应",
-      "skills/scripts/verify-routing-coherence.ps1 会校验二者一致性"
+      "skills/scripts/verify-routing-coherence.ps1 会校验二者一致性",
+      "本文件 R* 与 ops/analysis-decision-framework.md 的 ADF-R* 分属两套命名空间。路由 R42 是 threat-intelligence；ADF R42 是 YARA experimental"
     ]
   },
   "routes": {
@@ -212,6 +213,14 @@
         { "must": "threat.?hunt|detection.?engineer|blue.?team|sigma.?rule|\\bsigma\\b|威胁.?狩猎|检测.?工程|蓝队.?狩猎|检测.?规则" }
       ]
     },
+    "R42": {
+      "label": "Threat intelligence / OSINT",
+      "skill": "threat-intelligence/SKILL.md",
+      "keywords": [
+        { "must": "\\bosint\\b|open.?source.?intelligence|threat.?intelligence|\\bcti\\b|ioc.?enrichment|indicator.?enrichment|威胁.?情报|开源.?情报|ioc.?扩充|ioc.?富化" },
+        { "must": "twitter|tweet|x\\.com|x.?post|推文|社交.?媒体", "mustAll": ["ioc|threat|malware|campaign|actor|phish|scam|impersonat|indicator|情报|威胁|恶意|钓鱼|诈骗|仿冒"], "note": "要求安全上下文，避免把通用社交分析路由到威胁情报" }
+      ]
+    },
     "R28": {
       "label": "OT / ICS",
       "skill": "ot-ics/SKILL.md",
@@ -316,7 +325,7 @@
   "priority": [
     "R4", "R1", "R2", "R3", "R30", "R31", "R33", "R5", "R9", "R21",
     "R22", "R6", "R7", "R8", "R34", "R28", "R17", "R16", "R18", "R24",
-    "R37", "R23", "R35", "R25", "R36", "R29", "R38", "R32", "R26", "R27",
+    "R37", "R23", "R35", "R25", "R42", "R36", "R29", "R38", "R32", "R26", "R27",
     "R10", "R11", "R12", "R13", "R14", "R15", "R19", "R40", "R20", "R39", "R41", "R0"
   ]
 }

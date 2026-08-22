@@ -45,6 +45,7 @@ $scriptRefs = @{
     'npx' = @('js-reverse/SKILL.md')
     'jshookmcp' = @('js-reverse/SKILL.md')
     'reqable-mcp' = @('pentest-tools/SKILL.md')
+    'xquik-mcp' = @('threat-intelligence/SKILL.md')
     'jeb-pro' = @('apk-reverse/SKILL.md')
     'seclists' = @('pentest-tools/SKILL.md')
     'pentestswarm' = @('pentest-tools/SKILL.md')
@@ -100,7 +101,7 @@ $markdownContent = ($markdownLines -join [Environment]::NewLine) + [Environment]
 $markdownContent | Set-Content -LiteralPath $OutputMarkdown -Encoding utf8
 
 # --- Capability status view ---
-$capabilityNames = @('jadx', 'apktool', 'jeb-pro', 'frida', 'frida-ps', 'idalib-mcp', 'jshookmcp', 'reqable-mcp', 'anything-analyzer', 'idapro', 'r2', 'rabin2', 'adb', 'agent-browser', 'ghidra-mcp', 'seclists', 'proxycat', 'burpsuite-mcp', 'pentestswarm', 'nmap', 'binwalk', 'yara', 'pwntools', 'bkcrack')
+$capabilityNames = @('jadx', 'apktool', 'jeb-pro', 'frida', 'frida-ps', 'idalib-mcp', 'jshookmcp', 'reqable-mcp', 'xquik-mcp', 'anything-analyzer', 'idapro', 'r2', 'rabin2', 'adb', 'agent-browser', 'ghidra-mcp', 'seclists', 'proxycat', 'burpsuite-mcp', 'pentestswarm', 'nmap', 'binwalk', 'yara', 'pwntools', 'bkcrack')
 $capabilityRows = @()
 foreach ($capName in $capabilityNames) {
     $state = Get-ReverseCapabilityState -Name $capName

@@ -32,10 +32,23 @@ powershell -File skills\scripts\case-init.ps1 -Hint "full pentest" -CaseName "ac
 - result_summary:
 - artifacts: []      # relative paths under this case
 - evidence_ids: []   # E-xxx when promoted
+- decision_delta: [] # only decisions changed since the previous transition
+- carry_forward_refs: [scope.md] # unchanged authoritative state is referenced, not re-serialized
 - next:
 ```
 
 **MUST NOT** 删除或改写已有 `##` 时间块（更正用新条目 + `corrects: {timestamp}`）。
+
+### Decision delta boundary
+
+`scope.md`、`workitems.md` 与现有 Evidence 是当前 authoritative state。`timeline.md` 记录 transition，不复制完整 snapshot。
+
+- 每个真实 stage/turn transition **MUST** 写 `decision_delta`；只列从上一状态到当前状态真正改变、且会影响后续动作的 decision。没有变化时写 `[]`。
+- 未改变的 route、auth、scope、network profile、tool capability、既有 hypothesis/Evidence **MUST NOT** 为了交接再次展开；放在 `carry_forward_refs` 中引用 authoritative 文件或条目。
+- consumer **MUST** 先解析 `carry_forward_refs`，再把 `decision_delta` 覆盖到工作上下文；不得把 delta 当成完整状态。
+- 只有存在两个或以上 materially different、evidence-supported 分支，且用户选择会改变下一动作时才是 genuine decision boundary；确定性 transition 直接继续，不为制造菜单而重述上下文。
+
+代表性 transition：`Triage -> Static` 若 auth/scope/route 未变，只记录 `decision_delta: [phase=triage->static]`，并以 `carry_forward_refs: [scope.md, evidence/E-triage.md]` 继承其余状态。
 
 ## workitems.md 模板
 

@@ -43,6 +43,7 @@ Linux/macOS (Bash) 生成 7 列表格：
 | frida-ps | — | — | — | — | ✓ | pip-package |
 | idalib-mcp | — | — | — | — | ✓ | pip-package |
 | jshookmcp | — | ✓ | — | — | ✓ | npm-mcp |
+| xquik-mcp | — | — | — | — | ✓ | remote-http-mcp |
 | anything-analyzer | — | ✓ | — | — | ✓ | local-http-mcp |
 | idapro | — | ✓ | — | — | ✓ | local-http-mcp |
 | r2 | — | — | — | — | ✓ | github-release-zip |

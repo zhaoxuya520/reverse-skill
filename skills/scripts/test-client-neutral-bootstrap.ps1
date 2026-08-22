@@ -53,6 +53,32 @@ try {
     if ($null -eq $json.mcpServers.jshook) { throw 'Claude config missing jshook MCP server' }
     if ($claudeOutput -notmatch '"status"\s*:\s*"ready"') { throw 'Claude-only bootstrap did not report ready' }
 
+    Remove-Item -LiteralPath $claudeConfig -Force
+    $xquikDefaultOutput = (& $bootstrap -Capability xquik-mcp -SkipRefresh | Out-String)
+    if (Test-Path -LiteralPath $claudeConfig) { throw 'default Xquik bootstrap wrote Claude global config' }
+    if (Test-Path -LiteralPath $codexConfig) { throw 'default Xquik bootstrap wrote Codex global config' }
+    if ($xquikDefaultOutput -notmatch 'configured-not-ready') { throw 'default Xquik bootstrap did not report configured-not-ready' }
+
+    $xquikCodexOutput = (& $bootstrap -Capability xquik-mcp -SkipRefresh -McpHostTarget Codex | Out-String)
+    if (Test-Path -LiteralPath $claudeConfig) { throw 'Codex-only Xquik bootstrap wrote Claude config' }
+    if (-not (Test-Path -LiteralPath $codexConfig)) { throw 'Codex-only Xquik bootstrap did not write Codex config' }
+    $codexText = Get-Content -LiteralPath $codexConfig -Raw
+    if ($codexText -notmatch '(?m)^\[mcp_servers\.xquik\]\r?$') { throw 'Codex config missing xquik MCP block' }
+    if ($codexText -notmatch '(?m)^url = "https://xquik\.com/mcp"\r?$') { throw 'Codex config has the wrong Xquik MCP URL' }
+    if ($xquikCodexOutput -notmatch '"status"\s*:\s*"ready"') { throw 'Codex-only Xquik bootstrap did not report ready' }
+
+    $xquikState = Get-ReverseCapabilityState -Name 'xquik-mcp'
+    if (-not $xquikState.Registered) { throw 'Codex-only Xquik registration was not discovered' }
+    if (-not $xquikState.Ready) { throw 'registered remote Xquik MCP should be ready for OAuth' }
+
+    Remove-Item -LiteralPath $codexConfig -Force
+    $xquikClaudeOutput = (& $bootstrap -Capability xquik-mcp -SkipRefresh -McpHostTarget Claude | Out-String)
+    if (-not (Test-Path -LiteralPath $claudeConfig)) { throw 'Claude-only Xquik bootstrap did not write Claude config' }
+    if (Test-Path -LiteralPath $codexConfig) { throw 'Claude-only Xquik bootstrap wrote Codex config' }
+    $xquikJson = Get-Content -LiteralPath $claudeConfig -Raw -Encoding UTF8 | ConvertFrom-Json
+    if ($xquikJson.mcpServers.xquik.url -ne 'https://xquik.com/mcp') { throw 'Claude config has the wrong Xquik MCP URL' }
+    if ($xquikClaudeOutput -notmatch '"status"\s*:\s*"ready"') { throw 'Claude-only Xquik bootstrap did not report ready' }
+
     Write-Host 'client-neutral PowerShell bootstrap/discovery regression passed'
 }
 finally {

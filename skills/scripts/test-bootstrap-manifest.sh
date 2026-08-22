@@ -202,7 +202,10 @@ else
   expect_line 'apt-get|install|-y|python3'
 fi
 expect_line "npm|install|-g|$(json_value agent-browser npmPackage)"
-! grep -Fq '|pip|install|' "$CALL_LOG"
+if grep -Fq '|pip|install|' "$CALL_LOG"; then
+  echo "unexpected pip install invocation" >&2
+  exit 1
+fi
 
 # A required empty manifest field fails before any package-manager sink.
 BROKEN_DIR="$SCRATCH/broken-bootstrap"
@@ -223,10 +226,13 @@ env PATH="$STUB_BIN:/usr/bin:/bin" HOME="$SCRATCH/home" CALL_LOG="$CALL_LOG" \
 broken_rc=$?
 set -e
 [[ $broken_rc -ne 0 ]]
-! grep -Eq '^npm\|install\|-g(\||$)' "$CALL_LOG"
+if grep -Eq '^npm\|install\|-g(\||$)' "$CALL_LOG"; then
+  echo "unexpected global npm install invocation" >&2
+  exit 1
+fi
 
 # Table: each generic package-manager sink receives its canonical manifest value.
-while IFS='|' read -r capability field expected; do
+while IFS='|' read -r capability _field expected; do
   : > "$CALL_LOG"
   STUB_PIPX_VERSION=1.16.5 run_generic "$capability" --skip-refresh >/dev/null
   expect_line "$expected"
@@ -240,10 +246,15 @@ EOF
 
 # pipx itself is pinned; a failed pinned install has no mutable fallback.
 : > "$CALL_LOG"
-STUB_FAIL_PIP_INSTALL=1 run_generic frida --skip-refresh >/dev/null 2>&1 && exit 1 || true
+if STUB_FAIL_PIP_INSTALL=1 run_generic frida --skip-refresh >/dev/null 2>&1; then
+  exit 1
+fi
 expect_line "python3|-m|pip|install|--user|--upgrade|$pipx_package"
 [[ $(grep -c '|pip|install|' "$CALL_LOG") -eq 1 ]]
-! grep -Eq '^pipx\|(install|upgrade)' "$CALL_LOG"
+if grep -Eq '^pipx\|(install|upgrade)' "$CALL_LOG"; then
+  echo "unexpected pipx invocation" >&2
+  exit 1
+fi
 
 # Generic Anything Analyzer: staged checkout, pinned pnpm, frozen install, clean recheck, then dev.
 : > "$CALL_LOG"

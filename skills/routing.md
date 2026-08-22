@@ -46,6 +46,7 @@ Route tasks to the most appropriate skill module by target type, user intent, an
 | RF / SDR (non-Wi-Fi) | `radio-sdr/` | Wi-Fi → `wifi-wireless/` |
 | Browser extension (crx/xpi) | `browser-extension-reverse/` | page JS only → `js-reverse/` |
 | Wi-Fi / wireless | `wifi-wireless/` | close-range chain → `attack-chain/` |
+| Public-source threat intelligence / OSINT | `threat-intelligence/` | X/Twitter posts remain leads until independently corroborated |
 | Blue team / threat hunt | `threat-hunting/` | sample IOC → `malware-analysis/` |
 | Ghidra (no IDA) | `ghidra-reverse/` | `ida-reverse/` if IDA MCP available |
 
@@ -180,6 +181,7 @@ Route tasks to the most appropriate skill module by target type, user intent, an
 | "Active Directory / Kerberoast / Certipy / BloodHound" | `windows-ad/SKILL.md` |
 | "forensics / Volatility / memory dump / IR timeline" | `digital-forensics/SKILL.md` |
 | "code audit / SAST / Semgrep / CodeQL / whitebox" | `code-audit/SKILL.md` |
+| "OSINT / threat intelligence / public X IOC enrichment" | `threat-intelligence/SKILL.md` — public posts require independent corroboration |
 | "threat hunting / blue team / detection engineering" | `threat-hunting/SKILL.md` |
 | "game reverse / IL2CPP / Unity / Unreal" | `reverse-engineering/SKILL.md` + seed-014 |
 | "Wi-Fi / aircrack / wireless pentest" | `wifi-wireless/SKILL.md` |
@@ -266,7 +268,7 @@ When the user's wording is vague, emotionally phrased, imprecise, mixed-language
 3. **Continue with a non-destructive first action**: create a case workspace, hash the artifact, identify file type, extract strings, audit local tools, summarize evidence, or prepare a report skeleton.
 4. **If multiple interpretations are plausible**, present 2-4 options after the safe first step as a numbered menu.
 5. **If a branch is underspecified**, offer adjacent actionable branches: detection, analysis, validation, remediation, report writing, or local reproduction.
-6. **Always provide a next-step menu** — never leave the user with only a dead end.
+6. **Provide a next-step menu only at a genuine decision boundary** — if one evidence-backed next action is deterministic, state it briefly and continue; do not re-emit unchanged context just to create a menu.
 
 Suggested Chinese phrasing when recovering ambiguous intent:
 

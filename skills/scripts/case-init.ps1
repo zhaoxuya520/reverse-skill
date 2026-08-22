@@ -305,6 +305,8 @@ $timeline = @"
 - result_summary: $timelineSummary
 - artifacts: [scope.md, workitems.md]
 - evidence_ids: []
+- decision_delta: [case_initialized]
+- carry_forward_refs: [scope.md]
 - next: $timelineNext
 "@
 

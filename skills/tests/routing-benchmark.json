@@ -845,6 +845,31 @@
                       "hint":  "case review evidence chain traceability",
                       "expect":  "R40",
                       "quick":  true
+                  },
+                  {
+                      "hint":  "Collect public X and Twitter posts about this IOC for OSINT threat intelligence",
+                      "expect":  "R42",
+                      "quick":  true
+                  },
+                  {
+                      "hint":  "公开 X 推文补充这个恶意域名的威胁情报",
+                      "expect":  "R42",
+                      "quick":  false
+                  },
+                  {
+                      "hint":  "CTI indicator enrichment for this phishing campaign",
+                      "expect":  "R42",
+                      "quick":  false
+                  },
+                  {
+                      "hint":  "track an impersonation scam from public Twitter posts",
+                      "expect":  "R42",
+                      "quick":  false
+                  },
+                  {
+                      "hint":  "Twitter marketing sentiment for our product",
+                      "expect":  "R0",
+                      "quick":  false
                   }
               ]
 }
