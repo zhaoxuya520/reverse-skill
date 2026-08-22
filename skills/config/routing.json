@@ -304,6 +304,13 @@
         { "must": "case.?review|case.?audit|evidence.?chain|evidence.?graph|traceability|fixity.?check|证据.?链|证据.?图|可追溯性|案件.?审查|案例.?审计" }
       ]
     },
+    "R45": {
+      "label": "Methodology & Decision Framework",
+      "skill": "reverse-engineering/decision-framework/SKILL.md",
+      "keywords": [
+        { "must": "methodology|decision.?framework|方法论|决策.?框架|不知道怎么入手|找不到入口|混淆严重" }
+      ]
+    },
     "R41": {
       "label": "CTF sandbox orchestrator",
       "skill": "ctf-sandbox/SKILL.md",
@@ -325,6 +332,6 @@
     "R4", "R1", "R2", "R3", "R30", "R31", "R33", "R5", "R9", "R21",
     "R22", "R6", "R7", "R8", "R34", "R28", "R17", "R16", "R18", "R24",
     "R37", "R23", "R35", "R25", "R44", "R36", "R29", "R38", "R32", "R26", "R27",
-    "R10", "R11", "R12", "R13", "R14", "R15", "R19", "R40", "R20", "R39", "R41", "R0"
+    "R10", "R11", "R12", "R13", "R14", "R15", "R19", "R40", "R20", "R39", "R41", "R45", "R0"
   ]
 }

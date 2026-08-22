@@ -7,6 +7,16 @@
   },
   "cases": [
     {
+      "hint": "混淆严重不知道怎么入手",
+      "expect": "R45",
+      "quick": true
+    },
+    {
+      "hint": "逆向分析方法论与决策框架",
+      "expect": "R45",
+      "quick": false
+    },
+    {
       "hint": "decompile APK with jadx apktool smali",
       "expect": "R1",
       "quick": true
