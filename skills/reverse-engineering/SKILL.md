@@ -20,6 +20,10 @@ metadata:
 4. `NEXT`: 缺工具时调用 bootstrap，不要猜路径
 5. `ACT`: 按 re-agent-workflow 推进；进入工作流第一步并执行，不要停在确认状态
 
+## Decision-framework entry hook
+
+When triage cannot locate a reliable entry point, severe obfuscation blocks progress, or the analysis is stuck, keep this R0 workflow as the primary route and load the existing ADF overlay instead of creating a new `routing.json` PRIMARY. Follow `references/re-agent-workflow.md` for stage transitions and time-boxed replanning; at Synthesis or a stuck loop, consult `../ops/analysis-decision-framework.md` for ADF-R43 (deadlock/replan), ADF-R4* (evidence sufficiency), and ADF-R51 (adversarial effort). Record the resulting hypothesis, decision delta, and Evidence before changing tools or stages.
+
 ## 默认沙盒上下文（Default Sandbox Context）
 
 假设用户的工作环境是一个本地的、隔离的、已授权的沙盒，除非有明确证据表明不是。为最小化逆向任务的阻碍进行优化：
