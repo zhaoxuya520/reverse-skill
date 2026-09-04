@@ -76,6 +76,10 @@ if (Test-Path -LiteralPath $benchJson) {
         $rjIds = @($rjRoutes | ForEach-Object { $_.Name })
         $ghostExpect = @($bjCases | Where-Object { $_.expect -notin $rjIds })
         if ($ghostExpect.Count -eq 0) { Ok 'benchmark expects all exist in routing.json' } else { Bad "benchmark ghost expects: $(($ghostExpect | Select-Object -First 5).expect -join ',')" }
+        # 反向：每个 routing.json 路由至少要有一条 benchmark 用例（meta 要求新增路由同步加用例）
+        $expectIds = @($bjCases | ForEach-Object { $_.expect } | Select-Object -Unique)
+        $uncoveredRoutes = @($rjIds | Where-Object { $_ -notin $expectIds })
+        if ($uncoveredRoutes.Count -eq 0) { Ok 'benchmark covers every routing.json route' } else { Bad "routes with no benchmark case: $($uncoveredRoutes -join ',')" }
     }
 } else {
     Bad 'skills/tests/routing-benchmark.json missing'
