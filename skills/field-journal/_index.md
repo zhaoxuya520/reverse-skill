@@ -6,15 +6,16 @@
 
 ## 统计
 
-- 真实项目数：21
+- 真实项目数：22
 - 种子参考数：17
-- 总条目数：38
-- 最近更新：2026-09-03
+- 总条目数：39
+- 最近更新：2026-09-20
 
 ## 按场景分类
 
 ### APK / Android 逆向
 
+- [2026-09-20 iJiami 加固壳 dyncryptor RC4 变体 + zlib 解密链完整恢复](./2026-09-20_ijiami-dyncryptor-rc4-variant-zlib-recovery.md)
 - [2026-08-20 Flutter AOT 服务端驱动广告去除（Blutter + 等长字符串替换）](./2026-08-20_apk-flutter-banner-ad-removal.md)
 - [2026-05-15-cellular-pro-mumu-ksad-fragment-fix](./2026-05-15-cellular-pro-mumu-ksad-fragment-fix.md)
 - [[种子] seed-008_apk-okhttp-ssl-pin-bypass](./seed-008_apk-okhttp-ssl-pin-bypass.md)
@@ -86,6 +87,10 @@
 
 - [1 KiB 自带掩码 ROR/XOR、Cortex-M 向量 crib、跨固件验证](./2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor.md)
 
+### Android 加固壳自定义解密链
+
+- [dex overlay 手工解析 + RC4 变体 KSA/PRGA 识别 + zlib 解压（iJiami dyncryptor）](./2026-09-20_ijiami-dyncryptor-rc4-variant-zlib-recovery.md)
+
 ## 实体倒排（按目标特征）
 
 ### 多宿主安全技能路由包
@@ -100,6 +105,10 @@
 ### Cortex-M USB MSC 升级器
 
 - [应用/驻留 bootloader 边界与虚拟磁盘写入链路](./2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor.md)
+
+### iJiami（爱加密）加固 APK
+
+- [dyncryptor overlay manifest 结构 + RC4 变体步进（i+=2 / j+=state[i]+1）+ zlib 到 EOF](./2026-09-20_ijiami-dyncryptor-rc4-variant-zlib-recovery.md)
 
 ## 使用说明
 
