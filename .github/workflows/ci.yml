@@ -165,6 +165,8 @@ jobs:
           bash skills/scripts/test-routing.sh
           bash skills/scripts/test-bootstrap-manifest.sh
           bash skills/scripts/test-bash-workflow.sh
+          # Docker asset contracts (issue #129); no daemon required
+          bash skills/scripts/test-docker-assets.sh
 
           scratch="$(mktemp -d)"
           trap 'rm -rf "$scratch"' EXIT
