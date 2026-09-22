@@ -152,6 +152,88 @@ printf "pnpm|%s\n" "$*" >> "$BOOTSTRAP_PS_LOG"
     }
 
     . (Join-Path $PSScriptRoot 'bootstrap-reverse.ps1') -Capability '__test_missing__' -SkipRefresh | Out-Null
+
+    $genericManifest = Get-Content -LiteralPath (Join-Path $PSScriptRoot 'bootstrap-manifest.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+    $kaliManifest = Get-Content -LiteralPath (Join-Path $PSScriptRoot '../../kali/scripts/bootstrap-manifest.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+    foreach ($manifest in @($genericManifest, $kaliManifest)) {
+        $pwntoolsDefinition = $manifest.capabilities | Where-Object { $_.name -eq 'pwntools' } | Select-Object -First 1
+        Assert-True ($null -ne $pwntoolsDefinition) 'pwntools manifest definition missing'
+        Assert-True ($pwntoolsDefinition.verifyPythonModule -eq 'pwn') 'pwntools must verify the importable pwn module'
+        Assert-True (-not $pwntoolsDefinition.PSObject.Properties['verifyCommand']) 'pwntools must not advertise a nonexistent pwntools CLI'
+    }
+
+    $kaliBootstrapText = Get-Content -LiteralPath (Join-Path $PSScriptRoot '../../kali/scripts/bootstrap-reverse.sh') -Raw -Encoding UTF8
+    Assert-True ($kaliBootstrapText -match 'if \[\[ "\$name" != "pwntools" \]\] && command -v') 'Kali bootstrap still treats pwntools as a CLI command'
+    Assert-True ($kaliBootstrapText -match "(?s)function python_module_available|python_module_available\(\)") 'Kali bootstrap is missing its Python module verifier'
+    Assert-True ($kaliBootstrapText -match '(?s)pwntools\)\s+local verify_module package.*manifest_field pwntools verifyPythonModule.*manifest_field pwntools pipPackage.*python_module_available "\$verify_module".*install_pip_package "\$package".*if ! python_module_available "\$verify_module"') 'Kali bootstrap does not consume and enforce the pwntools manifest contract'
+
+    $env:PWNTOOLS_TEST_LOG = Join-Path $scratch 'pwntools-python.log'
+    $env:PWNTOOLS_TEST_READY = Join-Path $scratch 'pwntools-module-ready'
+    $env:PWNTOOLS_TEST_NO_MODULE = '0'
+    $pythonVerifier = Join-Path $bin ($(if ($isWindowsHost) { 'python.cmd' } else { 'python' }))
+    if ($isWindowsHost) {
+        Set-Content $pythonVerifier @'
+@echo off
+echo %*>>"%PWNTOOLS_TEST_LOG%"
+if "%1"=="-c" (
+  if exist "%PWNTOOLS_TEST_READY%" (exit /b 0) else (exit /b 1)
+)
+if "%1"=="-m" if "%2"=="pip" (
+  if not "%PWNTOOLS_TEST_NO_MODULE%"=="1" type nul > "%PWNTOOLS_TEST_READY%"
+  exit /b 0
+)
+exit /b 1
+'@
+    }
+    else {
+        Write-UnixExecutable -Path $pythonVerifier -Content @'
+#!/bin/sh
+printf '%s\n' "$*" >> "$PWNTOOLS_TEST_LOG"
+if [ "${1:-}" = -c ]; then
+  [ -f "$PWNTOOLS_TEST_READY" ]
+  exit
+fi
+if [ "${1:-}" = -m ] && [ "${2:-}" = pip ]; then
+  [ "${PWNTOOLS_TEST_NO_MODULE:-0}" = 1 ] || : > "$PWNTOOLS_TEST_READY"
+  exit 0
+fi
+exit 1
+'@
+    }
+
+    $pwntoolsInstall = [pscustomobject]@{
+        name = 'pwntools'
+        pipPackage = 'pwntools==4.15.0'
+        verifyPythonModule = 'pwn'
+    }
+    Remove-Item -LiteralPath $env:PWNTOOLS_TEST_READY -Force -ErrorAction SilentlyContinue
+    Set-Content -LiteralPath $env:PWNTOOLS_TEST_LOG -Value ''
+    $pwntoolsResult = Ensure-PipPackageInstall -Definition $pwntoolsInstall
+    Assert-True $pwntoolsResult.Verified 'pwntools install did not verify the pwn module'
+    Assert-True $pwntoolsResult.Installed 'first pwntools verification should install the package'
+    $pwntoolsLog = Get-Content -LiteralPath $env:PWNTOOLS_TEST_LOG -Raw
+    Assert-True ($pwntoolsLog -match '-m pip install --upgrade pwntools==4\.15\.0') 'pwntools did not use the pinned manifest package'
+    Set-Content -LiteralPath $env:PWNTOOLS_TEST_LOG -Value ''
+    $pwntoolsExisting = Ensure-PipPackageInstall -Definition $pwntoolsInstall
+    Assert-True $pwntoolsExisting.Verified 'existing pwn module was not accepted'
+    Assert-True (-not $pwntoolsExisting.Installed) 'existing pwn module triggered a reinstall'
+    Assert-True (-not ((Get-Content -LiteralPath $env:PWNTOOLS_TEST_LOG -Raw) -match '-m pip install')) 'ready pwn module reran pip install'
+
+    Remove-Item -LiteralPath $env:PWNTOOLS_TEST_READY -Force -ErrorAction SilentlyContinue
+    $env:PWNTOOLS_TEST_NO_MODULE = '1'
+    $verificationFailure = $false
+    try {
+        Ensure-PipPackageInstall -Definition $pwntoolsInstall | Out-Null
+    }
+    catch {
+        $verificationFailure = $_.Exception.Message -match "module 'pwn' is not importable"
+    }
+    Assert-True $verificationFailure 'pip success without an importable pwn module was accepted'
+    $env:PWNTOOLS_TEST_NO_MODULE = '0'
+
+    Remove-Item -LiteralPath $pythonVerifier -Force -ErrorAction SilentlyContinue
+    Remove-Item Env:PWNTOOLS_TEST_LOG, Env:PWNTOOLS_TEST_READY, Env:PWNTOOLS_TEST_NO_MODULE -ErrorAction SilentlyContinue
+
     $script:gitCloneDefinition = [pscustomobject]@{
         name = 'test-git-clone'
         bootstrapKind = 'git-clone'
@@ -190,3 +272,7 @@ printf "pnpm|%s\n" "$*" >> "$BOOTSTRAP_PS_LOG"
 finally {
     Remove-Item -LiteralPath $scratch -Recurse -Force -ErrorAction SilentlyContinue
 }
+
+# Expected native-command failures above can leave LASTEXITCODE non-zero on pwsh/Linux.
+# Reaching this point means every assertion completed successfully.
+exit 0

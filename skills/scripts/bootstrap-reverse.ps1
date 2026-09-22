@@ -520,11 +520,42 @@ function Ensure-ApktoolInstall {
     return (Resolve-ReverseToolSpec -Name 'apktool')
 }
 
+function Test-PythonModuleImport {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)][string]$PythonPath,
+        [Parameter(Mandatory = $true)][string]$Module
+    )
+
+    if ($Module -notmatch '^[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*$') {
+        throw "Invalid verifyPythonModule value: $Module"
+    }
+
+    try {
+        & $PythonPath -c 'import importlib, sys; importlib.import_module(sys.argv[1])' $Module *> $null
+        return ($LASTEXITCODE -eq 0)
+    }
+    catch {
+        return $false
+    }
+}
+
 function Ensure-PipPackageInstall {
     param([Parameter(Mandatory = $true)]$Definition)
 
     Ensure-PythonRuntime
     $python = Get-FirstCommandPath -Names @('python', 'python3')
+    $verifyModule = if ($Definition.PSObject.Properties['verifyPythonModule']) { [string]$Definition.verifyPythonModule } else { '' }
+
+    if (-not [string]::IsNullOrWhiteSpace($verifyModule) -and (Test-PythonModuleImport -PythonPath $python -Module $verifyModule)) {
+        return [pscustomobject]@{
+            Python = $python
+            Module = $verifyModule
+            Verified = $true
+            Installed = $false
+        }
+    }
+
     # Use pipSource (git URL) if available, otherwise use pipPackage name
     $installTarget = if ($Definition.PSObject.Properties['pipSource'] -and -not [string]::IsNullOrWhiteSpace($Definition.pipSource)) {
         $Definition.pipSource
@@ -534,6 +565,17 @@ function Ensure-PipPackageInstall {
     & $python -m pip install --upgrade $installTarget
     if ($LASTEXITCODE -ne 0) {
         throw "pip install failed for $installTarget"
+    }
+
+    if (-not [string]::IsNullOrWhiteSpace($verifyModule) -and -not (Test-PythonModuleImport -PythonPath $python -Module $verifyModule)) {
+        throw "pip installed $installTarget, but Python module '$verifyModule' is not importable via $python."
+    }
+
+    return [pscustomobject]@{
+        Python = $python
+        Module = $verifyModule
+        Verified = if ([string]::IsNullOrWhiteSpace($verifyModule)) { $null } else { $true }
+        Installed = $true
     }
 }
 
@@ -900,8 +942,7 @@ function Ensure-Capability {
             return Ensure-ApktoolInstall -Definition $definition
         }
         'pip-package' {
-            Ensure-PipPackageInstall -Definition $definition
-            return $true
+            return Ensure-PipPackageInstall -Definition $definition
         }
         'winget-package' {
             $wingetId = $definition.wingetId
@@ -1110,12 +1151,16 @@ foreach ($name in $expandedCapabilities) {
 
     try {
         $manualRequired = $false
+        $ensureVerified = $false
         switch ($name) {
             'adb' {
                 Ensure-AndroidPlatformTools | Out-Null
             }
             default {
                 $ensureResult = Ensure-Capability -Name $name
+                if ($ensureResult -and $ensureResult.PSObject.Properties['Verified'] -and [bool]$ensureResult.Verified) {
+                    $ensureVerified = $true
+                }
                 if ($ensureResult -eq $false) {
                     $def = Get-ReverseBootstrapDefinition -Name $name
                     $hint = if ($def -and $def.PSObject.Properties['manualInstallHint']) { $def.manualInstallHint } else { "Install manually. Docs: $($def.docsUrl)" }
@@ -1132,11 +1177,12 @@ foreach ($name in $expandedCapabilities) {
 
         if (-not $manualRequired) {
             $state = Get-ReverseCapabilityState -Name $name
-            $status = if ($state -and -not $state.Ready) { 'configured-not-ready' } else { 'ready' }
+            $effectiveReady = if ($ensureVerified) { $true } elseif ($state) { [bool]$state.Ready } else { $null }
+            $status = if ($effectiveReady -eq $false) { 'configured-not-ready' } else { 'ready' }
             $results += [pscustomobject]@{
                 name = $name
                 status = $status
-                ready = if ($state) { $state.Ready } else { $null }
+                ready = $effectiveReady
                 registered = if ($state) { $state.Registered } else { $null }
                 service_online = if ($state) { $state.ServiceOnline } else { $null }
             }
