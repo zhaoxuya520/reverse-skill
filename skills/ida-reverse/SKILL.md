@@ -16,7 +16,8 @@ description: |
 2. `NOW`: 确认当前任务是否命中本 skill 的适用范围
 3. `NEXT`: 读取 `../tool-index.md`，校验工具可用性和实际路径
 4. `NEXT`: 缺工具时调用 bootstrap，不要猜路径
-5. `ACT`: 进入"工作流"第一步并执行，不要停在确认状态
+5. `NEXT`: 若任务含**调试器**或**按提示自动 ASM patch** → 读取 `references/debugger-and-auto-patch.md`
+6. `ACT`: 进入"工作流"第一步并执行，不要停在确认状态
 
 ## 已知问题与反思（必读）
 
@@ -227,9 +228,13 @@ ERR:open_timeout_600s
 - `idapro_make_signature_for_function(addrs)` — 为函数生成签名
 - `idapro_find_xref_signatures(addrs)` — 为引用地址的代码生成签名
 
-### 调试器（需要 ?ext=dbg）
+### 调试器 + 提示驱动 ASM Patch（#136）
 - `idapro_open_file(file_path)` — 在 GUI IDA 实例中打开文件
-- 调试器工具默认隐藏，可通过 URL 参数 `?ext=dbg` 启用
+- 调试器工具默认隐藏，MCP URL 追加 `?ext=dbg` 启用（**仅 GUI IDA**；先 `start-gui.ps1`）
+- 静态 patch：`idapro_patch_asm(items)` / `idapro_patch(patches)`（见「修改操作」）
+- **按 prompt 自动打补丁契约**：分析定位地址 → 生成 patch plan JSON → `scripts/apply-asm-patch.py --dry-run` 校验 → MCP 或 `--apply` 下发 → 重反汇编验证 → 写 Evidence
+- 完整步骤 / 硬性规则 / 反模式：`references/debugger-and-auto-patch.md`
+- 授权门禁不变：`scope.md` 未 `auth.status=granted` 前禁止对目标 ACT；`case-guard --Force` 不得绕过
 
 ### 会话管理（ida-pro-mcp 2.x）
 - `idapro_idb_open` / HTTP `idb_open` — ⚠️ 建议用 `open.ps1` 打开

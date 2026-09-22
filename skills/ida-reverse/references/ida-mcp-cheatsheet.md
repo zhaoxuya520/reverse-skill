@@ -313,6 +313,9 @@ idapro_rename(batch={"local": [
 
 ### Patch 汇编
 
+Prompt-driven auto-patch contract (dry-run → apply → Evidence): see [debugger-and-auto-patch.md](debugger-and-auto-patch.md).
+Helper: `python3 skills/ida-reverse/scripts/apply-asm-patch.py --plan patch_plan.json --dry-run`.
+
 ```
 # NOP 掉检测代码
 idapro_patch_asm(items=[{"addr": "0x401050", "asm": "nop"}])
