@@ -100,7 +100,7 @@ fi
 
 PACKAGE=""
 if [[ -f "$APKTOOL_OUT/AndroidManifest.xml" ]]; then
-    PACKAGE=$(grep -oP 'package="[^"]*"' "$APKTOOL_OUT/AndroidManifest.xml" 2>/dev/null | head -1 | sed 's/package="//;s/"//')
+    PACKAGE=$(grep -oE 'package="[^"]*"' "$APKTOOL_OUT/AndroidManifest.xml" 2>/dev/null | head -1 | sed 's/package="//;s/"//')
 fi
 
 JAVA_COUNT=0
