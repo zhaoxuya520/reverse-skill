@@ -6,10 +6,10 @@
 
 ## 统计
 
-- 真实项目数：21
+- 真实项目数：22
 - 种子参考数：17
-- 总条目数：38
-- 最近更新：2026-09-03
+- 总条目数：39
+- 最近更新：2026-09-23
 
 ## 按场景分类
 
@@ -21,6 +21,7 @@
 
 ### 二进制 / 固件 / CTF
 
+- [2026-09-23 CUDA Spherical Cartesian-affine projection closure](./2026-09-23_cuda-spherical-cartesian-affine-projection.md) — Spherical cost 有效性首差、Cartesian `b1` 操作数、冻结旧二进制同输入 A/B
 - [2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor](./2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor.md)
 - [2026-07-22 Electron Bytenode 特权更新链分析](./2026-07-22_electron-bytenode-privileged-update-chain.md)
 - [2026-07-14_android-arm64-self-extract-source-recovery](./2026-07-14_android-arm64-self-extract-source-recovery.md)
@@ -75,6 +76,10 @@
 
 ## 高频成功模式（按技术）
 
+### 科学计算与 GPU 净室还原
+
+- [历史输入枚举、拒绝哨兵首差路由、PTX def-use 操作数恢复和同输入产品哈希归因](./2026-09-23_cuda-spherical-cartesian-affine-projection.md)
+
 ### 平台无关路由与供应链门禁
 
 - [隔离 worktree、多 PR 祖先闭环、Git-blob AV 审查与 reference/executable CI 边界](./2026-09-03_issue-pr-security-boundary-integration.md)
@@ -87,6 +92,10 @@
 - [1 KiB 自带掩码 ROR/XOR、Cortex-M 向量 crib、跨固件验证](./2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor.md)
 
 ## 实体倒排（按目标特征）
+
+### ELF64 stripped / CUDA / 摄影测量
+
+- [Spherical `b1*point.x`、longitude/latitude 仿射和退化标定下的原生 inert A/B](./2026-09-23_cuda-spherical-cartesian-affine-projection.md)
 
 ### 多宿主安全技能路由包
 
