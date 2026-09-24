@@ -692,6 +692,26 @@
       "quick": true
     },
     {
+      "hint": "ctf reverse challenge",
+      "expect": "R41",
+      "quick": false
+    },
+    {
+      "hint": "awd competition sandbox",
+      "expect": "R41",
+      "quick": false
+    },
+    {
+      "hint": "比赛题",
+      "expect": "R41",
+      "quick": false
+    },
+    {
+      "hint": "ctf pwn rop chain",
+      "expect": "R17",
+      "quick": false
+    },
+    {
       "hint": "CTF pwn 栈溢出",
       "expect": "R17",
       "quick": false
