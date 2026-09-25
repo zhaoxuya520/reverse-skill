@@ -1,5 +1,5 @@
 ---
-name: reverse-skill-router
+name: reverse-skill-adapter
 description: Use the reverse-skill repository from Codex for authorized reverse engineering, security analysis, CTF, and defensive testing tasks. Requires the reverse-skill repository to be available as the current workspace or an explicitly supplied local path.
 ---
 
