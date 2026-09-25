@@ -6,10 +6,10 @@
 
 ## 统计
 
-- 真实项目数：21
+- 真实项目数：22
 - 种子参考数：17
-- 总条目数：38
-- 最近更新：2026-09-03
+- 总条目数：39
+- 最近更新：2026-09-26
 
 ## 按场景分类
 
@@ -34,6 +34,7 @@
 
 ### Web / API / 渗透测试
 
+- [2026-09-26 上传成功但业务未入账的权威回读核验](./2026-09-26_upload-success-readback-ledger-consistency.md) - 稳定业务唯一键、权威回读、accepted/effective 分层、权威否定优先
 - [2026-08-01 Next.js CDK 契约保真本地重建](./2026-08-01_nextjs-cdk-contract-faithful-local-reconstruction.md)
 - [2026-08-01_pentest-encryption-oracle-public-template-sql-admin-takeover: .NET CMS 通用加密 oracle、公开密文模板消费者、完整 STL/模板解析、原始 SQL `UPDATE RETURNING`、官方管理员验证器新旧口令差分与隔离 PostgreSQL 清理闭环](./2026-08-01_pentest-encryption-oracle-public-template-sql-admin-takeover.md)
 
@@ -86,6 +87,10 @@
 
 - [1 KiB 自带掩码 ROR/XOR、Cortex-M 向量 crib、跨固件验证](./2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor.md)
 
+### 上传回读与账本一致性
+
+- [稳定业务唯一键、权威回读、分页/分月边界、accepted/effective 状态分层](./2026-09-26_upload-success-readback-ledger-consistency.md)
+
 ## 实体倒排（按目标特征）
 
 ### 多宿主安全技能路由包
@@ -100,6 +105,10 @@
 ### Cortex-M USB MSC 升级器
 
 - [应用/驻留 bootloader 边界与虚拟磁盘写入链路](./2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor.md)
+
+### 业务上传与计分账本
+
+- [上传成功不等于业务入账，权威否定优先于兼容兜底](./2026-09-26_upload-success-readback-ledger-consistency.md)
 
 ## 使用说明
 
