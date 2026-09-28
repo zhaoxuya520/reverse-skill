@@ -6,15 +6,16 @@
 
 ## 统计
 
-- 真实项目数：21
+- 真实项目数：22
 - 种子参考数：17
-- 总条目数：38
-- 最近更新：2026-09-03
+- 总条目数：39
+- 最近更新：2026-09-29
 
 ## 按场景分类
 
 ### APK / Android 逆向
 
+- [2026-09-29 Android 旧客户端评论目标与重签启动对照 — 关键词: 原生业务身份、评论类型映射、签名对照、真机验收边界](./2026-09-29_android-native-comment-identity-signing-control.md)
 - [2026-08-20 Flutter AOT 服务端驱动广告去除（Blutter + 等长字符串替换）](./2026-08-20_apk-flutter-banner-ad-removal.md)
 - [2026-05-15-cellular-pro-mumu-ksad-fragment-fix](./2026-05-15-cellular-pro-mumu-ksad-fragment-fix.md)
 - [[种子] seed-008_apk-okhttp-ssl-pin-bypass](./seed-008_apk-okhttp-ssl-pin-bypass.md)
