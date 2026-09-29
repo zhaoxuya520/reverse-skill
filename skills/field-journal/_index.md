@@ -6,10 +6,10 @@
 
 ## 统计
 
-- 真实项目数：21
+- 真实项目数：22
 - 种子参考数：17
-- 总条目数：38
-- 最近更新：2026-09-03
+- 总条目数：39
+- 最近更新：2026-09-29
 
 ## 按场景分类
 
@@ -21,6 +21,7 @@
 
 ### 二进制 / 固件 / CTF
 
+- [2026-09-29 剥离符号的 Go EXE + rustc 原生 DLL 静态分诊（pclntab 恢复、PE 导出、Ghidra headless）](./2026-09-29_stripped-go-pclntab-rust-dll-triage.md)
 - [2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor](./2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor.md)
 - [2026-07-22 Electron Bytenode 特权更新链分析](./2026-07-22_electron-bytenode-privileged-update-chain.md)
 - [2026-07-14_android-arm64-self-extract-source-recovery](./2026-07-14_android-arm64-self-extract-source-recovery.md)
@@ -86,6 +87,10 @@
 
 - [1 KiB 自带掩码 ROR/XOR、Cortex-M 向量 crib、跨固件验证](./2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor.md)
 
+### Go / Rust 剥离二进制分诊
+
+- [pclntab 恢复函数名（无 GoReSym）、`go version -m` 元数据、PE 导出表脚本解析、Ghidra headless Java postScript](./2026-09-29_stripped-go-pclntab-rust-dll-triage.md)
+
 ## 实体倒排（按目标特征）
 
 ### 多宿主安全技能路由包
@@ -100,6 +105,10 @@
 ### Cortex-M USB MSC 升级器
 
 - [应用/驻留 bootloader 边界与虚拟磁盘写入链路](./2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor.md)
+
+### 剥离符号的 Go EXE + rustc 原生 DLL
+
+- [pclntab 函数名恢复、Ghidra 识别 rustc、原生导出 RVA/VA](./2026-09-29_stripped-go-pclntab-rust-dll-triage.md)
 
 ## 使用说明
 
