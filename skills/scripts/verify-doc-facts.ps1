@@ -82,5 +82,19 @@ foreach ($c in $manifest.capabilities) {
 Check 'RULES.md burp tool count' ($rulesEn.Contains("$burpCount-tool")) "expected '$burpCount-tool' in RULES.md"
 Check 'RULES_zh.md burp tool count' ($rulesZh.Contains("$burpCount 工具全控制")) "expected '$burpCount 工具全控制' in RULES_zh.md"
 
+# --- Routing benchmark case count (derived, not hardcoded) ---
+$bmPath = Join-Path $Root 'skills\tests\routing-benchmark.json'
+$bm = Get-Content $bmPath -Raw -Encoding UTF8 | ConvertFrom-Json
+$caseCount = @($bm.cases).Count
+Write-Host "source-of-truth: routing-benchmark cases = $caseCount"
+
+$readmeEn = Get-Content (Join-Path $Root 'README.md') -Raw -Encoding UTF8
+$readmeZh = Get-Content (Join-Path $Root 'README_zh.md') -Raw -Encoding UTF8
+$relCheck = Get-Content (Join-Path $Root 'docs\RELEASE-CHECKLIST.md') -Raw -Encoding UTF8
+
+Check 'README.md case count' ($readmeEn.Contains("$caseCount cases") -and $readmeEn.Contains("$caseCount benchmark cases") -and $readmeEn.Contains("$caseCount (hint")) "expected '$caseCount cases' / '$caseCount benchmark cases' / '$caseCount (hint' in README.md"
+Check 'README_zh.md case count' ($readmeZh.Contains("$caseCount 条用例") -and $readmeZh.Contains("$caseCount 条路由回归基准") -and $readmeZh.Contains("（$caseCount 条）")) "expected $caseCount 条用例 / $caseCount 条路由回归基准 / （$caseCount 条） in README_zh.md"
+Check 'RELEASE-CHECKLIST case count' ($relCheck.Contains("routing $caseCount 基准")) "expected 'routing $caseCount 基准' in docs/RELEASE-CHECKLIST.md"
+
 Write-Host "verify-doc-facts: $fail failure(s)"
 if ($fail -gt 0) { exit 1 }

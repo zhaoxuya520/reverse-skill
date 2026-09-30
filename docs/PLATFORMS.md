@@ -42,6 +42,8 @@ The following must be adapted per OS:
 
 ## Tool coverage by platform
 
+> **Capability-name honesty:** `skills/scripts/bootstrap-manifest.json` is the generic (non-Kali) source of truth (26 capabilities). Names such as `sqlmap`, `nuclei`, `ffuf`, `hashcat`, `msfconsole`, and `gobuster` exist only in `kali/scripts/bootstrap-manifest.json` — do not expect `skills/scripts/bootstrap-reverse.sh --list` to offer them on Ubuntu/macOS.
+
 | Capability | Windows | Kali Linux | Ubuntu / Debian | macOS | Notes |
 |---|---|---|---|---|---|
 | Java / JDK | Installer / winget | `apt` | `apt` | `brew` | Required by jadx, apktool, Burp. |

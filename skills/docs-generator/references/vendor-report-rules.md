@@ -241,7 +241,7 @@ elif overlay == vuln:
 - [ ] `malware` / `apt` 报告有 IOC 表（或 n/a+原因）
 - [ ] `malware` / `apt` 报告有可执行建议/处置
 - [ ] 无 flavor 的任务没有被套入 malware/APT 专属章节
-- [ ] uln 仅在漏洞任务启用；含概述/分析/防护骨架与 E/F/P；无未授权 PoC 武器化
+- [ ] vuln 仅在漏洞任务启用；含概述/分析/防护骨架与 E/F/P；无未授权 PoC 武器化
 - [ ] 无厂商原文粘贴、无 placeholder/TODO
 - [ ] 导入表等硬门 Evidence 已进入静态/技术分析（若本任务做过二进制分析）
 

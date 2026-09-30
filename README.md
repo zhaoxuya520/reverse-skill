@@ -54,7 +54,7 @@ When an AI agent (Claude Code, Codex, Cursor, OpenCode, or another compatible cl
 ```
 User task
   → RULES.md
-  → MASTER-ROUTING / master-route.ps1 (PRIMARY)
+  → MASTER-ROUTING / master-route.ps1|.sh (PRIMARY)
   → case-init / scope.md (auth + network_profile; no target ACT until ready)
   → Scenario skill → tools / MCP / scripts
   → timeline + Evidence→Finding→Path → report + field-journal
@@ -70,7 +70,7 @@ User task
 
 | Routing rules | Regression benchmark | Core skill modules | CI platforms | Client model |
 |---:|---:|---:|---|---|
-| 44 (R0–R45) | 175 cases | 45 tracked modules | Windows + Ubuntu | Client-neutral |
+| 44 (R0–R45) | 178 cases | 45 tracked modules | Windows + Ubuntu | Client-neutral |
 
 The routing core is driven by one structured configuration, validated by cross-platform CI, and kept separate from optional client adapters.
 
@@ -215,12 +215,14 @@ Platform-specific docs:
 | [skills/routing.md](skills/routing.md) | Task → skill routing matrix |
 | [skills/SKILL.md](skills/SKILL.md) | Master entry point |
 | [skills/INDEX.md](skills/INDEX.md) | Auto-generated, client-neutral skill navigation index |
-| [skills/config/routing.json](skills/config/routing.json) | **Routing single source of truth** (43 rules, R0–R44) |
+| [skills/config/routing.json](skills/config/routing.json) | **Routing single source of truth** (44 routes, R0–R45 with R42/R43 unused) |
 | [skills/tool-index.md](skills/tool-index.md) | Local tool status (auto-generated) |
-| [skills/scripts/master-route.ps1](skills/scripts/master-route.ps1) | One-shot PRIMARY triage (reads routing.json) |
-| [skills/scripts/case-init.ps1](skills/scripts/case-init.ps1) | Case dir: scope / timeline / workitems |
+| [skills/scripts/master-route.ps1](skills/scripts/master-route.ps1) | Windows PRIMARY triage (reads routing.json) |
+| [skills/scripts/master-route.sh](skills/scripts/master-route.sh) | Linux/macOS/Kali PRIMARY triage (same routing.json) |
+| [skills/scripts/case-init.ps1](skills/scripts/case-init.ps1) | Case dir: scope / timeline / workitems (Windows) |
+| [skills/scripts/case-init.sh](skills/scripts/case-init.sh) | Case dir: scope / timeline / workitems (Linux/macOS/Kali) |
 | [skills/case-review/](skills/case-review/) | Read-only Evidence graph review and artifact fixity checks |
-| [skills/scripts/test-routing.ps1](skills/scripts/test-routing.ps1) | Routing regression runner (173 benchmark cases) |
+| [skills/scripts/test-routing.ps1](skills/scripts/test-routing.ps1) | Routing regression runner (178 benchmark cases) |
 | [skills/scripts/verify-routing-coherence.ps1](skills/scripts/verify-routing-coherence.ps1) | Structure + supply-chain pin gate checks |
 | [skills/scripts/extract-summaries.ps1](skills/scripts/extract-summaries.ps1) | Regenerates INDEX.md from skill frontmatter |
 | [AGENTS.md](AGENTS.md) | Platform-neutral repository instructions |
@@ -229,7 +231,7 @@ Platform-specific docs:
 ### Testing (run after any routing/config change)
 
 ```powershell
-# 1. Routing regression — 173 (hint → expected PRIMARY) cases, fails CI on any mismatch
+# 1. Routing regression — 178 (hint → expected PRIMARY) cases, fails CI on any mismatch
 powershell -NoProfile -ExecutionPolicy Bypass -File skills/scripts/test-routing.ps1
 # 2. Structure coherence + supply-chain pin gate (unpinned auto-install fails)
 powershell -NoProfile -ExecutionPolicy Bypass -File skills/scripts/verify-routing-coherence.ps1

@@ -156,7 +156,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Comment on failure
-        if: steps.validate.outputs.valid == 'false'
+        if: failure() && steps.validate.outputs.valid == 'false'
         run: |
           gh pr comment "$PR_NUMBER" \
             --body "❌ **自动审核未通过**
