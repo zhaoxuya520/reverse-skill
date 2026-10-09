@@ -6,15 +6,17 @@
 
 ## 统计
 
-- 真实项目数：21
+- 真实项目数：23
 - 种子参考数：17
-- 总条目数：38
-- 最近更新：2026-09-03
+- 总条目数：40
+- 最近更新：2026-10-08
 
 ## 按场景分类
 
 ### APK / Android 逆向
 
+- [2026-10-08 Flutter AOT 静态字符串表提取 Telemetry 字段 + 通知算法（XAPK 双源交叉验证，无动态 dump）](./2026-10-08_apk-flutter-static-telemetry-notification-re.md)
+- [2026-10-08 Flutter AOT 静态字符串表法 SOP（libapp.so 常數池 + liboffset 聚类重建类结构/状态机/数据通道）](./2026-10-08_flutter-aot-static-string-table-sop.md)
 - [2026-08-20 Flutter AOT 服务端驱动广告去除（Blutter + 等长字符串替换）](./2026-08-20_apk-flutter-banner-ad-removal.md)
 - [2026-05-15-cellular-pro-mumu-ksad-fragment-fix](./2026-05-15-cellular-pro-mumu-ksad-fragment-fix.md)
 - [[种子] seed-008_apk-okhttp-ssl-pin-bypass](./seed-008_apk-okhttp-ssl-pin-bypass.md)
@@ -75,6 +77,12 @@
 
 ## 高频成功模式（按技术）
 
+### Flutter AOT 静态字符串表提取（无动态 dump）
+
+- [字符串表五分类（点分路径=JSON 字段树 / URL=端点 / command/*=指令 / Name@liboffset=对象名 / package:app/=源文件）+ jadx Kotlin 共享模块（Gson @SerializedName + Retrofit）双源交叉验证，纯静态建 ~290 字段 API 契约目录](./2026-10-08_apk-flutter-static-telemetry-notification-re.md)
+- [liboffset 聚类（同偏移=同一 Dart 源文件）+ 对象名规则（get:/_x@NNN/Xxx.）列举源文件全部物件 → 重建功能物件模型、状态机（中信心）、数据取得通道（REST/WSS/设备端）](./2026-10-08_flutter-aot-static-string-table-sop.md)
+- [本地化触发字符串（messages_*/strings.xml）逐条映射到通知类 → 触发条件表；算法级结论一律降级中信心](./2026-10-08_apk-flutter-static-telemetry-notification-re.md)
+
 ### 平台无关路由与供应链门禁
 
 - [隔离 worktree、多 PR 祖先闭环、Git-blob AV 审查与 reference/executable CI 边界](./2026-09-03_issue-pr-security-boundary-integration.md)
@@ -100,6 +108,12 @@
 ### Cortex-M USB MSC 升级器
 
 - [应用/驻留 bootloader 边界与虚拟磁盘写入链路](./2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor.md)
+
+### Flutter AOT App（libapp.so 常數池，XAPK + Kotlin 共享模块）
+
+- [XAPK 多 split（base=Kotlin 壳+共享模块 / ABI split=libapp.so Dart AOT / 语言 split）；桌布小工具用 Kotlin 重写同一 wire format = 第二独立字段来源](./2026-10-08_apk-flutter-static-telemetry-notification-re.md)
+- [字串常數存活、執行個體欄位名不存活；字串表 byte-sorted（勿用行邻接推断语义）；2–4 字元短字串被 minlen 过滤 → membership 验证](./2026-10-08_flutter-aot-static-string-table-sop.md)
+- [三条数据通道：REST 轮询 + 每车 WebSocket 流（aaos_* 高频字段）+ FCM 推送；通知引擎输入=状态过渡×用户设定](./2026-10-08_apk-flutter-static-telemetry-notification-re.md)
 
 ## 使用说明
 
