@@ -6,10 +6,10 @@
 
 ## 统计
 
-- 真实项目数：21
+- 真实项目数：22
 - 种子参考数：17
-- 总条目数：38
-- 最近更新：2026-09-03
+- 总条目数：39
+- 最近更新：2026-10-30
 
 ## 按场景分类
 
@@ -34,6 +34,7 @@
 
 ### Web / API / 渗透测试
 
+- [2026-10-30 加密 API 信封站点被动侦察与玩币版重建 — 关键词: AES 信封离线解码, 轮询转 STOMP 推送, 可证明公平, 多 agent 重建, 受众/范围分离](./2026-10-30_js-encrypted-envelope-exchange-playmoney-rebuild.md)
 - [2026-08-01 Next.js CDK 契约保真本地重建](./2026-08-01_nextjs-cdk-contract-faithful-local-reconstruction.md)
 - [2026-08-01_pentest-encryption-oracle-public-template-sql-admin-takeover: .NET CMS 通用加密 oracle、公开密文模板消费者、完整 STL/模板解析、原始 SQL `UPDATE RETURNING`、官方管理员验证器新旧口令差分与隔离 PostgreSQL 清理闭环](./2026-08-01_pentest-encryption-oracle-public-template-sql-admin-takeover.md)
 
@@ -86,6 +87,10 @@
 
 - [1 KiB 自带掩码 ROR/XOR、Cortex-M 向量 crib、跨固件验证](./2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor.md)
 
+### 加密 API 信封与实时协议重建
+
+- [前导代码定位密钥后离线解码、每 topic seq + 有界重放 + REST 快照、after-commit 发布](./2026-10-30_js-encrypted-envelope-exchange-playmoney-rebuild.md)
+
 ## 实体倒排（按目标特征）
 
 ### 多宿主安全技能路由包
@@ -100,6 +105,10 @@
 ### Cortex-M USB MSC 升级器
 
 - [应用/驻留 bootloader 边界与虚拟磁盘写入链路](./2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor.md)
+
+### 体育交易所 + 真人牌桌站点（Angular 前端、AES 信封 API、比分 socket）
+
+- [仅公开被动观察；自有品牌、虚拟筹码重建，后台实时可控](./2026-10-30_js-encrypted-envelope-exchange-playmoney-rebuild.md)
 
 ## 使用说明
 
