@@ -627,6 +627,41 @@
       "quick": false
     },
     {
+      "hint": "reverse a stripped go binary",
+      "expect": "R33",
+      "quick": false
+    },
+    {
+      "hint": "recover types with goresym",
+      "expect": "R33",
+      "quick": false
+    },
+    {
+      "hint": "rustc compiled binary reverse",
+      "expect": "R33",
+      "quick": false
+    },
+    {
+      "hint": "analyze this go 程序 的符号",
+      "expect": "R33",
+      "quick": false
+    },
+    {
+      "hint": "go 语言 符号恢复",
+      "expect": "R33",
+      "quick": false
+    },
+    {
+      "hint": "go 逆向 恢复符号表",
+      "expect": "R33",
+      "quick": false
+    },
+    {
+      "hint": "rust 逆向 这个二进制",
+      "expect": "R33",
+      "quick": false
+    },
+    {
       "hint": "Windows AD 域渗透 kerberos",
       "expect": "R24",
       "quick": false
