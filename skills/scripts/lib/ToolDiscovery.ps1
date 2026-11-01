@@ -522,6 +522,87 @@ function Get-ReverseToolCatalog {
                 [pscustomobject]@{ Type = 'path'; Value = 'C:\Tools\bkcrack\bkcrack.exe' }
             )
         }
+        # --- 脱壳链（判型 → OEP → dump → IAT 重建 → 验证）---
+        # 这一组原本没进 catalog，导致 refresh-tools.ps1 -Check 报「新装漏记 0」是假的：
+        # 工具压根不在探测范围内，漏记自然查不出来。
+        [pscustomobject]@{
+            Name = 'diec'
+            Skill = 'malware-analysis'
+            Purpose = '壳/编译器/保护器判型（脱壳第一步）'
+            FixedVersion = 'v0.5.0'
+            VersionArgs = @('--version')
+            Fallbacks = @(
+                [pscustomobject]@{ Type = 'command'; Value = 'diec' },
+                [pscustomobject]@{ Type = 'path'; Value = (Join-Path $env:USERPROFILE 'Tools\die\diec.exe') }
+            )
+        }
+        [pscustomobject]@{
+            Name = 'upx'
+            Skill = 'reverse-engineering'
+            Purpose = 'UPX 直接解压（魔数被抹时需先还原特征）'
+            FixedVersion = 'v0.5.0'
+            VersionArgs = @('--version')
+            Fallbacks = @(
+                [pscustomobject]@{ Type = 'command'; Value = 'upx' },
+                [pscustomobject]@{ Type = 'path'; Value = (Join-Path $env:USERPROFILE 'Tools\upx\upx.exe') }
+            )
+        }
+        [pscustomobject]@{
+            Name = 'x64dbg'
+            Skill = 'malware-analysis'
+            Purpose = 'Windows 用户态调试器（OEP 定位）'
+            FixedVersion = 'v0.5.0'
+            VersionArgs = @()
+            Fallbacks = @(
+                [pscustomobject]@{ Type = 'command'; Value = 'x64dbg' },
+                [pscustomobject]@{ Type = 'path'; Value = (Join-Path $env:USERPROFILE 'Tools\x64dbg\release\x64dbg.bat') }
+            )
+        }
+        [pscustomobject]@{
+            Name = 'scylla'
+            Skill = 'malware-analysis'
+            Purpose = '内存 dump 后的 IAT 重建（Fix Dump）'
+            FixedVersion = 'v0.5.0'
+            VersionArgs = @()
+            Fallbacks = @(
+                [pscustomobject]@{ Type = 'command'; Value = 'Scylla_x64' },
+                [pscustomobject]@{ Type = 'command'; Value = 'Scylla_x86' },
+                [pscustomobject]@{ Type = 'path'; Value = (Join-Path $env:USERPROFILE 'Tools\scylla\Scylla_x64.exe') }
+            )
+        }
+        [pscustomobject]@{
+            Name = 'de4dot'
+            Skill = 'dotnet-reverse'
+            Purpose = '.NET 去混淆（脱壳）'
+            FixedVersion = 'v0.5.0'
+            VersionArgs = @('--help')
+            Fallbacks = @(
+                [pscustomobject]@{ Type = 'command'; Value = 'de4dot-x64' },
+                [pscustomobject]@{ Type = 'command'; Value = 'de4dot' },
+                [pscustomobject]@{ Type = 'path'; Value = (Join-Path $env:USERPROFILE 'Tools\de4dot\de4dot-x64.exe') }
+            )
+        }
+        [pscustomobject]@{
+            Name = 'ilspycmd'
+            Skill = 'dotnet-reverse'
+            Purpose = '.NET 反编译（ILSpy CLI，脱壳后读 IL）'
+            FixedVersion = 'v0.5.0'
+            VersionArgs = @('--version')
+            Fallbacks = @(
+                [pscustomobject]@{ Type = 'command'; Value = 'ilspycmd' },
+                [pscustomobject]@{ Type = 'path'; Value = (Join-Path $env:USERPROFILE '.dotnet\tools\ilspycmd.exe') }
+            )
+        }
+        [pscustomobject]@{
+            Name = 'frida-dexdump'
+            Skill = 'apk-reverse'
+            Purpose = 'Android 内存 dex dump（对抗加固壳）'
+            FixedVersion = 'v0.5.0'
+            VersionArgs = @('--help')
+            Fallbacks = @(
+                [pscustomobject]@{ Type = 'command'; Value = 'frida-dexdump' }
+            )
+        }
     )
 }
 

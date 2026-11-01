@@ -18,7 +18,13 @@ if [[ -z "$PYTHON" ]]; then
   exit 2
 fi
 
-"$PYTHON" - "$BENCHMARK" "$ROUTER" <<'PY'
+# 必须把“正在跑这个脚本的那个 bash”传下去，不能写死裸 `bash`：
+# Windows 上 PATH 里的 `bash` 常常先命中 C:\Windows\System32\bash.exe（WSL 空壳），
+# 它只会打印「适用于 Linux 的 Windows 子系统没有已安装的分发」然后 exit 1，
+# 于是 178 条全红，而报告读起来像路由坏了。
+BASH_BIN="${BASH:-bash}"
+
+"$PYTHON" - "$BENCHMARK" "$ROUTER" "$BASH_BIN" <<'PY'
 import json
 import pathlib
 import re
@@ -29,6 +35,7 @@ import tempfile
 
 benchmark_path = pathlib.Path(sys.argv[1])
 router_path = pathlib.Path(sys.argv[2])
+bash_bin = sys.argv[3]
 benchmark = json.loads(benchmark_path.read_text(encoding="utf-8-sig"))
 cases = benchmark["cases"]
 
@@ -43,7 +50,7 @@ with tempfile.TemporaryDirectory(prefix="rs-routing-bash-") as scratch:
         expected = case["expect"]
         out_dir = root / str(index)
         result = subprocess.run(
-            ["bash", str(router_path), "--hint", hint, "--out-dir", str(out_dir)],
+            [bash_bin, str(router_path), "--hint", hint, "--out-dir", str(out_dir)],
             capture_output=True,
             text=True,
             encoding="utf-8",
@@ -92,7 +99,7 @@ with tempfile.TemporaryDirectory(prefix="rs-routing-bash-") as scratch:
     caller_root = root / "caller-project"
     caller_root.mkdir()
     default_result = subprocess.run(
-        ["bash", str(fixture_router), "--hint", default_case["hint"]],
+        [bash_bin, str(fixture_router), "--hint", default_case["hint"]],
         cwd=caller_root,
         capture_output=True,
         text=True,

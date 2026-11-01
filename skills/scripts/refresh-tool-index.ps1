@@ -58,6 +58,13 @@ $scriptRefs = @{
     'yara' = @('malware-analysis/SKILL.md')
     'pwntools' = @('reverse-engineering/SKILL.md', 'reverse-engineering/patterns-ctf*.md')
     'bkcrack' = @('reverse-engineering/crypto-decode-tools.md', '../CTF-Sandbox-Orchestrator/competition-zip-archive/SKILL.md')
+    'diec' = @('malware-analysis/SKILL.md')
+    'upx' = @('reverse-engineering/SKILL.md')
+    'x64dbg' = @('malware-analysis/SKILL.md')
+    'scylla' = @('malware-analysis/SKILL.md', 'radare2/SKILL.md')
+    'de4dot' = @('dotnet-reverse/SKILL.md')
+    'ilspycmd' = @('dotnet-reverse/SKILL.md')
+    'frida-dexdump' = @('apk-reverse/references/advanced-unpacking.md')
 }
 
 $skillsRoot = Split-Path -Parent $PSScriptRoot
@@ -101,7 +108,7 @@ $markdownContent = ($markdownLines -join [Environment]::NewLine) + [Environment]
 $markdownContent | Set-Content -LiteralPath $OutputMarkdown -Encoding utf8
 
 # --- Capability status view ---
-$capabilityNames = @('jadx', 'apktool', 'jeb-pro', 'frida', 'frida-ps', 'idalib-mcp', 'jshookmcp', 'reqable-mcp', 'xquik-mcp', 'anything-analyzer', 'idapro', 'r2', 'rabin2', 'adb', 'agent-browser', 'ghidra-mcp', 'seclists', 'proxycat', 'burpsuite-mcp', 'pentestswarm', 'nmap', 'binwalk', 'yara', 'pwntools', 'bkcrack')
+$capabilityNames = @('jadx', 'apktool', 'jeb-pro', 'frida', 'frida-ps', 'idalib-mcp', 'jshookmcp', 'reqable-mcp', 'xquik-mcp', 'anything-analyzer', 'idapro', 'r2', 'rabin2', 'adb', 'agent-browser', 'ghidra-mcp', 'seclists', 'proxycat', 'burpsuite-mcp', 'pentestswarm', 'nmap', 'binwalk', 'yara', 'pwntools', 'bkcrack', 'diec', 'upx', 'x64dbg', 'scylla', 'de4dot', 'ilspycmd', 'frida-dexdump')
 $capabilityRows = @()
 foreach ($capName in $capabilityNames) {
     $state = Get-ReverseCapabilityState -Name $capName

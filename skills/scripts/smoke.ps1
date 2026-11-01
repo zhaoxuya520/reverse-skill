@@ -119,6 +119,24 @@ if (-not (Test-Path -LiteralPath $encodingTest)) {
     }
 }
 
+# --- 3b) bootstrap manifest structure regression ---
+# `test-bootstrap-manifest.sh` 只覆盖 POSIX（脚本里只有 Darwin / Linux 分支），
+# Windows 侧必须有自己的那一半，否则「bash 版 SKIP」等于这块完全没测。
+$manifestTest = Join-Path $scriptDir 'test-bootstrap-manifest.ps1'
+if (-not (Test-Path -LiteralPath $manifestTest)) {
+    Bad 'test-bootstrap-manifest.ps1 missing'
+} else {
+    $manifestLog = Join-Path $LogDir '03b-bootstrap-manifest.txt'
+    & $SmokeHostExe -NoProfile -ExecutionPolicy Bypass -File $manifestTest 2>&1 |
+        Tee-Object -FilePath $manifestLog | Out-Null
+    $manifestExit = $LASTEXITCODE
+    if ($manifestExit -eq 0) {
+        Ok 'bootstrap manifest structure regression'
+    } else {
+        Bad ("bootstrap manifest structure regression exit {0}" -f $manifestExit)
+    }
+}
+
 # --- 4) master-route sample matrix ---
 $mr = Join-Path $scriptDir 'master-route.ps1'
 $cases = @(

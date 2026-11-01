@@ -582,6 +582,70 @@
       "canAutoInstall": true,
       "verifyCommand": "bkcrack",
       "kaliNote": "传统 ZipCrypto 已知明文攻击工具；Kali/Debian 可通过 apt 安装。"
+    },
+    {
+      "name": "diec",
+      "bootstrapKind": "manual",
+      "docsUrl": "https://github.com/horsicq/Detect-It-Easy",
+      "canAutoInstall": false,
+      "verifyCommand": "diec",
+      "manualInstallHint": "Detect It Easy publishes Linux builds as an AppImage / tar per release (github.com/horsicq/Detect-It-Easy). Unpack to ~/tools/die and put diec on PATH. Used as the first step of any unpacking route: identify the protector before choosing a dump strategy.",
+      "kaliNote": "判壳型（UPX/MPRESS/Themida/VMP/自定义）第一步。无 apt 包，需手工放 diec。"
+    },
+    {
+      "name": "upx",
+      "bootstrapKind": "apt-package",
+      "aptPackage": "upx-ucl",
+      "docsUrl": "https://github.com/upx/upx/releases",
+      "canAutoInstall": true,
+      "verifyCommand": "upx",
+      "kaliNote": "UPX 解压（-d）。Debian/Kali 的包名是 upx-ucl，装了才有 upx 命令。"
+    },
+    {
+      "name": "x64dbg",
+      "bootstrapKind": "manual",
+      "docsUrl": "https://github.com/x64dbg/x64dbg/releases",
+      "canAutoInstall": false,
+      "verifyCommand": "x64dbg",
+      "manualInstallHint": "x64dbg is Windows-only (no Linux build). On Kali use gef / rizin / gdb for the same OEP-locating work; keep this entry so the capability name stays aligned with the Windows manifest.",
+      "kaliNote": "Windows 专用调试器。Kali 侧等价路线是 gef（gdb）+ rizin，不安装 x64dbg。"
+    },
+    {
+      "name": "scylla",
+      "bootstrapKind": "manual",
+      "docsUrl": "https://github.com/NtQuery/Scylla",
+      "canAutoInstall": false,
+      "verifyCommand": "Scylla_x64",
+      "manualInstallHint": "Scylla is a Windows IAT rebuilder with no Linux port. On Kali the equivalent after a memory dump is rizin's import reconstruction or a manual IAT walk; keep this entry so capability names stay aligned across manifests.",
+      "kaliNote": "Windows 专用 IAT 重建工具。Kali 侧用 rizin 重建导入表。"
+    },
+    {
+      "name": "de4dot",
+      "bootstrapKind": "manual",
+      "docsUrl": "https://github.com/de4dot/de4dot",
+      "canAutoInstall": false,
+      "verifyCommand": "de4dot-x64",
+      "manualInstallHint": "de4dot needs the .NET/Mono runtime. On Kali install mono-complete via apt, then drop a de4dot-cex build into ~/tools/de4dot and run it with mono.",
+      "kaliNote": ".NET 去混淆。需先 apt install mono-complete，再用 mono 跑 de4dot.exe。"
+    },
+    {
+      "name": "ilspycmd",
+      "bootstrapKind": "manual",
+      "docsUrl": "https://github.com/icsharpcode/ILSpy",
+      "canAutoInstall": false,
+      "verifyCommand": "ilspycmd",
+      "manualInstallHint": "Install the .NET SDK, then: dotnet tool install -g ilspycmd. It lands in ~/.dotnet/tools, which must be on PATH. This replaces dnSpy, which is no longer maintained.",
+      "kaliNote": ".NET 反编译（dnSpy 的替代）。需 .NET SDK 后 dotnet tool install -g ilspycmd。"
+    },
+    {
+      "name": "frida-dexdump",
+      "bootstrapKind": "pip-package",
+      "pipPackage": "frida-dexdump==2.0.1",
+      "pinnedVersion": "2.0.1",
+      "docsUrl": "https://github.com/hluwa/frida-dexdump",
+      "canAutoInstall": true,
+      "verifyCommand": "frida-dexdump",
+      "kaliNote": "Android 内存 dex dump（对抗加固壳）。pip 可装；需要设备在线且 frida-server 已起。"
     }
   ]
 }

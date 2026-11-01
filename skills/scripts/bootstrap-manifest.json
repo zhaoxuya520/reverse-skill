@@ -354,6 +354,62 @@
       "verifyCommand": "bkcrack",
       "releaseTag": "v1.8.1",
       "preferApiDigest": true
+    },
+    {
+      "name": "diec",
+      "bootstrapKind": "manual",
+      "docsUrl": "https://github.com/horsicq/Detect-It-Easy",
+      "canAutoInstall": false,
+      "verifyCommand": "diec",
+      "manualInstallHint": "Detect It Easy ships as a portable zip per release (github.com/horsicq/Detect-It-Easy). Unpack to %USERPROFILE%\\Tools\\die. Note: Windows Defender / Huorong may quarantine die.exe; diec.exe (CLI) is the one this catalog verifies, and it is the only file that needs to survive."
+    },
+    {
+      "name": "upx",
+      "bootstrapKind": "manual",
+      "docsUrl": "https://github.com/upx/upx/releases",
+      "canAutoInstall": false,
+      "verifyCommand": "upx",
+      "manualInstallHint": "Download the win64 zip for your release (upx-<version>-win64.zip) and unpack it so the version directory sits directly under tools\\upx\\ of your reverse-skill checkout; use-re.ps1 discovers the newest version directory, so never hardcode the version in PATH."
+    },
+    {
+      "name": "x64dbg",
+      "bootstrapKind": "manual",
+      "docsUrl": "https://github.com/x64dbg/x64dbg/releases",
+      "canAutoInstall": false,
+      "verifyCommand": "x64dbg",
+      "manualInstallHint": "Download the snapshot zip from x64dbg releases and unpack to %USERPROFILE%\\Tools\\x64dbg (or the tools\\x64dbg directory of your checkout). verifyCommand resolves the x64dbg.bat wrapper in release\\, not x64dbg.exe."
+    },
+    {
+      "name": "scylla",
+      "bootstrapKind": "manual",
+      "docsUrl": "https://github.com/NtQuery/Scylla",
+      "canAutoInstall": false,
+      "verifyCommand": "Scylla_x64",
+      "manualInstallHint": "Scylla has no packaged release: take the Scylla_x64.exe / Scylla_x86.exe pair from the project's release archive into %USERPROFILE%\\Tools\\scylla. It is the IAT rebuilder paired with x64dbg; there is no ImportREC equivalent for 64-bit targets."
+    },
+    {
+      "name": "de4dot",
+      "bootstrapKind": "manual",
+      "docsUrl": "https://github.com/de4dot/de4dot",
+      "canAutoInstall": false,
+      "verifyCommand": "de4dot-x64",
+      "manualInstallHint": "de4dot has no maintained release channel. Use a de4dot-cex build (github.com/de4dot/de4dot) and unpack de4dot.exe plus de4dot-x64.exe into %USERPROFILE%\\Tools\\de4dot. Use de4dot-x64 for 64-bit assemblies, de4dot.exe for 32-bit."
+    },
+    {
+      "name": "ilspycmd",
+      "bootstrapKind": "manual",
+      "docsUrl": "https://github.com/icsharpcode/ILSpy",
+      "canAutoInstall": false,
+      "verifyCommand": "ilspycmd",
+      "manualInstallHint": "Install with the .NET SDK: dotnet tool install -g ilspycmd. It lands in %USERPROFILE%\\.dotnet\\tools, which use-re.ps1 adds to PATH. This is the maintained replacement for dnSpy, which is no longer developed."
+    },
+    {
+      "name": "frida-dexdump",
+      "bootstrapKind": "manual",
+      "docsUrl": "https://github.com/hluwa/frida-dexdump",
+      "canAutoInstall": false,
+      "verifyCommand": "frida-dexdump",
+      "manualInstallHint": "pip install frida-dexdump into the workspace venv (use-re.ps1 puts it on PATH). Requires a reachable device and a running frida-server; the tool itself installs fine without one, but dumps only start once adb sees a device."
     }
   ]
 }

@@ -229,6 +229,40 @@ Assert-Fields (Join-Path $skillsRoot 'reverse-engineering/anti-analysis.md') @('
 Assert-Fields (Join-Path $skillsRoot 'reverse-engineering/references/nonpe-format-cookbook.md') @('U–AV', 'E-batch-deobf', 'E-ps-decode-layer-N', 'E-vba-pcode', 'E-js-vmp', 'E-driver-irp-handlers', 'E-dll-tls-dllmain', 'E-android-hidden-icon-manifest', 'E-delay-import')
 Assert-Fields (Join-Path $skillsRoot 'js-reverse/SKILL.md') @('E-js-vmp', 'E-js-deobf', 'nonpe-format-cookbook')
 Assert-Fields (Join-Path $skillsRoot 'apk-reverse/SKILL.md') @('E-android-hidden-icon-manifest', 'nonpe-format-cookbook')
+
+# apk-reverse 的两份索引与校验器：SKILL.md 声明「`python check_routing.py` 检查它与
+# references/routing.md 一致」，那么这两样东西必须真的在，并且真的能跑。
+# 否则提交 SKILL.md 的人会留下一个「让读者去打开、去执行都不存在的东西」的仓库 ——
+# 这类断裂只有在别人 clone 之后才会暴露，所以在源头上一道闸。
+$apkSkillPath = Join-Path $skillsRoot 'apk-reverse/SKILL.md'
+$apkSkillText = Get-Content -LiteralPath $apkSkillPath -Raw -Encoding UTF8
+# 用脚本自己解析到的 python，不写死名字：本机 `python` 可能是 Microsoft Store 的垫片，
+# 直接调用会弹应用商店而 fc 返回 0，报告看起来却是「校验器失败了」。
+$PythonExe = $null
+foreach ($cand in @('python3', 'python')) {
+    $found = Get-Command $cand -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($found) { $PythonExe = $found.Source; break }
+}
+if ($apkSkillText -like '*references/routing.md*') {
+    $apkRouting = Join-Path $skillsRoot 'apk-reverse/references/routing.md'
+    if (Test-Path -LiteralPath $apkRouting) { Ok 'apk-reverse routing.md present (referenced by SKILL.md)' }
+    else { Bad 'apk-reverse routing.md missing but SKILL.md references it' }
+}
+if ($apkSkillText -like '*check_routing.py*') {
+    $apkChecker = Join-Path $skillsRoot 'apk-reverse/check_routing.py'
+    if (-not (Test-Path -LiteralPath $apkChecker)) {
+        Bad 'apk-reverse check_routing.py missing but SKILL.md references it'
+    }
+    else {
+        $checkerOut = & $PythonExe $apkChecker 2>&1
+        if ($LASTEXITCODE -eq 0 -and ($checkerOut -join "`n") -match 'RESULT=ok') {
+            Ok 'apk-reverse check_routing.py runs clean'
+        }
+        else {
+            Bad ("apk-reverse check_routing.py failed: " + (($checkerOut | Select-Object -Last 3) -join ' | '))
+        }
+    }
+}
 Assert-Fields (Join-Path $skillsRoot 'reverse-engineering/kernel-driver-reverse.md') @('E-driver-irp-handlers', 'E-driver-ioctl', 'E-driver-byovd')
 Assert-Fields (Join-Path $skillsRoot 'docs-generator/references/security-report-templates.md') @('thin `vuln`', '1c. 漏洞技术分析')
 if ($vendorRulesText -match '(?m)vuln.*默认全文' -or $vendorRulesText -match '第 3 个默认全文 flavor') {

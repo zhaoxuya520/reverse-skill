@@ -30,7 +30,7 @@ for arg in "$@"; do
         --start-services) START_SERVICES=true ;;
         --skip-refresh) SKIP_REFRESH=true ;;
         --list|-l)
-            echo "jadx apktool jeb-pro frida frida-ps idalib-mcp jshookmcp reqable-mcp xquik-mcp anything-analyzer idapro r2 rabin2 adb agent-browser ghidra-mcp seclists proxycat burpsuite-mcp nmap pentestswarm pwntools bkcrack"
+            echo "jadx apktool jeb-pro frida frida-ps idalib-mcp jshookmcp reqable-mcp xquik-mcp anything-analyzer idapro r2 rabin2 adb agent-browser ghidra-mcp seclists proxycat burpsuite-mcp nmap pentestswarm pwntools bkcrack diec upx x64dbg scylla de4dot ilspycmd frida-dexdump"
             echo "mcp-kali-server metasploitmcp hexstrike-ai adaptixc2 atomic-operator sstimap xsstrike wpprobe fluxion gef coercer evil-winrm-py netexec responder bloodhound certipy"
             exit 0
             ;;
@@ -532,6 +532,43 @@ ensure_capability() {
             log_info "  MCP 模式: pentestswarm mcp serve"
             log_info "  扫描模式: pentestswarm scan <target> --scope <scope> --swarm"
             log_info "  需要设置: export PENTESTSWARM_ORCHESTRATOR_API_KEY=<your-claude-key>"
+            ;;
+
+        # ─── 脱壳链（判型 → OEP → dump → IAT 重建 → 验证）───
+        upx)
+            install_apt_package "upx-ucl"
+            ;;
+        diec)
+            log_warn "MANUAL_INSTALL_REQUIRED: diec"
+            log_warn "Detect It Easy 无 apt 包；从 github.com/horsicq/Detect-It-Easy 取 Linux 包，解到 ~/tools/die 并把 diec 放进 PATH。"
+            LAST_CAPABILITY_MANUAL=true
+            MANUAL_REQUIRED=true
+            return 0
+            ;;
+        x64dbg|scylla)
+            log_warn "MANUAL_INSTALL_REQUIRED: $name"
+            log_warn "$name 是 Windows 专用工具，Linux 侧等价路线：OEP 用 gef（gdb），IAT 重建用 rizin。此条目只为与 Windows manifest 的能力名对齐。"
+            LAST_CAPABILITY_MANUAL=true
+            MANUAL_REQUIRED=true
+            return 0
+            ;;
+        de4dot)
+            log_warn "MANUAL_INSTALL_REQUIRED: de4dot"
+            log_warn "先 apt install mono-complete，再把 de4dot-cex 放进 ~/tools/de4dot，用 mono 运行 de4dot.exe。"
+            LAST_CAPABILITY_MANUAL=true
+            MANUAL_REQUIRED=true
+            return 0
+            ;;
+        ilspycmd)
+            log_warn "MANUAL_INSTALL_REQUIRED: ilspycmd"
+            log_warn "需要 .NET SDK：dotnet tool install -g ilspycmd（落在 ~/.dotnet/tools，需在 PATH）。"
+            LAST_CAPABILITY_MANUAL=true
+            MANUAL_REQUIRED=true
+            return 0
+            ;;
+        frida-dexdump)
+            install_pip_package "frida-dexdump"
+            log_info "frida-dexdump 需要设备在线且 frida-server 已起才谈得上 dump。"
             ;;
 
         # ─── pip 安装 ───

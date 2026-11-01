@@ -5,6 +5,21 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BOOTSTRAP="$SCRIPT_DIR/bootstrap-reverse.sh"
 KALI_BOOTSTRAP="$SCRIPT_DIR/../../kali/scripts/bootstrap-reverse.sh"
 MANIFEST="$SCRIPT_DIR/bootstrap-manifest.json"
+
+# 这个回归测的是 bootstrap-reverse.sh 的 POSIX 沙箱行为：它自身只认 Darwin / Linux
+# （见该脚本的 `uname -s` 分支，其余一律 platform=unknown 后放弃）。在 MSYS / Cygwin /
+# Windows 上跑不出任何有效结论，只会把「平台不支持」报成「manifest 解析器坏了」。
+# 显式 SKIP 并给退出码 0，附上原因；不伪造通过，也不制造假红灯。
+case "$(uname -s)" in
+  Darwin|Linux) ;;
+  *)
+    echo "SKIP: bootstrap-reverse.sh 只有 Darwin / Linux 分支（本机 uname -s = $(uname -s)）"
+    echo "      这条回归请在 Linux 或 macOS 上跑；Windows 侧对应的是 PowerShell 的 bootstrap 回归。"
+    echo 'RESULT=skip'
+    exit 0
+    ;;
+esac
+
 REAL_PYTHON="$(command -v python3)"
 SCRATCH="$(mktemp -d /tmp/reverse-bootstrap-test-XXXXXX)"
 trap 'rm -rf "$SCRATCH"' EXIT
