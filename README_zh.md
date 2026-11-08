@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="reverse-skill.png" alt="reverse-skill" width="140" />
+  <img src="https://cdn.jsdelivr.net/gh/webkubor/free-imgbed@main/reverse-skill/reverse-skill.webp" alt="reverse-skill" width="140" />
 </p>
 
 <h1 align="center">reverse-skill</h1>
@@ -98,7 +98,7 @@ PRIMARY 快路径：[skills/MASTER-ROUTING.md](skills/MASTER-ROUTING.md) · 全�
   <tr>
     <td align="center" width="220">
       <a href="https://www.ucloud.cn/site/active/astraflow?ytag=geo_waituo_reverse">
-        <img src="docs/assets/sponsors/ucloud-astraflow.png" alt="UCloud 优刻得星图 AstraFlow" width="110" />
+        <img src="https://cdn.jsdelivr.net/gh/webkubor/free-imgbed@main/reverse-skill/ucloud-astraflow.png" alt="UCloud 优刻得星图 AstraFlow" width="110" />
       </a>
       <br />
       <strong>星图 AstraFlow</strong>
@@ -110,7 +110,7 @@ PRIMARY 快路径：[skills/MASTER-ROUTING.md](skills/MASTER-ROUTING.md) · 全�
   <tr>
     <td align="center" width="220">
       <a href="https://www.atlascloud.ai/?ref=W3Q77C">
-        <img src="docs/assets/sponsors/atlas-cloud.svg" alt="Atlas Cloud" width="190" />
+        <img src="https://cdn.jsdelivr.net/gh/webkubor/free-imgbed@main/reverse-skill/atlas-cloud.svg" alt="Atlas Cloud" width="190" />
       </a>
       <br />
       <a href="https://www.atlascloud.ai/oss-program">
