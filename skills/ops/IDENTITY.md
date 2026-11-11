@@ -1,62 +1,39 @@
-# reverse-skill 身份宣言（相对 Z3r0）
+﻿# reverse-skill identity
 
-> 本文件固定 **我们是谁**。吸收 Z3r0 的证据/范围/分工/时间线思想，但 **不** 做成 Z3r0 平台。
+This file defines the package boundary. `reverse-skill` adopts useful evidence, scope, role, and timeline concepts without becoming a platform runtime.
 
-## 我们是
+## What this package is
 
-| 维度 | reverse-skill |
-|------|----------------|
-| 形态 | **Skill 路由包** — 给任意 AI 客户端（Claude/Cursor/Codex…）用的方法论 + 工具自举 |
-| 入口 | `RULES.md` → `MASTER-ROUTING` / `master-route.ps1` → 子 skill |
-| 工具真相 | `tool-index.md` + `bootstrap-manifest.json`（本机路径，不猜） |
-| 进化 | `field-journal/` 脱敏经验回写 |
-| 产物 | Markdown 报告 + `work/<case>/` 本地作战目录（gitignore） |
-| 部署 | `git clone` 即可；无强制 PG/UI/Docker 池 |
+| Dimension | Definition |
+|---|---|
+| Form | Client-neutral skill router, methodology library, and tool bootstrap contract. |
+| Entry | `RULES.md` -> `MASTER-ROUTING.md` / platform router -> specialist skill. |
+| Tool source | `tool-index.md` and `bootstrap-manifest.json`; never guess local paths. |
+| Learning | Sanitized reusable lessons in `field-journal/`. |
+| Output | Markdown reports and a local `work/<case>/` evidence directory. |
+| Deployment | Clone the repository; no mandatory database, UI, container pool, or hosted service. |
 
-## 我们不是
+## What this package is not
 
-| Z3r0 有 | reverse-skill **故意不做** |
-|---------|---------------------------|
-| React 作战台 | ❌ |
-| FastAPI 控制面 + WebSocket 会话 | ❌ |
-| PostgreSQL 证据库 | ❌ |
-| LightRAG 服务 | ❌ |
-| Docker 主机池 / noVNC 控制代理 | ❌（可 **文档** 推荐可选沙箱 profile） |
-| 多 Agent 进程运行时 | ❌（仅 **角色→skill 映射 + 交接协议**） |
+It is not a React operations console, FastAPI control plane, PostgreSQL evidence store, LightRAG service, Docker host pool, VNC controller, or multi-agent runtime. It provides role-to-skill mapping and handoff contracts instead.
 
-## 我们从 Z3r0 学什么（缩水落地）
+## Core concepts
 
-| 思想 | reverse-skill 形态 |
-|------|-------------------|
-| 授权与项目边界 | `ops/scope-contract.md` → 每案 `scope.md` |
-| Evidence→Finding→Path | `ops/evidence-finding-path.md` + 报告模板 |
-| 专家分工 | `ops/role-map.md`（Lead/cie/cpe/cre…→ skill） |
-| 可回放 | `work/<case>/timeline.md` 追加写 |
-| WorkItem/覆盖 | `workitems.md` + coverage 勾选 |
-| 沙箱工具齐 | `ops/sandbox-profile.md` vs bootstrap-manifest |
-| 出站管控 | `network_profile` 字段（offline/lab/authorized） |
+- Authorization and project boundaries: `ops/scope-contract.md` and each case `scope.md`.
+- Traceability: `ops/evidence-finding-path.md` and report templates.
+- Specialist delegation: `ops/role-map.md`.
+- Replayability: append-only case timelines and work items.
+- Tool profiles: `ops/sandbox-profile.md` and the bootstrap manifest.
+- Outbound control: `network_profile` values such as `offline`, `lab`, and `authorized`.
 
-## 特色（必须保留）
+## Required characteristics
 
-1. **三轴路由 + PRIMARY 快路径**（目标类型 / 意图 / 工具链）  
-2. **bootstrap 按需装工具**，跨 Windows/Kali/Linux/macOS  
-3. **MCP 友好**（IDA/Burp/jshook/anything-analyzer）  
-4. **field-journal 脱敏进化**  
-5. **服从性工程**：ACTION REQUIRED / 完成自检 / 禁止假停  
+1. Three-axis routing: target type, user intent, and toolchain.
+2. On-demand tool bootstrap across Windows, Kali, Linux, and macOS.
+3. Optional MCP integrations for tools such as IDA, Burp, browser hooks, and traffic analyzers.
+4. Sanitized field-journal reuse.
+5. Explicit action-required steps, completion checks, and no false claims of completion.
 
-## 与 Z3r0 的健康关系
+## Boundary with external platforms
 
-```text
-Z3r0 = 红队操作系统 / 团队协作平台
-reverse-skill = Agent 的安全作业路由器 + 说明书
-
-可选未来：把本包 skill 内容挂进 Z3r0 sandbox-local skills
-当前：零依赖 Z3r0 安装即可完整工作
-```
-
-## 与「800+ 社区微 skill」的关系
-
-- **不** submodule 巨型 skill 库（投毒面与维护成本，见 `skill-supply-chain.md`）  
-- **要** 维护 `references/community-security-skills.md` 作索引与借鉴规则  
-- **要** 用 `domain-coverage-map.md` 证明：深度 skill + 路由 > 碎片 skill 堆叠  
-- 外部 skill 安装：AST10 思维 + 只信 curated 源（如 Trail of Bits curated）  
+External platforms may consume these skills through adapters. The core remains standalone, client-neutral, and usable without those platforms. Do not add large external skill libraries as submodules. Maintain `references/community-security-skills.md` as a curated index and use `domain-coverage-map.md` to evaluate coverage. External skill installation must follow `ops/skill-supply-chain.md`, use curated sources, and receive explicit approval.

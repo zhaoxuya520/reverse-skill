@@ -1,26 +1,30 @@
-# ops — reverse-skill 作战契约层
+﻿# Operational contracts
 
-Z3r0 启发、**本包形态**实现：
+This directory contains the operational contracts shared by all specialist skills.
 
-| 文件 | 用途 |
-|------|------|
-| [IDENTITY.md](IDENTITY.md) | 我们是谁 / 不做平台 |
-| [scope-contract.md](scope-contract.md) | 启动 scope + network_profile |
-| [evidence-finding-path.md](evidence-finding-path.md) | 证据链 |
-| [role-map.md](role-map.md) | 角色→skill + 交接 |
-| [timeline-workitem.md](timeline-workitem.md) | 时间线与覆盖 |
-| [sandbox-profile.md](sandbox-profile.md) | 工具对照 |
-| [skill-supply-chain.md](skill-supply-chain.md) | Agent Skill/MCP 供应链安全（AST10 精简） |
-| [case-review/](../case-review/) | Evidence 图完整性审查与报告交接 |
+| File | Purpose |
+|---|---|
+| [IDENTITY.md](IDENTITY.md) | Package boundary and identity. |
+| [scope-contract.md](scope-contract.md) | Case scope, authorization, and network profile. |
+| [evidence-finding-path.md](evidence-finding-path.md) | Evidence traceability and finding promotion. |
+| [role-map.md](role-map.md) | Lead/specialist roles and handoff. |
+| [timeline-workitem.md](timeline-workitem.md) | Timeline and work-item coverage. |
+| [sandbox-profile.md](sandbox-profile.md) | Tool and isolation profiles. |
+| [skill-supply-chain.md](skill-supply-chain.md) | External skill and MCP supply-chain controls. |
+| [case-review](../case-review/) | Evidence graph review and report handoff. |
 
-相关 references（非孤儿，从本 hub / MASTER / SKILL 可达）：
+## Related references
 
-- `../references/community-security-skills.md` — 社区 skill 生态对照  
-- `../references/domain-coverage-map.md` — 本包领域覆盖  
-- `../attack-chain/references/lifecycle-checklist.md` — 攻击链阶段门闩  
-- `../reverse-engineering/references/re-agent-workflow.md` — RE 四阶段  
-- `../pentest-tools/references/recon-pipeline.md` — 授权侦察 + Evidence 门  
+- `../references/community-security-skills.md`: curated external skill index.
+- `../references/domain-coverage-map.md`: package coverage map.
+- `../attack-chain/references/lifecycle-checklist.md`: attack-chain phase gates.
+- `../reverse-engineering/references/re-agent-workflow.md`: reverse-engineering phases.
+- `../pentest-tools/references/recon-pipeline.md`: authorized reconnaissance and evidence gates.
 
-- 脚本：`../scripts/case-init.ps1`
-- 校验：`../scripts/verify-routing-coherence.ps1`（含 ops 契约检查）
-- 审查：`../case-review/scripts/review_case.py`（只读 Evidence 图检查）
+## Commands
+
+- Case initialization: `../scripts/case-init.ps1` or `../scripts/case-init.sh`.
+- Routing coherence: `../scripts/verify-routing-coherence.ps1`.
+- Read-only evidence review: `../case-review/scripts/review_case.py`.
+
+Run commands only after the activation and consent gates in `RULES.md` are satisfied.

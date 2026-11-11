@@ -1,19 +1,19 @@
-# 通用 Scope 契约（任务启动硬门槛）
+# Scope Contract
 
-> **MUST**：任何安全/逆向/渗透任务在 **ACT 之前** 在当前用户分析项目的 `work/<case>/` 落地 `scope.md`。
-> 无 scope → 只允许读文档/路由，**禁止** 对目标主动扫描、Hook、利用。
-> 模板可复制；字段名保持英文键，便于脚本校验。
+> **MUST:** Before target activity in a security, reverse-engineering, or penetration-testing task, create `work/<case>/scope.md` in the user's analysis project.
+> Without an authorized scope, only documentation and routing may be read; active scanning, hooking, and exploitation are prohibited.
+> Copy the template as needed and preserve its English keys for automated validation. Before running repository scripts, obtain explicit approval for the disclosed commands and effects.
 
-## 如何初始化
+## Initialization
 
-Windows：
+Windows:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File skills\scripts\case-init.ps1 -Hint "<任务一句话>" -CaseName "my-case"
-# 默认产出：当前分析项目的 work/<case>/scope.md 等
-# 从其他目录调用 skill 时显式指定：-ProjectRoot "C:\path\to\analysis-project"
+powershell -NoProfile -ExecutionPolicy Bypass -File skills\scripts\case-init.ps1 -Hint "<one-sentence task>" -CaseName "my-case"
+# Default output: work/<case>/scope.md and related artifacts in the analysis project.
+# When invoking from elsewhere, specify -ProjectRoot "C:\path\to\analysis-project".
 
-# 合法本地离线样本：auth granted + offline + explicit sample → ready_for_act=true
+# Authorized local offline sample: granted authorization + offline + explicit sample -> ready_for_act=true
 powershell -NoProfile -ExecutionPolicy Bypass -File skills\scripts\case-init.ps1 `
   -Hint "offline apk" -CaseName "my-sample" -Preset offline-sample -Sample ".\app.apk"
 ```
@@ -31,9 +31,9 @@ bash skills/scripts/case-init.sh \
   --preset offline-sample --sample ./app.apk
 ```
 
-`-PackageRoot` / `--package-root` 保留为兼容参数；新流程应以 `ProjectRoot` / `--project-root` 表示 case artifact 的归属项目。
+`-PackageRoot` / `--package-root` remain compatibility parameters. Use `-ProjectRoot` / `--project-root` to identify the project that owns the case artifacts.
 
-## scope.md 完整模板
+## Complete scope.md template
 
 ```markdown
 # Case Scope
@@ -65,10 +65,10 @@ bash skills/scripts/case-init.sh \
 ## network_profile
 - mode: offline | lab_only | authorized_target_only | unrestricted_lab
 - notes: |
-    offline = 无对外发包（纯静态/本地样本）
-    lab_only = 仅 lab/VM IP
-    authorized_target_only = 仅 in_scope 资产
-- MUST NOT use unrestricted against production without written auth
+    offline = no external packets; static analysis or local sample only
+    lab_only = lab or VM IPs only
+    authorized_target_only = in-scope assets only
+- MUST NOT use unrestricted against production without written authorization
 
 ## deliverables
 - report: true
@@ -90,28 +90,28 @@ bash skills/scripts/case-init.sh \
   - [ ] out_of_scope reviewed
 ```
 
-## 路由挂钩（AI 必须执行）
+## Routing integration
 
 ```text
 RULES / MASTER-ROUTING / SKILL:
-  1) master-route → PRIMARY
-  2) 平台原生 case-init 或手写 scope.md
-  3) auth 未 granted → STOP，只允许补授权材料
-  4) ready_for_act = true → 打开 PRIMARY SKILL.md → ACT
+  1) master-route -> PRIMARY
+  2) Initialize the case with the platform-native case-init or write scope.md.
+  3) If authorization is not granted, stop and obtain authorization evidence.
+  4) When ready_for_act = true, open the PRIMARY SKILL.md and act.
 ```
 
-`case-guard -Force` / `case-guard --force` 是兼容参数，**不得**绕过 `auth.status`、合法 scope、network profile 或 `ready_for_act` 硬门。
+`case-guard -Force` and `case-guard --force` are compatibility parameters. They must not bypass `auth.status`, a valid scope, the network profile, or `ready_for_act`.
 
-## network_profile 速查
+## Network profiles
 
-| mode | 允许 | 禁止 |
-|------|------|------|
-| `offline` | 静态分析、本地文件、模拟 | 任意外连、公网 RPC |
-| `lab_only` | lab/CTF 靶机网段 | 生产/未授权 IP |
-| `authorized_target_only` | in_scope 列表 | 列表外资产 |
-| `unrestricted_lab` | 隔离实验网（书面） | 互联网生产 |
+| Mode | Allowed | Prohibited |
+|------|---------|------------|
+| `offline` | Static analysis, local files, simulation | External connections and public RPC |
+| `lab_only` | Authorized lab or CTF target networks | Production and unauthorized IP addresses |
+| `authorized_target_only` | Listed in-scope assets | Assets outside the list |
+| `unrestricted_lab` | Isolated lab network with written authorization | Internet production systems |
 
-## 特色
+## Design
 
-- 纯 Markdown，**无数据库**  
-- 与 `tool-index` / bootstrap 正交：scope 管「能不能打」，tool-index 管「用什么打」
+- Case artifacts use Markdown and require no database.
+- Scope determines whether an action is allowed; the tool index and bootstrap determine which tools are available.

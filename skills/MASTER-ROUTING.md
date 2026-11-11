@@ -1,18 +1,18 @@
-# reverse-skill PRIMARY 快路径
+# PRIMARY Routing Contract
 
-> `scripts/master-route.ps1` 与 `scripts/master-route.sh` 必须保持相同路由契约；平台只改变执行入口，不改变 routing semantics。
+`scripts/master-route.ps1` and `scripts/master-route.sh` must implement the same routing contract. The platform changes the entry command, not routing semantics.
 
-## 执行契约
+## Required sequence
 
 ```text
-1. 先路由后动手
-2. 输出 PRIMARY 路径 + 一句话依据
-3. case-init / scope.md（ops/scope-contract）— auth 未 granted 禁止对目标 ACT
-4. 指定 lead + specialist 角色（ops/role-map）
-5. 立即打开 PRIMARY 的 SKILL.md → ACTION REQUIRED
-6. 工具路径只认 tool-index；缺则 bootstrap（仅 manifest 能力）
-7. 过程追加 timeline / workitems；结论走 Evidence→Finding→Path
-8. 未命中 → 读 routing.md 全表或提议新 skill
+1. Route before acting.
+2. Report the PRIMARY path and a one-sentence reason.
+3. Initialize case scope; authorization must be granted before target activity.
+4. Assign lead and specialist roles using ops/role-map.
+5. Open the PRIMARY SKILL.md and execute ACTION REQUIRED.
+6. Use only tool-index paths; bootstrap only manifest-approved capabilities.
+7. Append timeline and work-item records; report Evidence -> Finding -> Path.
+8. If no route matches, read routing.md or propose a new skill.
 ```
 
 ### Windows

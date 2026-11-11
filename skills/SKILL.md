@@ -2,31 +2,32 @@
 name: reverse-skill-router
 description: Routes reverse engineering, exploitation, penetration testing, malware, mobile, firmware, browser automation, documentation, and security tasks to the appropriate specialist skill. Use when a task spans modules or the correct reverse-skill entrypoint is unclear.
 ---
-# Reverse Engineering Skills Master Control
+# Reverse-skill Master Controller
 
-本目录收录了一系列逆向工程相关的技能模块，每个子目录是一个独立模块，内含 `SKILL.md` 描述其适用场景、工具链和工作流程。
+This directory contains specialist workflow modules. Each module has a `SKILL.md` that defines its scope, tools, required actions, and handoff conditions.
 
-## CRITICAL: 路由执行契约（必须立即执行）
+## Critical: routing execution contract
 
-读完本文件后，不允许只回复“已读/已理解”。必须按顺序执行：
+After reading this file, do not reply with only an acknowledgement. For an activated task, execute these steps in order:
 
-1. `NOW`：跑平台原生 router（Windows `scripts/master-route.ps1`；Linux/macOS/Kali `scripts/master-route.sh`），从 `config/routing.json` 定 PRIMARY；疑难再读 `routing.md` 三轴附录。
-2. `NOW`：平台原生 `case-init` 落地当前分析项目的 `work/<case>/scope.md`；**auth 未 granted 禁止对目标 ACT**。本地离线样本使用 `offline-sample` preset + explicit sample；Force 不得绕过硬门。
-3. `ACT`：立即打开 PRIMARY `SKILL.md` 执行 ACTION REQUIRED。
-4. `NEXT`：工具路径只认 `tool-index.md`；缺工具 → 平台原生 bootstrap（仅 manifest）。
-5. 结论用 Evidence→Finding→Path。报告/journal 是 SHOULD，除非用户要交付物。
+1. `NOW`: After activation and approval, run the platform-native router (`scripts/master-route.ps1` on Windows or `scripts/master-route.sh` on Linux/macOS/Kali). Select PRIMARY from `config/routing.json`; consult the three-axis appendix in `routing.md` when ambiguous.
+2. `NOW`: Run the platform-native `case-init` to create `work/<case>/scope.md` in the current analysis project. Do not act on a target without granted authorization and a valid network profile. For an authorized local sample, use the `offline-sample` preset with an explicit sample. Force cannot bypass this gate.
+3. `ACT`: Open the PRIMARY `SKILL.md` and follow ACTION REQUIRED.
+4. `NEXT`: Resolve tool paths from `tool-index.md`. If a required tool is missing, use the platform-native bootstrap only for manifest capabilities and after approval.
+5. Record conclusions as Evidence -> Finding -> Path. Reports and journal updates are SHOULD unless requested as deliverables.
 
-**身份**：见 `ops/IDENTITY.md`（轻量路由包 + 工具自举 + journal；**不是** Z3r0 式平台）。
+**Identity:** See `ops/IDENTITY.md`. This is a lightweight routing package with tool bootstrap and a journal, not a Z3r0-style platform.
 
-如果路由无法命中，必须先联网补充方法论并提议新增 skill，禁止硬塞到不匹配模块。
+If routing does not match, research the methodology and propose a new skill rather than forcing the task into an unsuitable module. Obtain approval before any network access or other side effect.
 
-## 指令语义级别（RFC 2119）
+## Instruction levels (RFC 2119)
 
-- `MUST`：必须执行，违背即任务失败。
-- `MUST NOT`：禁止执行，违背即安全违规。
-- `SHOULD`：原则上要做，不做必须说明原因。
-- `MAY`：可选动作。
-## 当前模块
+- `MUST`: required; failure means the task is incomplete.
+- `MUST NOT`: prohibited; violation is a safety failure.
+- `SHOULD`: expected unless the reason for omission is recorded.
+- `MAY`: optional.
+
+## Module catalog
 
 | 模块 | 目录 | 适用场景 |
 |------|------|---------|
