@@ -142,6 +142,21 @@
       "quick": false
     },
     {
+      "hint": "用 radare2 分析这个二进制文件",
+      "expect": "R7",
+      "quick": false
+    },
+    {
+      "hint": "rabin2 查看导入表和节区",
+      "expect": "R7",
+      "quick": false
+    },
+    {
+      "hint": "radiff2 对两个固件做二进制差分",
+      "expect": "R7",
+      "quick": false
+    },
+    {
       "hint": "firmware binwalk iot",
       "expect": "R8",
       "quick": true
@@ -627,6 +642,41 @@
       "quick": false
     },
     {
+      "hint": "reverse a stripped go binary",
+      "expect": "R33",
+      "quick": false
+    },
+    {
+      "hint": "recover types with goresym",
+      "expect": "R33",
+      "quick": false
+    },
+    {
+      "hint": "rustc compiled binary reverse",
+      "expect": "R33",
+      "quick": false
+    },
+    {
+      "hint": "analyze this go 程序 的符号",
+      "expect": "R33",
+      "quick": false
+    },
+    {
+      "hint": "go 语言 符号恢复",
+      "expect": "R33",
+      "quick": false
+    },
+    {
+      "hint": "go 逆向 恢复符号表",
+      "expect": "R33",
+      "quick": false
+    },
+    {
+      "hint": "rust 逆向 这个二进制",
+      "expect": "R33",
+      "quick": false
+    },
+    {
       "hint": "Windows AD 域渗透 kerberos",
       "expect": "R24",
       "quick": false
@@ -692,6 +742,26 @@
       "quick": true
     },
     {
+      "hint": "ctf reverse challenge",
+      "expect": "R41",
+      "quick": false
+    },
+    {
+      "hint": "awd competition sandbox",
+      "expect": "R41",
+      "quick": false
+    },
+    {
+      "hint": "比赛题",
+      "expect": "R41",
+      "quick": false
+    },
+    {
+      "hint": "ctf pwn rop chain",
+      "expect": "R17",
+      "quick": false
+    },
+    {
       "hint": "CTF pwn 栈溢出",
       "expect": "R17",
       "quick": false
@@ -708,6 +778,46 @@
     },
     {
       "hint": "攻击路径图",
+      "expect": "R39",
+      "quick": false
+    },
+    {
+      "hint": "render this with graphviz",
+      "expect": "R39",
+      "quick": false
+    },
+    {
+      "hint": "generate a plantuml diagram",
+      "expect": "R39",
+      "quick": false
+    },
+    {
+      "hint": "draw a flowchart of the control flow",
+      "expect": "R39",
+      "quick": false
+    },
+    {
+      "hint": "画一个 状态图",
+      "expect": "R39",
+      "quick": false
+    },
+    {
+      "hint": "生成 数据流图",
+      "expect": "R39",
+      "quick": false
+    },
+    {
+      "hint": "画 er图 描述表关系",
+      "expect": "R39",
+      "quick": false
+    },
+    {
+      "hint": "帮我 画图 表示架构",
+      "expect": "R39",
+      "quick": false
+    },
+    {
+      "hint": "输出一个 图表 展示流程",
       "expect": "R39",
       "quick": false
     },
