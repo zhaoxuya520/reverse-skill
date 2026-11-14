@@ -72,9 +72,13 @@ echo ""
 echo "=== 节区 ==="
 rabin2 -S -- "$TARGET"
 
+# `head` closes the pipe after N lines. With `set -o pipefail`, a large binary
+# makes rabin2 die of SIGPIPE (exit 141) and aborts the whole recon before the
+# exports/strings/analysis sections run. `sed` consumes the full stream but
+# still limits output, and keeps genuine rabin2 failures visible.
 echo ""
 echo "=== 导入 ==="
-rabin2 -i -- "$TARGET" | head -n "$IMPORTS_LIMIT"
+rabin2 -i -- "$TARGET" | sed -n "1,${IMPORTS_LIMIT}p"
 
 echo ""
 echo "=== 导出 ==="
@@ -82,7 +86,7 @@ rabin2 -E -- "$TARGET"
 
 echo ""
 echo "=== 字符串 ==="
-rabin2 -zz -- "$TARGET" | head -n "$STRINGS_LIMIT"
+rabin2 -zz -- "$TARGET" | sed -n "1,${STRINGS_LIMIT}p"
 
 if [[ "$RUN_ANALYSIS" == "true" ]]; then
     echo ""
