@@ -557,8 +557,8 @@
       "quick": false
     },
     {
-      "hint": "iOS 越狱 检测绕过",
-      "expect": "R2",
+      "hint": "ai 红队 模型安全测试",
+      "expect": "R14",
       "quick": false
     },
     {
