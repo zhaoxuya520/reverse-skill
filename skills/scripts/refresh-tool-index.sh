@@ -133,6 +133,7 @@ TOOLS=(
   "hashcat|pentest-tools|Password recovery|hashcat|hashcat --version|"
   "nuclei|pentest-tools|Template-based vulnerability scanner|nuclei|nuclei -version|"
   "binwalk|firmware-pentest|Firmware extraction and analysis|binwalk|binwalk --version|"
+  "bkcrack|reverse-engineering|CTF ZIP/PKZIP ZipCrypto known-plaintext attack|bkcrack|bkcrack --version|"
   "binaryninja|binary-ninja-reverse|Binary Ninja commercial reverse-engineering platform|binaryninja,binaryninja-headless|binaryninja --version|/Applications/Binary Ninja.app/Contents/MacOS/binaryninja;$HOME/BinaryNinja/binaryninja;/opt/binaryninja/binaryninja"
   "seclists|pentest-tools|Security wordlists|none|none|$HOME/tools/SecLists;/usr/share/seclists"
   "jshookmcp|js-reverse|JS/CDP/Hook MCP capability (requires registration + npx runtime)|none|none|"
