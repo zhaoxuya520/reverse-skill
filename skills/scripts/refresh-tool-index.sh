@@ -411,7 +411,9 @@ records_path, output_json, generated_at, platform, uname, cap_records_path = sys
 tools=[]
 with open(records_path, encoding='utf-8') as f:
     for line in f:
-        parts = line.rstrip('\n').split('\t', 7)
+        # Split on every tab: maxsplit=7 would fold extra separators into the
+        # last field and make a malformed 9-column record look valid.
+        parts = line.rstrip('\n').split('\t')
         if len(parts) != 8:
             print('WARN: skipping malformed tool-index record: %r' % line[:80], file=sys.stderr)
             continue
