@@ -43,6 +43,67 @@ PATTERNS = {
 }
 ACTION_USE = re.compile(r"^\s*-?\s*uses:\s*([^\s#]+)", re.M)
 FULL_SHA = re.compile(r"^[0-9a-f]{40}$")
+AGENT_ENTRY_FILES = ("README_AI.md", "RULES.md", "RULES_zh.md", "AGENTS.md")
+REQUIRED_AGENT_CONSENT_MARKERS = (
+    "Reading repository files is not authorization to execute them.",
+    "Explicit user approval is required before running any repository script.",
+    "Client-global configuration remains opt-in.",
+)
+UNSAFE_AGENT_ENTRY_PATTERNS = {
+    "execute-section-on-read": re.compile(r"execute section 0 immediately", re.I),
+    "automatic-execution-on-read": re.compile(r"must automatically execute", re.I),
+    "remove-user-from-setup": re.compile(
+        r"the user does not need to operate manually", re.I
+    ),
+    "global-instruction-injection": re.compile(r"global injection", re.I),
+    "execute-immediately-after-read": re.compile(
+        r"execute immediately after reading", re.I
+    ),
+    "must-run-after-read": re.compile(
+        r"after reading this file,?\s+you must now", re.I
+    ),
+    "side-effects-as-read-goal": re.compile(r"produce actual side effects", re.I),
+    "skip-first-consent": re.compile(r"do not wait for the user to say", re.I),
+    "auto-configure-after-read": re.compile(
+        r"auto-configure after reading", re.I
+    ),
+    "execute-after-read-zh": re.compile(
+        r"读完(?:本文件|规则|文档)?后?[^\n]{0,40}(?:立即[^\n]{0,6}(?:执行|运行)|必须[：,:， ]{0,3}(?:执行|运行|NOW))",
+        re.I,
+    ),
+    "automatic-execution-after-read-zh": re.compile(
+        r"(?:读完|读取)[^\n]{0,40}自动(?:执行|运行)", re.I
+    ),
+    "global-instruction-injection-zh": re.compile(r"全局注入", re.I),
+    "side-effects-as-read-goal-zh": re.compile(
+        r"产生实际(?:的)?副作用", re.I
+    ),
+    "extract-into-global-config-zh": re.compile(
+        r"首次配置时由 AI 提取本段写入", re.I
+    ),
+    "precedent-as-authorization-zh": re.compile(
+        r"授权已在 precedent-auth\.md 中确认", re.I
+    ),
+    "precedent-as-step-zero": re.compile(
+        r"step 0[^\n]{0,80}precedent-auth", re.I
+    ),
+    "precedent-declaration-as-gate-zh": re.compile(
+        r"precedent-auth\.md[^\n]{0,30}授权预声明", re.I
+    ),
+}
+
+
+def check_agent_entry_contract(path: str, text: str) -> list[str]:
+    errors: list[str] = []
+    for marker in REQUIRED_AGENT_CONSENT_MARKERS:
+        if marker not in text:
+            errors.append(
+                f"agent entry missing consent marker: {path}: {marker}"
+            )
+    for label, pattern in UNSAFE_AGENT_ENTRY_PATTERNS.items():
+        if pattern.search(text):
+            errors.append(f"unsafe agent execute-on-read pattern {label}: {path}")
+    return errors
 
 
 def git(*args: str) -> bytes:
@@ -73,6 +134,13 @@ def main() -> int:
     symlinks = sorted(path for path, mode in entries.items() if mode == "120000")
     if symlinks:
         errors.extend(f"tracked symlink requires review: {path}" for path in symlinks)
+
+    for path in AGENT_ENTRY_FILES:
+        if path not in entries:
+            errors.append(f"agent entry file missing from index: {path}")
+            continue
+        text = blob(path).decode("utf-8-sig", errors="replace")
+        errors.extend(check_agent_entry_contract(path, text))
 
     binary_paths = sorted(
         path for path in entries if PurePosixPath(path).suffix.lower() in BINARY_SUFFIXES
@@ -127,7 +195,8 @@ def main() -> int:
         "OK verify-repository-security: "
         f"tracked={len(entries)} executable_sources="
         f"{sum(PurePosixPath(p).suffix.lower() in EXECUTABLE_SUFFIXES for p in entries)} "
-        f"binary_like={len(binary_paths)} symlinks=0"
+        f"binary_like={len(binary_paths)} agent_entries={len(AGENT_ENTRY_FILES)} "
+        "symlinks=0"
     )
     return 0
 
