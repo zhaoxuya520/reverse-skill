@@ -40,8 +40,6 @@
 
 ### Web / API / 渗透测试
 
-- [2026-10-16 Vue SPA 无源码站点契约保真复刻（运行时探测优先）](./2026-10-16_vue-spa-contract-replication-runtime-probe.md)
-
 - [2026-10-30 加密 API 信封站点被动侦察与玩币版重建 — 关键词: AES 信封离线解码, 轮询转 STOMP 推送, 可证明公平, 多 agent 重建, 受众/范围分离](./2026-10-30_js-encrypted-envelope-exchange-playmoney-rebuild.md)
 - [2026-08-01 Next.js CDK 契约保真本地重建](./2026-08-01_nextjs-cdk-contract-faithful-local-reconstruction.md)
 - [2026-08-01_pentest-encryption-oracle-public-template-sql-admin-takeover: .NET CMS 通用加密 oracle、公开密文模板消费者、完整 STL/模板解析、原始 SQL `UPDATE RETURNING`、官方管理员验证器新旧口令差分与隔离 PostgreSQL 清理闭环](./2026-08-01_pentest-encryption-oracle-public-template-sql-admin-takeover.md)
