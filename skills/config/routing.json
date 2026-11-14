@@ -111,7 +111,8 @@
       "label": "LLM / Agent security",
       "skill": "llm-security/SKILL.md",
       "keywords": [
-        { "must": "llm|prompt.?inject|jailbreak|agent.?secur|garak|owasp.?llm|提示词.?注入|模型.?红队|模型.?越狱|llm.?越狱|提示词.?越狱|ai.?红队" }
+        { "must": "llm|prompt.?inject|jailbreak|agent.?secur|garak|owasp.?llm|提示词.?注入|模型.?红队|模型.?越狱|llm.?越狱|提示词.?越狱|ai.?红队" },
+        { "must": "模型.?红队|ai.?红队|红队.?ai|llm.?越狱|提示词.?越狱", "note": "Second rule gives LLM red-team hints 2 points, so R10's bare 红队 keyword cannot win the priority tie" }
       ]
     },
     "R15": {
