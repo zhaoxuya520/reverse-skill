@@ -712,6 +712,46 @@
       "quick": false
     },
     {
+      "hint": "render this with graphviz",
+      "expect": "R39",
+      "quick": false
+    },
+    {
+      "hint": "generate a plantuml diagram",
+      "expect": "R39",
+      "quick": false
+    },
+    {
+      "hint": "draw a flowchart of the control flow",
+      "expect": "R39",
+      "quick": false
+    },
+    {
+      "hint": "画一个 状态图",
+      "expect": "R39",
+      "quick": false
+    },
+    {
+      "hint": "生成 数据流图",
+      "expect": "R39",
+      "quick": false
+    },
+    {
+      "hint": "画 er图 描述表关系",
+      "expect": "R39",
+      "quick": false
+    },
+    {
+      "hint": "帮我 画图 表示架构",
+      "expect": "R39",
+      "quick": false
+    },
+    {
+      "hint": "输出一个 图表 展示流程",
+      "expect": "R39",
+      "quick": false
+    },
+    {
       "hint": "威胁狩猎 检测规则 sigma",
       "expect": "R27",
       "quick": false
