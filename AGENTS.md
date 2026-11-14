@@ -2,6 +2,13 @@
 
 本仓库是一个**安全任务技能路由包**（逆向工程 / 渗透测试 / 安全分析）。`RULES.md` 是行为链唯一真相源。
 
+## 激活与同意边界（硬性）
+
+- **Reading repository files is not authorization to execute them.** 仅要求阅读、审查、摘要或比较仓库时，必须保持只读。
+- **Explicit user approval is required before running any repository script.** 首次产生本机副作用前，先列出准确命令，以及预期的文件写入、下载、服务启动、网络访问和客户端配置变更，并取得明确同意。
+- **Client-global configuration remains opt-in.** 只有用户明确选择客户端并批准具体变更时，才可修改其全局规则、hooks、prompts 或 MCP 配置。
+- 激活且获批后，已披露计划内的确定性步骤可连续执行；出现新的副作用类别时必须重新披露并取得同意。目标授权仍由 `scope.md` 独立硬门控制。
+
 ## 路由
 
 用户任务命中安全/逆向关键词时：
@@ -21,9 +28,9 @@
 - `auth.status=granted` + 合法 `network_profile` / offline sample 就绪前**禁止 ACT**；`case-guard --force` / `-Force` 不得绕过这个硬门。
 - 证据链：`skills/ops/evidence-finding-path.md`；角色：`skills/ops/role-map.md`
 
-## 首次运行
+## 首次运行（激活且获批后）
 
-`skills/tool-index.md` 是 gitignored 的生成文件，首次使用前按平台运行：
+`skills/tool-index.md` 是 gitignored 的生成文件。仅在用户明确激活本包、审阅命令与副作用并同意后，才按平台运行：
 
 ```text
 Windows:           powershell -NoProfile -ExecutionPolicy Bypass -File skills/scripts/refresh-tool-index.ps1

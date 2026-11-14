@@ -8,6 +8,17 @@ trap 'rm -rf "$SCRATCH"' EXIT
 
 echo "=== Testing Bash Workflow ==="
 
+# Portable in-place rewrite: works with GNU sed and BSD sed (macOS).
+# Avoids platform-specific `sed -i` / `sed -i ''` branching.
+replace_in_file() {
+    local expr="$1"
+    local file="$2"
+    local tmp
+    tmp="$(mktemp "${file}.XXXXXX")"
+    sed "$expr" "$file" > "$tmp"
+    mv "$tmp" "$file"
+}
+
 # Test 1: case-init.sh creates proper structure
 echo "[Test 1] case-init.sh basic execution"
 bash "$SCRIPT_DIR/case-init.sh" \
@@ -49,7 +60,7 @@ fi
 
 # Test 4: case-guard.sh rejects invalid network mode
 echo "[Test 4] case-guard.sh rejects invalid network mode"
-sed -i 's/mode: authorized_target_only/mode: invalid_mode/g' "$SCRATCH/work/test-bash-01/scope.md"
+replace_in_file 's/mode: authorized_target_only/mode: invalid_mode/g' "$SCRATCH/work/test-bash-01/scope.md"
 if bash "$SCRIPT_DIR/case-guard.sh" --case-root "$SCRATCH/work/test-bash-01" > /dev/null 2>&1; then
     echo "FAIL: case-guard accepted invalid network mode"
     exit 1
@@ -57,11 +68,12 @@ fi
 
 # Test 5: case-guard.sh rejects ungranted auth
 echo "[Test 5] case-guard.sh rejects ungranted auth"
-sed -i 's/mode: invalid_mode/mode: authorized_target_only/g' "$SCRATCH/work/test-bash-01/scope.md"
-sed -i 's/status: granted/status: pending/g' "$SCRATCH/work/test-bash-01/scope.md"
+replace_in_file 's/mode: invalid_mode/mode: authorized_target_only/g' "$SCRATCH/work/test-bash-01/scope.md"
+replace_in_file 's/status: granted/status: pending/g' "$SCRATCH/work/test-bash-01/scope.md"
 if bash "$SCRIPT_DIR/case-guard.sh" --case-root "$SCRATCH/work/test-bash-01" > /dev/null 2>&1; then
     echo "FAIL: case-guard accepted pending auth"
     exit 1
 fi
 
+echo "TOTAL=5 PASS=5 FAIL=0"
 echo "=== All Bash Workflow Tests Passed ==="

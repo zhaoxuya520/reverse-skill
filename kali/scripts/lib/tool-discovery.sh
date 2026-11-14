@@ -53,7 +53,9 @@ declare -a TOOL_CATALOG=(
     "msfconsole|pentest-tools|Metasploit 框架|--version|msfconsole"
     "nikto|pentest-tools|Web 漏洞扫描|-Version|nikto"
     "binwalk|reverse-engineering|固件分析与提取|--help|binwalk"
+    "pwntools|reverse-engineering|CTF pwn 利用开发框架|version|pwn"
     "bkcrack|reverse-engineering|CTF ZIP/PKZIP ZipCrypto 已知明文攻击|--version|bkcrack"
+    "yara|malware-analysis|恶意软件规则匹配引擎|--version|yara"
     "gdb|reverse-engineering|调试器|--version|gdb"
     "objdump|reverse-engineering|反汇编|--version|objdump"
     "strings|reverse-engineering|字符串提取|--version|strings"
@@ -159,7 +161,11 @@ get_tool_version() {
     fi
 
     local output
-    output=$("$cmd" $version_args 2>&1 | head -n1) || true
+    if [[ "${cmd##*/}" == "pwn" && "$version_args" == "version" ]]; then
+        output=$(PWNLIB_NOTERM=1 "$cmd" version 2>&1 | head -n1) || true
+    else
+        output=$("$cmd" $version_args 2>&1 | head -n1) || true
+    fi
     echo "$output"
 }
 

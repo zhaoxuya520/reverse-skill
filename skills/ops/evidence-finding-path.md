@@ -128,4 +128,4 @@ Promotion to status=validated is stricter (decision cookbook):
 | **validated** | **SHOULD >=2 independent** Evidence (best: 1 static + 1 dynamic). A single Evidence item alone MUST NOT silently promote to validated — keep candidate/preliminary, or record residual_risk + human confirm. |
 | blocked promotion | record Evidence E-insufficient-evidence |
 
-Full recipes: [nalysis-decision-framework.md](analysis-decision-framework.md) (R4*, R1, R41, R44).
+Full recipes: [analysis-decision-framework.md](analysis-decision-framework.md) (R4*, R1, R41, R44).
