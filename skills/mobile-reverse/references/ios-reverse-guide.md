@@ -24,6 +24,40 @@ Clutch -d 1  # 解密第 1 个
 DYLD_INSERT_LIBRARIES=dumpdecrypted.dylib /path/to/App
 ```
 
+### 离线解密：fairplay-decrypt（16 字节账号凭据）
+
+来源 <https://github.com/EthanArbuckle/fairplay-decrypt>，装在 `~/Developer/fairplay-decrypt`（Tom-MacM5 与 M4-32G-001 均已构建并自检通过）。
+
+与 frida-ios-dump / Clutch 的区别：那两个**必须在越狱设备上跑、必须在设备上装载目标 App**；fairplay-decrypt 是**离线解包**，只要拿到该 App Store 账号的 16 字节 FairPlay 凭据，就能在 macOS/Linux 上直接解一个加密 IPA，不需要设备在场，也不用装载目标 App。
+
+```bash
+cd ~/Developer/fairplay-decrypt
+
+# 一次性准备（已做，换机才需要）
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+make transform                     # 只编 C 变换器；make all 在只有 CommandLineTools 的机上会失败（见下）
+
+# 解密
+.venv/bin/python decrypt.py /path/to/encrypted.ipa /path/to/decrypted.ipa \
+  --credential /path/to/credential.bin
+```
+
+要点：
+
+- `credential.bin` 恰好 16 字节，对应**拥有该 App 的账号**，一个账号一份，跨 App 复用。
+- 输出路径必须不存在，工具拒绝覆盖；输入输出不能同一个文件。
+- 支持 SUPF v3/v5、SINF `priv` 448 字节与 440 字节（440 必须末 8 字节全零）、加密 arm64 slice。
+- `decrypt.py` 靠同目录的 `transform`（C 变换器）+ `transform_const_data.bin` 跑页密钥派生，**这两个必须在项目根**，缺了报 `build transform executable and keep constant-data file`。
+- 能解的是加密段（`cryptid` 非 0）的 arm64 页；已经是 cryptid=0 的二进制会被跳过，全部跳过时报 `no encrypted arm64 binaries`。
+
+凭据获取（`credential-retrieval/`）需要**一台已配对、可 root SSH 的越狱设备**，外加 `idevice_id`、`iproxy`：
+
+```bash
+python3 credential-retrieval/retrieve.py --output-dir /path/to/new-dir   # 产出 credential.bin
+```
+
+该子模块要用 `xcrun --sdk iphoneos` 编 iOS 目标，**必须装完整 Xcode + `ldid`**（只有 CommandLineTools 时会 `CommonCrypto/CommonCryptor.h not found`；Tom-MacM5 与 M4-32G-001 目前都是这种状态，所以两台的 `make all` 会失败，`make transform` 正常）。所以：**解密随时可用，取凭据要有完整 Xcode + 越狱设备**。凭据在别处拿到的，直接喂 `--credential` 即可。
+
 ## Mach-O 分析
 
 ```bash
@@ -165,7 +199,7 @@ Interceptor.attach(_dyld_get_image_count, {
 
 | 防护 | iOS 绕过方法 |
 |------|-------------|
-| App Store 加密 | frida-ios-dump / Clutch |
+| App Store 加密 | frida-ios-dump / Clutch（设备在线）/ fairplay-decrypt（离线，需账号凭据） |
 | SSL Pinning | Objection `ios sslpinning disable` / SSL Kill Switch 2 |
 | 越狱检测 | Objection `ios jailbreak disable` / 自定义 Frida Hook |
 | 反调试 (PT_DENY_ATTACH) | Frida 启动后注入 / debugserver |
