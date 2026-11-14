@@ -95,8 +95,8 @@ Core scripts MUST NOT write client-global configuration. Optional adapters belon
 
 Hot path only:
 
-1. `skills/scripts/master-route.ps1 -Hint "<task>"` — PRIMARY from `skills/config/routing.json`
-2. `skills/scripts/case-init.ps1` — `scope.md` gate
+1. Platform-native master-route — `skills/scripts/master-route.ps1 -Hint "<task>"` (Windows) / `skills/scripts/master-route.sh --hint "<task>"` (Linux, macOS, Kali) — PRIMARY from `skills/config/routing.json`
+2. Platform-native case-init (`.ps1` / `.sh`) — `scope.md` gate
 3. PRIMARY `SKILL.md` ACTION REQUIRED
 4. `skills/tool-index.md` — real tool paths (if missing → generate it with the approved platform-native refresh command)
 
