@@ -6,15 +6,16 @@
 
 ## 统计
 
-- 真实项目数：25
+- 真实项目数：26
 - 种子参考数：17
-- 总条目数：42
+- 总条目数：43
 - 最近更新：2026-11-11
 
 ## 按场景分类
 
 ### APK / Android 逆向
 
+- [2026-09-20 iJiami 加固壳 dyncryptor RC4 变体 + zlib 解密链完整恢复](./2026-09-20_ijiami-dyncryptor-rc4-variant-zlib-recovery.md)
 - [2026-08-20 Flutter AOT 服务端驱动广告去除（Blutter + 等长字符串替换）](./2026-08-20_apk-flutter-banner-ad-removal.md)
 - [2026-05-15-cellular-pro-mumu-ksad-fragment-fix](./2026-05-15-cellular-pro-mumu-ksad-fragment-fix.md)
 - [[种子] seed-008_apk-okhttp-ssl-pin-bypass](./seed-008_apk-okhttp-ssl-pin-bypass.md)
@@ -90,6 +91,9 @@
 
 - [1 KiB 自带掩码 ROR/XOR、Cortex-M 向量 crib、跨固件验证](./2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor.md)
 
+### Android 加固壳自定义解密链
+
+- [dex overlay 手工解析 + RC4 变体 KSA/PRGA 识别 + zlib 解压（iJiami dyncryptor）](./2026-09-20_ijiami-dyncryptor-rc4-variant-zlib-recovery.md)
 ### Go / Rust 剥离二进制分诊
 
 - [pclntab 恢复函数名（无 GoReSym）、`go version -m` 元数据、PE 导出表脚本解析、Ghidra headless Java postScript](./2026-09-29_stripped-go-pclntab-rust-dll-triage.md)
@@ -119,6 +123,9 @@
 
 - [应用/驻留 bootloader 边界与虚拟磁盘写入链路](./2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor.md)
 
+### iJiami（爱加密）加固 APK
+
+- [dyncryptor overlay manifest 结构 + RC4 变体步进（i+=2 / j+=state[i]+1）+ zlib 到 EOF](./2026-09-20_ijiami-dyncryptor-rc4-variant-zlib-recovery.md)
 ### 剥离符号的 Go EXE + rustc 原生 DLL
 
 - [pclntab 函数名恢复、Ghidra 识别 rustc、原生导出 RVA/VA](./2026-09-29_stripped-go-pclntab-rust-dll-triage.md)
