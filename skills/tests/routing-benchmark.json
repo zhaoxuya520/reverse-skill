@@ -142,6 +142,21 @@
       "quick": false
     },
     {
+      "hint": "用 radare2 分析这个二进制文件",
+      "expect": "R7",
+      "quick": false
+    },
+    {
+      "hint": "rabin2 查看导入表和节区",
+      "expect": "R7",
+      "quick": false
+    },
+    {
+      "hint": "radiff2 对两个固件做二进制差分",
+      "expect": "R7",
+      "quick": false
+    },
+    {
       "hint": "firmware binwalk iot",
       "expect": "R8",
       "quick": true
