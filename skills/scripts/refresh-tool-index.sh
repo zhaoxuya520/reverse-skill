@@ -33,7 +33,11 @@ run_version() {
     echo ""
     return 0
   fi
-  "$cmd" "$@" 2>&1 | head -n 1 | tr '\n' ' ' | sed 's/[[:space:]]*$//' || true
+  if [[ "$cmd" == "pwn" && "$#" -eq 1 && "${1-}" == "version" ]]; then
+    PWNLIB_NOTERM=1 "$cmd" "$@" 2>&1 | head -n 1 | tr '\n' ' ' | sed 's/[[:space:]]*$//' || true
+  else
+    "$cmd" "$@" 2>&1 | head -n 1 | tr '\n' ' ' | sed 's/[[:space:]]*$//' || true
+  fi
 }
 
 file_exists_any() {
@@ -138,7 +142,7 @@ TOOLS=(
   "anything-analyzer|browser-automation|Browser/HTTP analyzer MCP project|none|none|$HOME/tools/anything-analyzer;$REPO_ROOT/../anything-analyzer"
   "burp-mcp-full|burp-mcp|Local Burp MCP extension and stdio bridge|none|none|$REPO_ROOT/burp-mcp-full/mcp-bridge.js"
   "yara|malware-analysis|Malware rule matching engine|yara|yara --version|"
-  "pwntools|reverse-engineering|CTF pwn exploit development framework|pwn|pwn --version|"
+  "pwntools|reverse-engineering|CTF pwn exploit development framework|pwn|pwn version|"
 )
 
 records_tmp="$(mktemp)"
@@ -188,10 +192,10 @@ for entry in "${TOOLS[@]}"; do
     done
   fi
 
-  if [[ "$version_spec" != "none" ]]; then
-    read -r ver_cmd ver_arg1 ver_arg2 <<< "$version_spec"
-    if has_cmd "$ver_cmd"; then
-      version="$(run_version "$ver_cmd" "${ver_arg1:-}" "${ver_arg2:-}")"
+  if [[ -n "$version_spec" && "$version_spec" != "none" ]]; then
+    read -r -a version_parts <<< "$version_spec"
+    if has_cmd "${version_parts[0]}"; then
+      version="$(run_version "${version_parts[@]}")"
     fi
   fi
 

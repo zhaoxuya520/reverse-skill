@@ -7,6 +7,8 @@ and pure `#anchor` links are ignored, as are links inside fenced code blocks
 (``` / ~~~) and the generated `tool-index.md`. Link targets are resolved
 relative to the containing file and matched against the set of git-tracked
 files and directories (UTF-8 paths, so CJK filenames compare correctly).
+Percent-encoded local paths are decoded once after query strings and
+fragments are removed; literal plus signs remain part of the filename.
 
 Markdown is read from the Git index rather than the working tree. This keeps
 the check deterministic when antivirus software quarantines a research
@@ -20,6 +22,7 @@ import os
 import re
 import subprocess
 import sys
+from urllib.parse import unquote
 
 sys.stdout.reconfigure(encoding="utf-8")
 
@@ -75,6 +78,8 @@ def links_in(path):
 
 
 def resolve(md, target):
+    """Resolve the extracted URL path, preserving encoded filename delimiters."""
+    target = unquote(target)
     if target.startswith("/"):
         base = target.lstrip("/")
     else:
