@@ -269,7 +269,7 @@ import json, pathlib, re, socket, sys, urllib.request
 manifest_path, claude_config_path, codex_config_path, tool_records_path, out_path = sys.argv[1:6]
 
 try:
-    manifest = json.loads(pathlib.Path(manifest_path).read_text(encoding='utf-8'))
+    manifest = json.loads(pathlib.Path(manifest_path).read_text(encoding='utf-8-sig'))
 except Exception:
     manifest = {'capabilities': []}
 capabilities = manifest.get('capabilities', [])
