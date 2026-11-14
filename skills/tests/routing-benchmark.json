@@ -1110,6 +1110,11 @@
       "hint": "请求签名算法还原",
       "expect": "R3",
       "quick": false
+    },
+    {
+      "hint": "my_.net reverse",
+      "expect": "R0",
+      "quick": false
     }
   ]
 }
