@@ -319,12 +319,11 @@
     },
     {
       "name": "binwalk",
-      "bootstrapKind": "winget-package",
-      "wingetId": "ReFirmLabs.binwalk",
-      "pinPolicy": "winget-latest",
+      "bootstrapKind": "manual",
       "docsUrl": "https://github.com/ReFirmLabs/binwalk",
-      "canAutoInstall": true,
-      "verifyCommand": "binwalk"
+      "canAutoInstall": false,
+      "verifyCommand": "binwalk",
+      "manualInstallHint": "binwalk is not published to winget and ships no prebuilt binaries on any GitHub release. Install the Rust toolchain (winget install Rustlang.Rustup) and run: cargo install binwalk"
     },
     {
       "name": "yara",
@@ -342,7 +341,7 @@
       "pinnedVersion": "4.15.0",
       "docsUrl": "https://github.com/Gallopsled/pwntools",
       "canAutoInstall": true,
-      "verifyCommand": "pwntools"
+      "verifyCommand": "pwn"
     },
     {
       "name": "bkcrack",

@@ -150,6 +150,10 @@ jobs:
             echo "syntax OK: $f"
           done < <(git ls-files '*.sh')
 
+      - name: Kali pwntools discovery regression
+        shell: bash
+        run: bash kali/scripts/test-pwntools-discovery.sh
+
       - name: Client-neutral bootstrap/discovery (Bash)
         shell: bash
         run: bash skills/scripts/test-client-neutral-bootstrap.sh
@@ -161,6 +165,12 @@ jobs:
           bash skills/scripts/test-routing.sh
           bash skills/scripts/test-bootstrap-manifest.sh
           bash skills/scripts/test-bash-workflow.sh
+          # Docker asset contracts (issue #129); no daemon required
+          bash skills/scripts/test-docker-assets.sh
+          bash skills/scripts/test-apk-decode-manifest.sh
+
+          # Offline IDA patch-plan validation (issue #136)
+          python3 skills/ida-reverse/scripts/test-apply-asm-patch.py
 
           scratch="$(mktemp -d)"
           trap 'rm -rf "$scratch"' EXIT
@@ -333,6 +343,10 @@ jobs:
       - name: review_case.py unit tests
         shell: bash
         run: python3 skills/case-review/tests/test_review_case.py
+
+      - name: Markdown link validator regression tests
+        shell: bash
+        run: python3 -m unittest discover -s skills/scripts/tests -p test_verify_doc_links.py
 
       - name: Internal Markdown links resolve
         shell: bash

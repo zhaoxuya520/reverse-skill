@@ -571,7 +571,7 @@
       "pinnedVersion": "4.15.0",
       "docsUrl": "https://github.com/Gallopsled/pwntools",
       "canAutoInstall": true,
-      "verifyCommand": "pwntools",
+      "verifyCommand": "pwn",
       "kaliNote": "CTF pwn 利用开发框架。Kali 预装，pip 可更新。"
     },
     {
