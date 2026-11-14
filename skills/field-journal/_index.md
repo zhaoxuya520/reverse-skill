@@ -6,9 +6,9 @@
 
 ## 统计
 
-- 真实项目数：26
+- 真实项目数：27
 - 种子参考数：17
-- 总条目数：43
+- 总条目数：44
 - 最近更新：2026-11-11
 
 ## 按场景分类
@@ -22,6 +22,7 @@
 
 ### 二进制 / 固件 / CTF
 
+- [2026-09-17 Mir2 系厚客户端「外壳 + 加密载荷」双段结构分析](./2026-09-17_mir2-thick-client-wrapper-encrypted-payload.md)
 - [2026-09-29 剥离符号的 Go EXE + rustc 原生 DLL 静态分诊（pclntab 恢复、PE 导出、Ghidra headless）](./2026-09-29_stripped-go-pclntab-rust-dll-triage.md)
 - [2026-10-16 Go+Wails 用量看板全逻辑还原（stripped 无符号：手工 pclntab/functab + 字节级字符串还原）](./2026-10-16_wails-go-usage-dashboard-stripped-re.md)
 - [2026-11-11 Windows 强壳 PE 静态测绘（虚拟节 / 满熵载荷 / 诱饵 IAT / 熵地图）](./2026-11-11_windows-pe-packed-entropy-map.md)
