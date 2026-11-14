@@ -34,11 +34,27 @@ if ($e2 -notmatch "superseded by F-CONSOL-2") { throw "ps1 did not mark supersed
 # review_case accepts superseded
 $demo = Join-Path $scratch "ctf"
 Copy-Item (Join-Path $root "examples\ctf-demo") $demo -Recurse
-python (Join-Path $root "skills\scripts\consolidate_evidence.py") --case-root $demo --evidence-ids "E-001" --finding-id F-001 --title "keep contract" --description "ok" --severity info --status validated --confidence medium --location "E-001" | Out-Null
-# F-001 already exists in ctf-demo report; just check the case still PARSES with
-# superseded evidence. --verify-hashes cannot pass here by design: consolidation
+python (Join-Path $root "skills\scripts\consolidate_evidence.py") --case-root $demo --evidence-ids "E-001" --finding-id F-CONSOL-DEMO --title "keep contract" --description "ok" --severity info --status validated --confidence medium --location "E-001" | Out-Null
+if ($LASTEXITCODE -ne 0) { throw "Python consolidation failed" }
+# Use a new identity: F-001 already exists in the demonstration report.
+# --verify-hashes cannot pass here by design: consolidation
 # rewrites E-001.md (adds the superseded marker), which changes its SHA-256.
 $review = python (Join-Path $root "skills\case-review\scripts\review_case.py") $demo 2>&1 | Select-Object -Last 8
 if ($LASTEXITCODE -ne 0) { throw "review_case failed to parse consolidated case:`n$($review -join [Environment]::NewLine)" }
+
+# Invalid IDs and duplicate Findings must fail before changing any record.
+$beforeEvidence = [Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $scratch 'evidence\E-001.md')))
+$beforeReport = [Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $scratch 'report\report.md')))
+foreach ($ids in @('../outside', 'E-001')) {
+    $rejected = $false
+    try {
+        & (Join-Path $root 'skills\scripts\consolidate-evidence.ps1') -CaseRoot $scratch -EvidenceIds $ids -FindingId F-CONSOL-2 -Title 'invalid' -Description 'must not append' -ErrorAction Stop
+    } catch {
+        $rejected = $true
+    }
+    if (-not $rejected) { throw "PowerShell accepted invalid/duplicate consolidation: $ids" }
+}
+if ($beforeEvidence -cne [Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $scratch 'evidence\E-001.md')))) { throw 'rejected consolidation changed Evidence' }
+if ($beforeReport -cne [Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $scratch 'report\report.md')))) { throw 'rejected consolidation changed report' }
 Write-Host "CONSOLIDATE_ALIGN_OK"
 Remove-Item $scratch -Recurse -Force

@@ -1,6 +1,9 @@
 import hashlib
 import importlib.util
 import tempfile
+import subprocess
+import sys
+from unittest.mock import patch
 import unittest
 from pathlib import Path
 
@@ -193,5 +196,149 @@ class ReviewCaseTests(unittest.TestCase):
             self.assertFalse(any(item["code"] == "scope.assets_missing" for item in result["issues"]))
 
 
+class ReviewIntegrityTests(unittest.TestCase):
+    write_case = ReviewCaseTests.write_case
+
+    def codes(self, root, **options):
+        return {item['code'] for item in REVIEW_CASE.review_case(root, **options)['issues']}
+
+    def test_escaped_workitem_pipe_preserves_status_and_evidence_columns(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_case(root)
+            path = root / 'workitems.md'
+            path.write_text(path.read_text().replace('Recover sample behavior', r'Recover A\|B behavior'))
+            result = REVIEW_CASE.review_case(root)
+            self.assertEqual(result['status'], 'PASS')
+            self.assertEqual(result['traceability']['E-001']['workitems'], 1)
+
+    def test_duplicate_workitem_id_is_not_silently_overwritten(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_case(root)
+            path = root / 'workitems.md'
+            path.write_text(path.read_text() + '| WI-001 | Other | cre | sample | binary | pending | E-001 | |\n')
+            self.assertIn('workitem.duplicate', self.codes(root))
+
+    def test_duplicate_report_ids_across_files_are_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_case(root)
+            (root / 'report' / 'duplicate.md').write_text((root / 'report' / 'analysis.md').read_text())
+            codes = self.codes(root)
+            self.assertIn('finding.duplicate', codes)
+            self.assertIn('path.duplicate', codes)
+
+    def test_finding_classification_values_are_validated(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_case(root)
+            path = root / 'report' / 'analysis.md'
+            path.write_text(path.read_text().replace('- severity: info', '- severity: typo').replace('- confidence: high', '- confidence: typo'))
+            codes = self.codes(root)
+            self.assertIn('finding.severity', codes)
+            self.assertIn('finding.confidence', codes)
+
+    def test_path_reference_to_missing_finding_fails(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_case(root)
+            path = root / 'report' / 'analysis.md'
+            path.write_text(path.read_text().replace('1. Hash the sample with E-001.', '1. E-001 supports finding F-999.'))
+            self.assertIn('reference.unknown_finding', self.codes(root))
+
+    def test_supersedes_reference_to_missing_evidence_fails(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_case(root)
+            path = root / 'evidence' / 'E-001.md'
+            path.write_text(path.read_text() + '- supersedes: E-999\n')
+            self.assertIn('reference.unknown_evidence', self.codes(root))
+
+    def test_fenced_examples_do_not_create_records_or_scope_fields(self):
+        self.assertEqual(REVIEW_CASE.field_value('```yaml\n- status: granted\n```\n- status: denied\n', 'status'), 'denied')
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_case(root)
+            path = root / 'report' / 'analysis.md'
+            path.write_text(path.read_text() + '\n```markdown\n### F-example\n### P-example\n```\n')
+            result = REVIEW_CASE.review_case(root)
+            self.assertEqual(result['status'], 'PASS')
+            self.assertEqual(result['summary']['findings'], 1)
+            self.assertEqual(result['summary']['paths'], 1)
+
+    def test_unreadable_artifact_produces_failed_review_instead_of_traceback(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_case(root)
+            with patch.object(REVIEW_CASE, 'sha256_file', side_effect=PermissionError('fixture access denied')):
+                self.assertIn('artifact.unreadable', self.codes(root, verify_hashes=True))
+
+
+CONSOLIDATE = Path(__file__).resolve().parents[2] / 'scripts' / 'consolidate_evidence.py'
+
+
+class ConsolidationIntegrityTests(unittest.TestCase):
+    def run_consolidation(self, root, *extra):
+        return subprocess.run([sys.executable, str(CONSOLIDATE), '--case-root', str(root), '--evidence-ids', 'E-001', '--finding-id', 'F-001', '--title', 'Fixture', '--description', 'Fixture', *extra], capture_output=True, text=True)
+
+    def test_invalid_record_ids_do_not_read_or_rewrite_outside_evidence(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'evidence').mkdir()
+            outside = root / 'outside.md'
+            outside.write_text('### E-001\n- status: observed\n')
+            before = outside.read_bytes()
+            result = self.run_consolidation(root, '--evidence-ids', '../outside')
+            self.assertNotEqual(result.returncode, 0)
+            self.assertEqual(outside.read_bytes(), before)
+            self.assertFalse((root / 'report').exists())
+
+    def test_duplicate_finding_is_rejected_before_evidence_mutation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'evidence').mkdir()
+            evidence = root / 'evidence' / 'E-001.md'
+            evidence.write_text('### E-001\n- status: observed\n')
+            first = self.run_consolidation(root)
+            self.assertEqual(first.returncode, 0, first.stderr)
+            before = {p: p.read_bytes() for p in root.rglob('*') if p.is_file()}
+            result = self.run_consolidation(root, '--description', 'Different conclusion')
+            self.assertNotEqual(result.returncode, 0)
+            self.assertEqual({p: p.read_bytes() for p in root.rglob('*') if p.is_file()}, before)
+
+    def test_finding_identity_is_not_a_prefix_match(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'evidence').mkdir()
+            (root / 'evidence' / 'E-001.md').write_text('### E-001\n- status: observed\n')
+            (root / 'report').mkdir()
+            (root / 'report' / 'other.md').write_text('### F-001-other\n- status: candidate\n')
+            result = self.run_consolidation(root)
+            self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_invalid_finding_id_and_evidence_link_leave_case_unchanged(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'evidence').mkdir()
+            (root / 'evidence' / 'E-001.md').write_text('### E-001\n- status: observed\n')
+            before = (root / 'evidence' / 'E-001.md').read_bytes()
+            result = self.run_consolidation(root, '--finding-id', 'F-001\n### F-other')
+            self.assertNotEqual(result.returncode, 0)
+            self.assertEqual((root / 'evidence' / 'E-001.md').read_bytes(), before)
+            self.assertFalse((root / 'report').exists())
+            (root / 'evidence' / 'E-001.md').unlink()
+            outside = root / 'outside.md'
+            outside.write_bytes(before)
+            (root / 'evidence' / 'E-001.md').symlink_to(outside)
+            result = self.run_consolidation(root)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertEqual(outside.read_bytes(), before)
+            self.assertFalse((root / 'report').exists())
+
+
+
+
 if __name__ == "__main__":
     unittest.main()
+
