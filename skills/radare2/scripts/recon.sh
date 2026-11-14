@@ -32,6 +32,14 @@ if [[ -z "$TARGET" ]]; then
     exit 1
 fi
 
+# `sed -n "1,Np"` (used below to avoid the SIGPIPE issue) does not reject an
+# invalid N: N=0 still prints one line and a non-numeric N can produce garbage
+# with exit 0. Validate before any tool runs.
+if [[ ! "$IMPORTS_LIMIT" =~ ^[1-9][0-9]*$ || ! "$STRINGS_LIMIT" =~ ^[1-9][0-9]*$ ]]; then
+    echo "ERR: --imports-limit / --strings-limit 必须是正整数" >&2
+    exit 1
+fi
+
 if [[ ! -f "$TARGET" ]]; then
     echo "ERR: 文件不存在: $TARGET"
     exit 1
