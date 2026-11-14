@@ -367,6 +367,15 @@ manifest_dependency() {
         '.bootstrapDependencies[$name][$field] // empty' "$KALI_MANIFEST"
 }
 
+python_module_available() {
+    local module="$1"
+    if [[ ! "$module" =~ ^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*$ ]]; then
+        log_err "无效的 Python module 验证值: $module"
+        return 2
+    fi
+    python3 -c 'import importlib, sys; importlib.import_module(sys.argv[1])' "$module" 2>/dev/null
+}
+
 install_manifest_release() {
     local capability="$1"
     local repo asset_regex install_dir release_tag asset_sha256
@@ -403,7 +412,7 @@ ensure_capability() {
     fi
 
     # 先检查是否已可用
-    if command -v "$verify_command" &>/dev/null; then
+    if [[ "$name" != "pwntools" ]] && command -v "$verify_command" &>/dev/null; then
         log_ok "$name 已可用: $(command -v "$verify_command")"
         return 0
     fi
@@ -564,7 +573,24 @@ EOF
             fi
             ;;
         pwntools)
-            install_pip_package "pwntools==4.15.0"
+            local verify_module package
+            verify_module=$(manifest_field pwntools verifyPythonModule) || {
+                log_err "manifest 中缺少 pwntools.verifyPythonModule"
+                return 1
+            }
+            package=$(manifest_field pwntools pipPackage) || {
+                log_err "manifest 中缺少 pwntools.pipPackage"
+                return 1
+            }
+            if python_module_available "$verify_module"; then
+                log_ok "pwntools 已可用（Python module: $verify_module）"
+            else
+                install_pip_package "$package"
+                if ! python_module_available "$verify_module"; then
+                    log_err "pwntools 安装完成，但 Python module '$verify_module' 仍无法导入"
+                    return 1
+                fi
+            fi
             ;;
 
         # ─── GitHub Release ───
