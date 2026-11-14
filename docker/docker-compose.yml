@@ -1,0 +1,29 @@
+# reverse-skill all-in-one environment (issue #129)
+# Build/run from repository root:
+#   docker compose -f docker/docker-compose.yml build
+#   docker compose -f docker/docker-compose.yml run --rm reverse-skill
+
+services:
+  reverse-skill:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        BOOTSTRAP: "false"
+    image: reverse-skill:local
+    working_dir: /opt/reverse-skill
+    stdin_open: true
+    tty: true
+    environment:
+      REVERSE_SKILL_ROOT: /opt/reverse-skill
+      LANG: C.UTF-8
+    volumes:
+      # Live package source (client-neutral routing core + skills + kali adapters)
+      - ..:/opt/reverse-skill
+      # Case artifacts persist on the host
+      - reverse-skill-work:/home/analyst/work
+    # Intentionally not privileged and not mounting the host container-runtime socket
+    command: ["bash"]
+
+volumes:
+  reverse-skill-work:
