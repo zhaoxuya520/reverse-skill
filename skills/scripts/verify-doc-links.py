@@ -72,7 +72,15 @@ def links_in(path):
                 continue
             if target.lower().startswith(SKIP_PREFIX):
                 continue
-            if "tool-index" in target or SKIP_CHARS & set(target):
+            if "tool-index" in target:
+                continue
+            # Skip obvious non-link placeholders (template vars, inline code, pipes),
+            # but still validate anything that looks like a file path (has a separator
+            # or a file extension) even if it contains one of those characters, so a
+            # broken path like docs/missing$.md is not silently skipped.
+            if SKIP_CHARS & set(target) and not (
+                "/" in target or re.search(r"\.\w{1,6}$", target)
+            ):
                 continue
             yield lineno, target
 
