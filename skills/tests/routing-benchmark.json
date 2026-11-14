@@ -1007,6 +1007,16 @@
       "quick": false
     },
     {
+      "hint": "wireshark 分析 example.net 的 pcap 流量",
+      "expect": "R21",
+      "quick": false
+    },
+    {
+      "hint": "api.example.net graphql bola",
+      "expect": "R12",
+      "quick": false
+    },
+    {
       "hint": "分析这个APK，看看有没有加固",
       "expect": "R1",
       "quick": false

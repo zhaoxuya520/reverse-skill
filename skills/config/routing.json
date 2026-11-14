@@ -45,7 +45,7 @@
       "label": ".NET reverse",
       "skill": "dotnet-reverse/SKILL.md",
       "keywords": [
-        { "must": "\\.net|dnspy|de4dot|confuserex|csharp|dotnet|c#" }
+        { "must": "(?<![A-Za-z0-9])\\.net(?![A-Za-z])|dnspy|de4dot|confuserex|csharp|dotnet|c#", "note": "Anchor the .net keyword so FQDNs (example.net) and .network/.netfoo strings do not hijack R5; bare '.net reverse' still matches" }
       ]
     },
     "R6": {
