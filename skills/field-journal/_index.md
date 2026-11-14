@@ -6,22 +6,28 @@
 
 ## 统计
 
-- 真实项目数：22
+- 真实项目数：29
 - 种子参考数：17
-- 总条目数：39
-- 最近更新：2026-10-09
+- 总条目数：46
+- 最近更新：2026-11-11
 
 ## 按场景分类
 
 ### APK / Android 逆向
 
 - [2026-10-09 Android APK 离线授权链与内置载荷分析](./2026-10-09_android-apk-offline-auth-flow.md)
+- [2026-09-20 iJiami 加固壳 dyncryptor RC4 变体 + zlib 解密链完整恢复](./2026-09-20_ijiami-dyncryptor-rc4-variant-zlib-recovery.md)
 - [2026-08-20 Flutter AOT 服务端驱动广告去除（Blutter + 等长字符串替换）](./2026-08-20_apk-flutter-banner-ad-removal.md)
 - [2026-05-15-cellular-pro-mumu-ksad-fragment-fix](./2026-05-15-cellular-pro-mumu-ksad-fragment-fix.md)
 - [[种子] seed-008_apk-okhttp-ssl-pin-bypass](./seed-008_apk-okhttp-ssl-pin-bypass.md)
 
 ### 二进制 / 固件 / CTF
 
+- [2026-09-07 Famicom Namco-163 战略 RPG ROM 静态拆解（iNES mapper19 / 6502 / 递归tracer / N163音源 / 启动硬件校验 / stdlib CHR→PNG）](./2026-09-07_famicom-namco163-strategy-rom-teardown.md)
+- [2026-09-17 Mir2 系厚客户端「外壳 + 加密载荷」双段结构分析](./2026-09-17_mir2-thick-client-wrapper-encrypted-payload.md)
+- [2026-09-29 剥离符号的 Go EXE + rustc 原生 DLL 静态分诊（pclntab 恢复、PE 导出、Ghidra headless）](./2026-09-29_stripped-go-pclntab-rust-dll-triage.md)
+- [2026-10-16 Go+Wails 用量看板全逻辑还原（stripped 无符号：手工 pclntab/functab + 字节级字符串还原）](./2026-10-16_wails-go-usage-dashboard-stripped-re.md)
+- [2026-11-11 Windows 强壳 PE 静态测绘（虚拟节 / 满熵载荷 / 诱饵 IAT / 熵地图）](./2026-11-11_windows-pe-packed-entropy-map.md)
 - [2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor](./2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor.md)
 - [2026-07-22 Electron Bytenode 特权更新链分析](./2026-07-22_electron-bytenode-privileged-update-chain.md)
 - [2026-07-14_android-arm64-self-extract-source-recovery](./2026-07-14_android-arm64-self-extract-source-recovery.md)
@@ -35,6 +41,7 @@
 
 ### Web / API / 渗透测试
 
+- [2026-10-30 加密 API 信封站点被动侦察与玩币版重建 — 关键词: AES 信封离线解码, 轮询转 STOMP 推送, 可证明公平, 多 agent 重建, 受众/范围分离](./2026-10-30_js-encrypted-envelope-exchange-playmoney-rebuild.md)
 - [2026-08-01 Next.js CDK 契约保真本地重建](./2026-08-01_nextjs-cdk-contract-faithful-local-reconstruction.md)
 - [2026-08-01_pentest-encryption-oracle-public-template-sql-admin-takeover: .NET CMS 通用加密 oracle、公开密文模板消费者、完整 STL/模板解析、原始 SQL `UPDATE RETURNING`、官方管理员验证器新旧口令差分与隔离 PostgreSQL 清理闭环](./2026-08-01_pentest-encryption-oracle-public-template-sql-admin-takeover.md)
 
@@ -87,7 +94,24 @@
 
 - [1 KiB 自带掩码 ROR/XOR、Cortex-M 向量 crib、跨固件验证](./2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor.md)
 
+### Android 加固壳自定义解密链
+
+- [dex overlay 手工解析 + RC4 变体 KSA/PRGA 识别 + zlib 解压（iJiami dyncryptor）](./2026-09-20_ijiami-dyncryptor-rc4-variant-zlib-recovery.md)
+### Go / Rust 剥离二进制分诊
+
+- [pclntab 恢复函数名（无 GoReSym）、`go version -m` 元数据、PE 导出表脚本解析、Ghidra headless Java postScript](./2026-09-29_stripped-go-pclntab-rust-dll-triage.md)
+### Go stripped 符号恢复与逻辑还原
+
+- [手工 pclntab/functab 恢复（GoReSym 失败分支）、LEA+len 精确字符串配对、时间常量三角验证](./2026-10-16_wails-go-usage-dashboard-stripped-re.md)
+### 加密 API 信封与实时协议重建
+
+- [前导代码定位密钥后离线解码、每 topic seq + 有界重放 + REST 快照、after-commit 发布](./2026-10-30_js-encrypted-envelope-exchange-playmoney-rebuild.md)
+
 ## 实体倒排（按目标特征）
+
+### Wails v2 / Go-stripped Windows 桌面应用
+
+- [Wails bindings/events 接口面还原、OSCrypt(DPAPI+AES-GCM) 凭据链识别、SQLite 增量扫描位点模型](./2026-10-16_wails-go-usage-dashboard-stripped-re.md)
 
 ### 多宿主安全技能路由包
 
@@ -101,6 +125,19 @@
 ### Cortex-M USB MSC 升级器
 
 - [应用/驻留 bootloader 边界与虚拟磁盘写入链路](./2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor.md)
+
+### iJiami（爱加密）加固 APK
+
+- [dyncryptor overlay manifest 结构 + RC4 变体步进（i+=2 / j+=state[i]+1）+ zlib 到 EOF](./2026-09-20_ijiami-dyncryptor-rc4-variant-zlib-recovery.md)
+### 剥离符号的 Go EXE + rustc 原生 DLL
+
+- [pclntab 函数名恢复、Ghidra 识别 rustc、原生导出 RVA/VA](./2026-09-29_stripped-go-pclntab-rust-dll-triage.md)
+### 体育交易所 + 真人牌桌站点（Angular 前端、AES 信封 API、比分 socket）
+
+- [仅公开被动观察；自有品牌、虚拟筹码重建，后台实时可控](./2026-10-30_js-encrypted-envelope-exchange-playmoney-rebuild.md)
+### Windows 商用保护壳 PE
+
+- [内存还原型壳：6 个 RawSize=0 节 + 60 MiB 满熵载荷 + 代码块映射表](./2026-11-11_windows-pe-packed-entropy-map.md)
 
 ## 使用说明
 
