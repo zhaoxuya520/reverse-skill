@@ -14,14 +14,14 @@
       "label": "APK reverse",
       "skill": "apk-reverse/SKILL.md",
       "keywords": [
-        { "must": "\\bapk\\b|smali|jadx|apktool|\\bandroid\\b|android.?reverse|安卓|反编译.?apk|apk.?加固|重打包|root.?detect|root.?检测|证书.?校验|certificate.?pinning|pinning.?绕过|签名.?校验", "note": "android 裸词/root 检测/证书校验/pinning 绕过 均为 APK 分析常见诉求" }
+        { "must": "(?<![A-Za-z0-9_])apk(?![A-Za-z0-9_])|smali|jadx|apktool|(?<![A-Za-z0-9_])android(?![A-Za-z0-9_])|android.?reverse|安卓|反编译.?apk|apk.?加固|重打包|root.?detect|root.?检测|证书.?校验|certificate.?pinning|pinning.?绕过|签名.?校验", "note": "android 裸词/root 检测/证书校验/pinning 绕过 均为 APK 分析常见诉求" }
       ]
     },
     "R2": {
       "label": "Mobile reverse (Android+iOS)",
       "skill": "mobile-reverse/SKILL.md",
       "keywords": [
-        { "must": "\\bipa\\b|ios.?reverse|objection|mobsf|mobile.?reverse|ios.?逆向" },
+        { "must": "(?<![A-Za-z0-9_])ipa(?![A-Za-z0-9_])|ios.?reverse|objection|mobsf|mobile.?reverse|ios.?逆向" },
         { "must": "fairplay|supf|\\bsinf\\b|ipa.?脱壳|ipa.?解密|离线.?解密.?ipa", "note": "FairPlay/SUPF/SINF/IPA 离线解密 归 iOS 侧（fairplay-decrypt）" },
         { "must": "越狱", "exclude": "模型|提示词|llm|prompt|jailbreak|garak|红队.?ai|ai.?红队", "note": "越狱 裸词分给 iOS 侧；LLM/模型上下文归 R14" },
         { "must": "jailbreak", "mustAll": ["ios|iphone|ipad|mobile|objection|ipa"], "note": "jailbreak 仅当带 iOS 语境才归移动端" }
@@ -31,7 +31,7 @@
       "label": "JS / frontend reverse",
       "skill": "js-reverse/SKILL.md",
       "keywords": [
-        { "must": "js.?reverse|webpack|cryptojs|frontend.?sign|jshook|cdp|encrypted.?param|前端.?签名|js.?逆向|加密.?参数|webpack.?逆向|抓包|http.?capture|请求.?重放|request.?replay|js.?加密|js.?解密|前端.?加密", "note": "抓包/HTTP 捕获/请求重放 属 JS 前端链路 (anything-analyzer)" }
+        { "must": "js.?reverse|webpack|cryptojs|frontend.?sign|jshook|cdp|encrypted.?param|前端.?签名|js.?逆向|加密.?参数|webpack.?逆向|抓包|http.?capture|请求.?重放|request.?replay|js.?加密|js.?解密|前端.?加密|sign.?参数|sign.?算法|signature|请求.?签名|签名.?算法|参数.?加密|hook.?参数|接口.?签名", "note": "抓包/HTTP 捕获/请求重放 属 JS 前端链路 (anything-analyzer)" }
       ]
     },
     "R4": {
@@ -52,14 +52,14 @@
       "label": "IDA reverse",
       "skill": "ida-reverse/SKILL.md",
       "keywords": [
-        { "must": "\\bida\\b|decompile|disassembl|反编译|反汇编|静态.?分析.?二进制|\\.so\\b|\\.elf\\b|so.?文件|native.?分析|jni", "note": ".so/.elf/native/JNI 分析归二进制静态分析（IDA/反汇编路线）" }
+        { "must": "(?<![A-Za-z0-9_])ida(?![A-Za-z0-9_])|decompile|disassembl|反编译|反汇编|静态.?分析.?二进制|\\.so(?![A-Za-z0-9_])|\\.elf(?![A-Za-z0-9_])|so.?文件|native.?分析|jni", "note": ".so/.elf/native/JNI 分析归二进制静态分析（IDA/反汇编路线）" }
       ]
     },
     "R7": {
       "label": "radare2",
       "skill": "radare2/SKILL.md",
       "keywords": [
-        { "must": "radare|\\br2\\b" },
+        { "must": "radare|(?<![A-Za-z0-9_])r2(?![A-Za-z0-9_])" },
         { "must": "r2xsql|r2mcp|r2http|radius2|r2pm|rabin2|rasm2|radiff2|rahash2|rax2" }
       ]
     },
@@ -97,7 +97,7 @@
       "skill": "api-security/SKILL.md",
       "keywords": [
         { "must": "graphql|bola|bfla|api.?secur|接口.?安全|越权|未授权.?访问|rest.?api.?secur" },
-        { "must": "\\boauth\\b", "exclude": "oauth2|oidc|saml|sso|openid|联邦|单点", "note": "OAuth 裸词分给 API；OIDC/SAML/SSO 归 R37" }
+        { "must": "(?<![A-Za-z0-9_])oauth(?![A-Za-z0-9_])", "exclude": "oauth2|oidc|saml|sso|openid|联邦|单点", "note": "OAuth 裸词分给 API；OIDC/SAML/SSO 归 R37" }
       ]
     },
     "R13": {
@@ -132,7 +132,7 @@
       "label": "Pwn chain",
       "skill": "pwn-chain/SKILL.md",
       "keywords": [
-        { "must": "\\bpwn\\b|rop|ret2libc|heap.?overflow|stack.?overflow|buffer.?overflow|kernel.?pwn|exploit.?dev|pwntools|栈溢出|堆溢出|格式化.?字符串" }
+        { "must": "(?<![A-Za-z0-9_])pwn(?![A-Za-z0-9_])|rop|ret2libc|heap.?overflow|stack.?overflow|buffer.?overflow|kernel.?pwn|exploit.?dev|pwntools|栈溢出|堆溢出|格式化.?字符串" }
       ]
     },
     "R18": {
@@ -153,7 +153,7 @@
       "label": "Docs generator",
       "skill": "docs-generator/SKILL.md",
       "keywords": [
-        { "must": "writeup|write.?report|generate.?report|\\breport\\b|写.?报告|出.?报告|渗透.?报告|逆向.?报告" }
+        { "must": "writeup|write.?report|generate.?report|(?<![A-Za-z0-9_])report(?![A-Za-z0-9_])|写.?报告|出.?报告|渗透.?报告|逆向.?报告" }
       ]
     },
     "R39": {
@@ -181,14 +181,14 @@
       "label": "Cloud / K8s",
       "skill": "cloud-k8s/SKILL.md",
       "keywords": [
-        { "must": "kubernetes|\\bk8s\\b|container.?escape|docker.?escape|kube-?bench|cloud.?secur|imds|169\\.254\\.169\\.254|容器.?逃逸|云.?安全|k8s.?渗透|s3|对象存储|存储桶", "note": "S3/对象存储归云安全" }
+        { "must": "kubernetes|(?<![A-Za-z0-9_])k8s(?![A-Za-z0-9_])|container.?escape|docker.?escape|kube-?bench|cloud.?secur|imds|169\\.254\\.169\\.254|容器.?逃逸|云.?安全|k8s.?渗透|s3|对象存储|存储桶", "note": "S3/对象存储归云安全" }
       ]
     },
     "R24": {
       "label": "Windows / AD",
       "skill": "windows-ad/SKILL.md",
       "keywords": [
-        { "must": "active.?directory|\\bad\\b.?cs|bloodhound|kerberoast|as-?rep|certipy|ntlm.?relay|dc.?sync|kerberos.?攻击|ad.?证书|impacket|mimikatz|secretsdump" },
+        { "must": "active.?directory|(?<![A-Za-z0-9_])ad(?![A-Za-z0-9_]).?cs|bloodhound|kerberoast|as-?rep|certipy|ntlm.?relay|dc.?sync|kerberos.?攻击|ad.?证书|impacket|mimikatz|secretsdump" },
         { "must": "域.?渗透|域控", "exclude": "完整.?渗透|从外网|打到域控|attack.?chain|full.?pentest", "note": "完整渗透/打到域控 归 R10 攻击链" }
       ]
     },
@@ -210,14 +210,14 @@
       "label": "Threat hunting",
       "skill": "threat-hunting/SKILL.md",
       "keywords": [
-        { "must": "threat.?hunt|detection.?engineer|blue.?team|sigma.?rule|\\bsigma\\b|威胁.?狩猎|检测.?工程|蓝队.?狩猎|检测.?规则" }
+        { "must": "threat.?hunt|detection.?engineer|blue.?team|sigma.?rule|(?<![A-Za-z0-9_])sigma(?![A-Za-z0-9_])|威胁.?狩猎|检测.?工程|蓝队.?狩猎|检测.?规则" }
       ]
     },
     "R44": {
       "label": "Threat intelligence / OSINT",
       "skill": "threat-intelligence/SKILL.md",
       "keywords": [
-        { "must": "\\bosint\\b|open.?source.?intelligence|threat.?intelligence|\\bcti\\b|ioc.?enrichment|indicator.?enrichment|威胁.?情报|开源.?情报|ioc.?扩充|ioc.?富化" },
+        { "must": "(?<![A-Za-z0-9_])osint(?![A-Za-z0-9_])|open.?source.?intelligence|threat.?intelligence|(?<![A-Za-z0-9_])cti(?![A-Za-z0-9_])|ioc.?enrichment|indicator.?enrichment|威胁.?情报|开源.?情报|ioc.?扩充|ioc.?富化" },
         { "must": "twitter|tweet|x\\.com|x.?post|推文|社交.?媒体", "mustAll": ["ioc|threat|malware|campaign|actor|phish|scam|impersonat|indicator|情报|威胁|恶意|钓鱼|诈骗|仿冒"], "note": "要求安全上下文，避免把通用社交分析路由到威胁情报" }
       ]
     },
@@ -225,7 +225,7 @@
       "label": "OT / ICS",
       "skill": "ot-ics/SKILL.md",
       "keywords": [
-        { "must": "\\bot\\b|\\bics\\b|scada|plc\\b|modbus|dnp3|s7comm|purdue|工控|工业.?控制|ot/?ics", "note": "\\bot\\b 词边界避免 forensics 误伤" }
+        { "must": "(?<![A-Za-z0-9_])ot(?![A-Za-z0-9_])|(?<![A-Za-z0-9_])ics(?![A-Za-z0-9_])|scada|plc(?![A-Za-z0-9_])|modbus|dnp3|s7comm|purdue|工控|工业.?控制|ot/?ics", "note": "\\bot\\b 词边界避免 forensics 误伤" }
       ]
     },
     "R29": {
@@ -239,7 +239,7 @@
       "label": "Browser extension reverse",
       "skill": "browser-extension-reverse/SKILL.md",
       "keywords": [
-        { "must": "browser.?extension|chrome.?extension|\\bcrx\\b|\\bxpi\\b|mv3.?extension|浏览器.?扩展|chrome.?扩展" }
+        { "must": "browser.?extension|chrome.?extension|(?<![A-Za-z0-9_])crx(?![A-Za-z0-9_])|(?<![A-Za-z0-9_])xpi(?![A-Za-z0-9_])|mv3.?extension|浏览器.?扩展|chrome.?扩展" }
       ]
     },
     "R31": {
@@ -260,7 +260,7 @@
       "label": "Go / Rust reverse",
       "skill": "go-rust-reverse/SKILL.md",
       "keywords": [
-        { "must": "\\bgolang\\b|\\brustc\\b|go.?binary|go.?二进|go.?语言|go.?程序|stripped.?go|gore.?sym|go.?malware|rust.?binary|go.?逆向|rust.?逆向" }
+        { "must": "(?<![A-Za-z0-9_])golang(?![A-Za-z0-9_])|(?<![A-Za-z0-9_])rustc(?![A-Za-z0-9_])|go.?binary|go.?二进|go.?语言|go.?程序|stripped.?go|gore.?sym|go.?malware|rust.?binary|go.?逆向|rust.?逆向" }
       ]
     },
     "R34": {
@@ -274,28 +274,28 @@
       "label": "Database security",
       "skill": "database-security/SKILL.md",
       "keywords": [
-        { "must": "database.?secur|\\bmysql\\b|\\bpostgres|mongodb|redis.?secur|mssql|数据库.?安全|数据库.?渗透" }
+        { "must": "database.?secur|(?<![A-Za-z0-9_])mysql(?![A-Za-z0-9_])|(?<![A-Za-z0-9_])postgres|mongodb|redis.?secur|mssql|数据库.?安全|数据库.?渗透" }
       ]
     },
     "R36": {
       "label": "Email / phishing analysis",
       "skill": "email-security/SKILL.md",
       "keywords": [
-        { "must": "phish|spf|dkim|dmarc|bec\\b|email.?secur|钓鱼.?邮件|邮件.?安全" }
+        { "must": "phish|spf|dkim|dmarc|bec(?![A-Za-z0-9_])|email.?secur|钓鱼.?邮件|邮件.?安全" }
       ]
     },
     "R37": {
       "label": "Identity federation (SAML/OIDC)",
       "skill": "identity-federation/SKILL.md",
       "keywords": [
-        { "must": "saml|oidc|openid.?connect|oauth2|sso\\b|联邦.?身份|单点.?登录" }
+        { "must": "saml|oidc|openid.?connect|oauth2|sso(?![A-Za-z0-9_])|联邦.?身份|单点.?登录" }
       ]
     },
     "R38": {
       "label": "RF / SDR research",
       "skill": "radio-sdr/SKILL.md",
       "keywords": [
-        { "must": "\\bsdr\\b|hackrf|rtl-?sdr|gnu.?radio|\\burh\\b|射频|软件.?无线电|蓝牙|bluetooth|\\bble\\b", "note": "蓝牙/BLE 归射频研究" }
+        { "must": "(?<![A-Za-z0-9_])sdr(?![A-Za-z0-9_])|hackrf|rtl-?sdr|gnu.?radio|(?<![A-Za-z0-9_])urh(?![A-Za-z0-9_])|射频|软件.?无线电|蓝牙|bluetooth|(?<![A-Za-z0-9_])ble(?![A-Za-z0-9_])", "note": "蓝牙/BLE 归射频研究" }
       ]
     },
     "R40": {
@@ -309,14 +309,14 @@
       "label": "CTF sandbox orchestrator",
       "skill": "ctf-sandbox/SKILL.md",
       "keywords": [
-        { "must": "\\bctf\\b|awd|靶场|比赛.?题", "exclude": "pwn|rop|栈溢出|堆溢出|ret2" }
+        { "must": "(?<![A-Za-z0-9_])ctf(?![A-Za-z0-9_])|awd|靶场|比赛.?题", "exclude": "pwn|rop|栈溢出|堆溢出|ret2" }
       ]
     },
     "R45": {
       "label": "Binary Ninja reverse",
       "skill": "binary-ninja-reverse/SKILL.md",
       "keywords": [
-        { "must": "binary.?ninja|binaryninja|\\bbinja\\b|binary[_-]ninja[_-]mcp|hlil|mlil", "note": "Binary Ninja GUI, IL, Python API, MCP, or localhost HTTP integration" }
+        { "must": "binary.?ninja|binaryninja|(?<![A-Za-z0-9_])binja(?![A-Za-z0-9_])|binary[_-]ninja[_-]mcp|hlil|mlil", "note": "Binary Ninja GUI, IL, Python API, MCP, or localhost HTTP integration" }
       ]
     },
     "R0": {
@@ -324,7 +324,7 @@
       "skill": "reverse-engineering/SKILL.md",
       "keywords": [
         { "must": "ollvm|anti-?debug|unicorn|angr|gdb|deobfuscat|控制流平坦|反调试|unity|il2cpp|游戏.?逆向|game.?reverse|anti-?cheat|反作弊", "note": "Unity/游戏逆向归通用逆向 (seed-014)" },
-        { "must": "frida", "exclude": "\\bapk\\b|smali|jadx|android|安卓", "note": "APK 语境下 frida 归 R1" },
+        { "must": "frida", "exclude": "(?<![A-Za-z0-9_])apk(?![A-Za-z0-9_])|smali|jadx|android|安卓", "note": "APK 语境下 frida 归 R1" },
         { "must": "reverse|逆向", "exclude": "apk|js.?reverse|ios|mobile|\\.net|firmware|malware|安卓|固件|恶意|protocol|ghidra|extension|macos|mach|golang|rust|工控|厚客户端|取证|协议|扩展", "note": "泛逆向兜底；命中更具体域时让位" }
       ]
     }
