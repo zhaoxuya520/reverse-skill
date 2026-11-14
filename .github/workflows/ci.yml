@@ -167,6 +167,9 @@ jobs:
           bash skills/scripts/test-bash-workflow.sh
           bash skills/scripts/test-apk-decode-manifest.sh
 
+          # Offline IDA patch-plan validation (issue #136)
+          python3 skills/ida-reverse/scripts/test-apply-asm-patch.py
+
           scratch="$(mktemp -d)"
           trap 'rm -rf "$scratch"' EXIT
 
