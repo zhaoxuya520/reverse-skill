@@ -56,7 +56,7 @@ Linux/macOS (Bash) 生成 7 列表格：
 | burpsuite-mcp | — | ✓ | — | — | ✗ | manual Burp extension |
 | nmap | — | — | — | — | ✓ | winget-package / apt-package |
 | pentestswarm | — | — | — | — | ✓ | go-install / docker-image |
-| binwalk | — | — | — | — | ✓ | winget-package / apt-package |
+| binwalk | — | — | — | — | ✗ | manual (cargo install) / apt-package |
 | yara | — | — | — | — | ✓ | winget-package / apt-package |
 | pwntools | — | — | — | — | ✓ | pip-package |
 
