@@ -40,6 +40,17 @@ run_version() {
   fi
 }
 
+# TSV records are split on literal tabs. If a version string (or any other
+# field) contains a tab, every following column shifts and the Python unpack
+# fails, leaving no tool-index.json at all. Normalize field separators here,
+# at the emit boundary, rather than trusting external tool output.
+tsv_field() {
+  local v="${1//$'\t'/ }"
+  v="${v//$'\r'/ }"
+  v="${v//$'\n'/ }"
+  printf '%s' "$v"
+}
+
 file_exists_any() {
   local p
   for p in "$@"; do
@@ -205,8 +216,19 @@ for entry in "${TOOLS[@]}"; do
   [[ -z "$source" ]] && source="—"
   hint="$(install_hint "$name")"
 
-  echo "| $name | $skill | $purpose | $available | $path | $version | $source | $hint |" >> "$OUTPUT_MD"
-  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$name" "$skill" "$purpose" "$available" "$path" "$version" "$source" "$hint" >> "$records_tmp"
+  r_name="$(tsv_field "$name")"
+  r_skill="$(tsv_field "$skill")"
+  r_purpose="$(tsv_field "$purpose")"
+  r_available="$(tsv_field "$available")"
+  r_path="$(tsv_field "$path")"
+  r_version="$(tsv_field "$version")"
+  r_source="$(tsv_field "$source")"
+  r_hint="$(tsv_field "$hint")"
+
+  echo "| $r_name | $r_skill | $r_purpose | $r_available | $r_path | $r_version | $r_source | $r_hint |" >> "$OUTPUT_MD"
+  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+    "$r_name" "$r_skill" "$r_purpose" "$r_available" \
+    "$r_path" "$r_version" "$r_source" "$r_hint" >> "$records_tmp"
 done
 
 {
@@ -389,7 +411,11 @@ records_path, output_json, generated_at, platform, uname, cap_records_path = sys
 tools=[]
 with open(records_path, encoding='utf-8') as f:
     for line in f:
-        name, skill, purpose, available, path, version, source, hint = line.rstrip('\n').split('\t')
+        parts = line.rstrip('\n').split('\t', 7)
+        if len(parts) != 8:
+            print('WARN: skipping malformed tool-index record: %r' % line[:80], file=sys.stderr)
+            continue
+        name, skill, purpose, available, path, version, source, hint = parts
         tools.append({
             'name': name,
             'skill': skill,
