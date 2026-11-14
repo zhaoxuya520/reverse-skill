@@ -6,9 +6,9 @@
 
 ## 统计
 
-- 真实项目数：27
+- 真实项目数：28
 - 种子参考数：17
-- 总条目数：44
+- 总条目数：45
 - 最近更新：2026-11-11
 
 ## 按场景分类
@@ -22,6 +22,7 @@
 
 ### 二进制 / 固件 / CTF
 
+- [2026-09-07 Famicom Namco-163 战略 RPG ROM 静态拆解（iNES mapper19 / 6502 / 递归tracer / N163音源 / 启动硬件校验 / stdlib CHR→PNG）](./2026-09-07_famicom-namco163-strategy-rom-teardown.md)
 - [2026-09-17 Mir2 系厚客户端「外壳 + 加密载荷」双段结构分析](./2026-09-17_mir2-thick-client-wrapper-encrypted-payload.md)
 - [2026-09-29 剥离符号的 Go EXE + rustc 原生 DLL 静态分诊（pclntab 恢复、PE 导出、Ghidra headless）](./2026-09-29_stripped-go-pclntab-rust-dll-triage.md)
 - [2026-10-16 Go+Wails 用量看板全逻辑还原（stripped 无符号：手工 pclntab/functab + 字节级字符串还原）](./2026-10-16_wails-go-usage-dashboard-stripped-re.md)
