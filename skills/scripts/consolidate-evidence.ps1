@@ -17,19 +17,40 @@ if (-not (Test-Path -LiteralPath $CaseRoot)) { Write-Error "CaseRoot not found: 
 
 $evidenceDir = Join-Path $CaseRoot "evidence"
 $reportDir = Join-Path $CaseRoot "report"
-if (-not (Test-Path -LiteralPath $reportDir)) { New-Item -ItemType Directory -Path $reportDir -Force | Out-Null }
 
-$idList = @($EvidenceIds -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' })
+$idList = @($EvidenceIds -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' } | Select-Object -Unique)
 if ($idList.Count -eq 0) { Write-Error "No Evidence IDs provided." }
-
+if ($FindingId -cnotmatch '\AF-[A-Za-z0-9][A-Za-z0-9_-]*\z') { Write-Error "Expected a plain F-... record ID." }
 foreach ($id in $idList) {
-    $evidenceFile = Join-Path $evidenceDir "$id.md"
-    if (-not (Test-Path -LiteralPath $evidenceFile)) { Write-Error "Evidence file not found: $evidenceFile" }
+    if ($id -cnotmatch '\AE-[A-Za-z0-9][A-Za-z0-9_-]*\z') { Write-Error "Expected plain E-... record IDs." }
+}
+if ((Get-Item -LiteralPath $evidenceDir).Attributes -band [IO.FileAttributes]::ReparsePoint) {
+    Write-Error "Evidence directory must be case-local, not a link."
 }
 
+$contents = @{}
 foreach ($id in $idList) {
     $evidenceFile = Join-Path $evidenceDir "$id.md"
-    $content = Get-Content -LiteralPath $evidenceFile -Raw -Encoding UTF8
+    if (-not (Test-Path -LiteralPath $evidenceFile -PathType Leaf)) { Write-Error "Evidence file not found: $evidenceFile" }
+    if ((Get-Item -LiteralPath $evidenceFile).Attributes -band [IO.FileAttributes]::ReparsePoint) {
+        Write-Error "Evidence must be a regular file, not a link: $evidenceFile"
+    }
+    $contents[$id] = Get-Content -LiteralPath $evidenceFile -Raw -Encoding UTF8
+}
+
+$heading = '(?m)^###\s+' + [regex]::Escape($FindingId) + '(?=\s|$)'
+if (Test-Path -LiteralPath $reportDir) {
+    foreach ($report in @(Get-ChildItem -LiteralPath $reportDir -Filter '*.md' -File -Recurse)) {
+        if ((Get-Content -LiteralPath $report.FullName -Raw -Encoding UTF8) -cmatch $heading) {
+            Write-Error "Finding already exists: $FindingId in $($report.FullName)"
+        }
+    }
+}
+
+if (-not (Test-Path -LiteralPath $reportDir)) { New-Item -ItemType Directory -Path $reportDir -Force | Out-Null }
+foreach ($id in $idList) {
+    $evidenceFile = Join-Path $evidenceDir "$id.md"
+    $content = $contents[$id]
     if ($content -match "(?m)^-\s*status:\s*.*$") {
         $content = [regex]::Replace($content, "(?m)^-\s*status:\s*.*$", "- status: superseded by $FindingId")
     } elseif ($content -match "(?m)^---\s*$") {
