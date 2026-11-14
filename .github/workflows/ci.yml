@@ -45,6 +45,10 @@ jobs:
         shell: pwsh
         run: ./skills/scripts/test-parse-contracts.ps1
 
+      - name: Skill name uniqueness (metadata contract)
+        shell: pwsh
+        run: ./skills/scripts/test-skill-name-uniqueness.ps1
+
       - name: Journal PR title safety
         shell: pwsh
         run: ./skills/scripts/test-workflow-title-safety.ps1
