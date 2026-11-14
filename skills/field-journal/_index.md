@@ -6,10 +6,10 @@
 
 ## 统计
 
-- 真实项目数：22
+- 真实项目数：23
 - 种子参考数：17
-- 总条目数：39
-- 最近更新：2026-10-30
+- 总条目数：40
+- 最近更新：2026-11-11
 
 ## 按场景分类
 
@@ -21,6 +21,7 @@
 
 ### 二进制 / 固件 / CTF
 
+- [2026-11-11 Windows 强壳 PE 静态测绘（虚拟节 / 满熵载荷 / 诱饵 IAT / 熵地图）](./2026-11-11_windows-pe-packed-entropy-map.md)
 - [2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor](./2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor.md)
 - [2026-07-22 Electron Bytenode 特权更新链分析](./2026-07-22_electron-bytenode-privileged-update-chain.md)
 - [2026-07-14_android-arm64-self-extract-source-recovery](./2026-07-14_android-arm64-self-extract-source-recovery.md)
@@ -109,6 +110,9 @@
 ### 体育交易所 + 真人牌桌站点（Angular 前端、AES 信封 API、比分 socket）
 
 - [仅公开被动观察；自有品牌、虚拟筹码重建，后台实时可控](./2026-10-30_js-encrypted-envelope-exchange-playmoney-rebuild.md)
+### Windows 商用保护壳 PE
+
+- [内存还原型壳：6 个 RawSize=0 节 + 60 MiB 满熵载荷 + 代码块映射表](./2026-11-11_windows-pe-packed-entropy-map.md)
 
 ## 使用说明
 

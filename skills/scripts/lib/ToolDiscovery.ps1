@@ -496,7 +496,8 @@ function Get-ReverseToolCatalog {
             VersionArgs = @('--version')
             Fallbacks = @(
                 [pscustomobject]@{ Type = 'command'; Value = 'yara' },
-                [pscustomobject]@{ Type = 'path'; Value = 'C:\Program Files\yara\yara.exe' }
+                [pscustomobject]@{ Type = 'path'; Value = 'C:\Program Files\yara\yara.exe' },
+                [pscustomobject]@{ Type = 'file-glob'; Value = (Join-Path $localAppData 'Microsoft\WinGet\Packages\VirusTotal.YARA_*\yara64.exe') }
             )
         }
         [pscustomobject]@{
@@ -1053,6 +1054,26 @@ function Resolve-ReverseToolSpec {
                         Command = ''
                         PrefixArgs = @()
                         VersionArgs = @()
+                        FixedVersion = $fixedVersion
+                    }
+                }
+            }
+            'file-glob' {
+                $globMatch = @(Get-ChildItem -Path $candidate.Value -File -ErrorAction SilentlyContinue | Select-Object -First 1)
+                if ($globMatch.Count -gt 0) {
+                    Add-ReverseProcessPath -Path (Split-Path -Path $globMatch[0].FullName -Parent)
+                    return [pscustomobject]@{
+                        Name = $definition.Name
+                        Skill = $definition.Skill
+                        Purpose = $definition.Purpose
+                        Available = $true
+                        IsExecutable = $true
+                        IsDirectory = $false
+                        Source = 'FallbackFileGlob'
+                        ResolvedPath = $globMatch[0].FullName
+                        Command = $globMatch[0].FullName
+                        PrefixArgs = @()
+                        VersionArgs = $definition.VersionArgs
                         FixedVersion = $fixedVersion
                     }
                 }
