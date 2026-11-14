@@ -165,6 +165,7 @@ jobs:
           bash skills/scripts/test-routing.sh
           bash skills/scripts/test-bootstrap-manifest.sh
           bash skills/scripts/test-bash-workflow.sh
+          bash skills/scripts/test-apk-decode-manifest.sh
 
           scratch="$(mktemp -d)"
           trap 'rm -rf "$scratch"' EXIT
