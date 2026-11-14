@@ -6,15 +6,16 @@
 
 ## 统计
 
-- 真实项目数：28
+- 真实项目数：29
 - 种子参考数：17
-- 总条目数：45
+- 总条目数：46
 - 最近更新：2026-11-11
 
 ## 按场景分类
 
 ### APK / Android 逆向
 
+- [2026-10-09 Android APK 离线授权链与内置载荷分析](./2026-10-09_android-apk-offline-auth-flow.md)
 - [2026-09-20 iJiami 加固壳 dyncryptor RC4 变体 + zlib 解密链完整恢复](./2026-09-20_ijiami-dyncryptor-rc4-variant-zlib-recovery.md)
 - [2026-08-20 Flutter AOT 服务端驱动广告去除（Blutter + 等长字符串替换）](./2026-08-20_apk-flutter-banner-ad-removal.md)
 - [2026-05-15-cellular-pro-mumu-ksad-fragment-fix](./2026-05-15-cellular-pro-mumu-ksad-fragment-fix.md)
