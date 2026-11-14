@@ -10,8 +10,10 @@ This plugin is an optional Codex entry point. The repository remains the canonic
 When the current workspace is the `reverse-skill` repository:
 
 1. Read `RULES.md` at the repository root.
-2. Run the platform-native `skills/scripts/master-route` entry with the user's task to select the PRIMARY skill from `skills/config/routing.json`.
-3. Before any target action, create and validate `work/<case>/scope.md` with the platform-native `case-init` and `case-guard` scripts.
+2. Run the platform-native router with the user's task to select the PRIMARY skill from `skills/config/routing.json`:
+   - Windows: `powershell -NoProfile -ExecutionPolicy Bypass -File skills/scripts/master-route.ps1 -Hint "<task>"`
+   - Linux / macOS / Kali: `bash skills/scripts/master-route.sh --hint "<task>"`
+3. Before any target action, create and validate `work/<case>/scope.md` with the platform-native `case-init` and `case-guard` scripts (`.ps1` on Windows, `.sh` on Linux/macOS/Kali).
 4. Open the selected `skills/<PRIMARY>/SKILL.md` and follow its task-specific instructions.
 5. Resolve tools only through the generated `skills/tool-index.md`; do not register MCP servers or install tools unless the user requested that action.
 

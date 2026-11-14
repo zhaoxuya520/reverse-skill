@@ -13,7 +13,7 @@ PROJECT_ROOT=""
 PACKAGE_ROOT_BOUND=0
 AUTH_STATUS=""
 AUTH_GRANTED=0
-AUTH_BASIS="unknown"
+AUTH_BASIS="own_system"
 EVIDENCE_OF_AUTH=""
 TARGET_URL=""
 NETWORK_PROFILE=""
@@ -136,6 +136,11 @@ if [[ -n "$AUTH_STATUS" ]]; then
     *) echo "WARN: ignoring invalid --auth-status '$AUTH_STATUS'" >&2 ;;
   esac
 fi
+# Align with case-init.ps1 + scope-contract allow-list (see issue #149).
+case "$AUTH_BASIS" in
+  written_contract|bug_bounty_scope|ctf_public|own_system|lab_only) ;;
+  *) AUTH_BASIS="own_system" ;;
+esac
 
 if [[ -n "$EVIDENCE_OF_AUTH" ]]; then
   evidence_auth="$EVIDENCE_OF_AUTH"

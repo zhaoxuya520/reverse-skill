@@ -1,0 +1,4 @@
+scripts:
+  setup: >-
+    powershell -NoProfile -ExecutionPolicy Bypass -File skills/scripts/refresh-tool-index.ps1
+setupAgentStartupPolicy: wait-for-setup

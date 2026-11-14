@@ -5,12 +5,14 @@ on:
     paths:
       - 'skills/scripts/**/*.sh'
       - 'skills/scripts/*.sh'
+      - 'skills/apk-reverse/scripts/*.sh'
       - '.github/workflows/macos-bash-compat.yml'
   push:
     branches: [main]
     paths:
       - 'skills/scripts/**/*.sh'
       - 'skills/scripts/*.sh'
+      - 'skills/apk-reverse/scripts/*.sh'
       - '.github/workflows/macos-bash-compat.yml'
 
 permissions:
@@ -44,6 +46,10 @@ jobs:
       - name: Run bash workflow regression (portable sed; case-guard reject paths)
         shell: bash
         run: /bin/bash skills/scripts/test-bash-workflow.sh
+
+      - name: Run APK decode manifest summary regression (system grep)
+        shell: bash
+        run: /bin/bash skills/scripts/test-apk-decode-manifest.sh
 
       - name: Exercise structured router and case contract
         shell: bash

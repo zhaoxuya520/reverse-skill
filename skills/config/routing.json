@@ -22,6 +22,7 @@
       "skill": "mobile-reverse/SKILL.md",
       "keywords": [
         { "must": "\\bipa\\b|ios.?reverse|objection|mobsf|mobile.?reverse|ios.?逆向" },
+        { "must": "fairplay|supf|\\bsinf\\b|ipa.?脱壳|ipa.?解密|离线.?解密.?ipa", "note": "FairPlay/SUPF/SINF/IPA 离线解密 归 iOS 侧（fairplay-decrypt）" },
         { "must": "越狱", "exclude": "模型|提示词|llm|prompt|jailbreak|garak|红队.?ai|ai.?红队", "note": "越狱 裸词分给 iOS 侧；LLM/模型上下文归 R14" },
         { "must": "jailbreak", "mustAll": ["ios|iphone|ipad|mobile|objection|ipa"], "note": "jailbreak 仅当带 iOS 语境才归移动端" }
       ]

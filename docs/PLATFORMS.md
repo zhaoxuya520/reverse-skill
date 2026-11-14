@@ -14,6 +14,7 @@ This project uses a layered platform model:
 | Kali Linux | Full specialized path | `kali/README-kali.md` | Dedicated Kali layer with `apt`, bash scripts, and Kali-native security tooling. |
 | Ubuntu / Debian Linux | Supported generic path | `docs/platforms/linux.md`, `skills/scripts/bootstrap-reverse.sh`, `skills/scripts/refresh-tool-index.sh` | Uses `apt`, `pipx` / venv, `npm`, GitHub releases, and optional Kali scripts as reference. |
 | macOS | Supported generic path | `docs/platforms/macos.md`, `skills/scripts/bootstrap-reverse.sh`, `skills/scripts/refresh-tool-index.sh` | Uses Homebrew, `pipx` / venv, `npm`, app bundle paths, and manual IDA / Burp setup. |
+| All-in-one Docker | Optional container shell | `docker/README.md`, `docker/docker-compose.yml`, `docker/Dockerfile` | Kali rolling base + repo bind-mount; case artifacts in a named volume. Not a bypass for auth/scope gates. |
 
 ## What is shared across platforms
 
@@ -41,6 +42,8 @@ The following must be adapted per OS:
 - MCP config file locations for each Agent client.
 
 ## Tool coverage by platform
+
+> **Capability-name honesty:** `skills/scripts/bootstrap-manifest.json` is the generic (non-Kali) source of truth (26 capabilities). Names such as `sqlmap`, `nuclei`, `ffuf`, `hashcat`, `msfconsole`, and `gobuster` exist only in `kali/scripts/bootstrap-manifest.json` — do not expect `skills/scripts/bootstrap-reverse.sh --list` to offer them on Ubuntu/macOS.
 
 | Capability | Windows | Kali Linux | Ubuntu / Debian | macOS | Notes |
 |---|---|---|---|---|---|
@@ -70,6 +73,7 @@ The following must be adapted per OS:
 - Kali users: start from `kali/README-kali.md`.
 - Ubuntu / Debian users: start from `docs/platforms/linux.md`.
 - macOS users: start from `docs/platforms/macos.md`.
+- Docker users: start from `docker/README.md`.
 - Kali users should use `kali/scripts/bootstrap-reverse.sh` and `kali/scripts/refresh-tool-index.sh`. Generic Linux/macOS users should use `skills/scripts/bootstrap-reverse.sh` and `skills/scripts/refresh-tool-index.sh`.
 
 ## Linux/macOS bootstrap and tool index

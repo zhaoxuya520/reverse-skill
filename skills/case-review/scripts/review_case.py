@@ -25,8 +25,27 @@ PATH_TYPES = {"attack", "callflow", "solve"}
 NETWORK_MODES = {"offline", "lab_only", "authorized_target_only", "unrestricted_lab"}
 
 
+def structural_text(text):
+    """Keep line numbers while excluding fenced Markdown examples from the graph."""
+    result = []
+    fence = ""
+    width = 0
+    for line in text.splitlines(keepends=True):
+        match = re.match(r"^ {0,3}(`{3,}|~{3,})(.*)$", line.rstrip("\r\n"))
+        if fence:
+            if match and match.group(1)[0] == fence and len(match.group(1)) >= width and not match.group(2).strip():
+                fence = ""
+            result.append("\n" if line.endswith("\n") else "")
+        elif match:
+            fence, width = match.group(1)[0], len(match.group(1))
+            result.append("\n" if line.endswith("\n") else "")
+        else:
+            result.append(line)
+    return "".join(result)
+
+
 def field_value(text, name):
-    lines = text.splitlines()
+    lines = structural_text(text).splitlines()
     for index, line in enumerate(lines):
         match = FIELD_LINE.match(line)
         if not match or match.group(1) != name:
@@ -73,7 +92,18 @@ def split_table_row(line):
     stripped = line.strip()
     if not stripped.startswith("|") or not stripped.endswith("|"):
         return []
-    return [cell.strip() for cell in stripped[1:-1].split("|")]
+    cells = []
+    cell = []
+    backslashes = 0
+    for character in stripped[1:-1]:
+        if character == "|" and backslashes % 2 == 0:
+            cells.append("".join(cell).strip())
+            cell = []
+        else:
+            cell.append(character)
+        backslashes = backslashes + 1 if character == "\\" else 0
+    cells.append("".join(cell).strip())
+    return cells
 
 
 def parse_workitems(root, issues):
@@ -84,11 +114,14 @@ def parse_workitems(root, issues):
         issue(issues, "error", "workitems.missing", "workitems.md is missing", "workitems.md")
         return records, references
 
-    for line_number, line in enumerate(path.read_text(encoding="utf-8-sig").splitlines(), 1):
+    for line_number, line in enumerate(structural_text(path.read_text(encoding="utf-8-sig")).splitlines(), 1):
         cells = split_table_row(line)
         if len(cells) < 8 or not WORKITEM_ID.fullmatch(cells[0]):
             continue
         workitem_id = cells[0]
+        if workitem_id in records:
+            issue(issues, "error", "workitem.duplicate", "duplicate work item ID: " + workitem_id, "workitems.md:" + str(line_number))
+            continue
         status = cells[5].lower()
         if status not in WORKITEM_STATUSES:
             issue(
@@ -115,7 +148,7 @@ def parse_timeline(root, issues):
         issue(issues, "error", "timeline.missing", "timeline.md is missing", "timeline.md")
         return events, references
 
-    lines = path.read_text(encoding="utf-8-sig").splitlines()
+    lines = structural_text(path.read_text(encoding="utf-8-sig")).splitlines()
     for index, line in enumerate(lines):
         if not line.startswith("## ") or "|" not in line:
             continue
@@ -141,7 +174,7 @@ def parse_scope(root, issues, strict):
         issue(issues, "error", "scope.missing", "scope.md is missing", "scope.md")
         return result
 
-    text = path.read_text(encoding="utf-8-sig")
+    text = structural_text(path.read_text(encoding="utf-8-sig"))
     auth = section_text(text, "auth")
     scope_section = section_text(text, "in_scope")
     network = section_text(text, "network_profile")
@@ -203,6 +236,8 @@ def parse_reports(root, issues):
     finding_records = []
     path_records = []
     references = []
+    finding_ids = set()
+    path_ids = set()
     report_root = root / "report"
     report_files = sorted(report_root.rglob("*.md")) if report_root.is_dir() else []
     if not report_files:
@@ -210,8 +245,11 @@ def parse_reports(root, issues):
         return finding_records, path_records, references
 
     for report_path in report_files:
-        text = report_path.read_text(encoding="utf-8-sig")
+        text = structural_text(report_path.read_text(encoding="utf-8-sig"))
         for finding_id, body in report_sections(text, FINDING_HEADING):
+            if finding_id in finding_ids:
+                issue(issues, "error", "finding.duplicate", "duplicate Finding ID: " + finding_id, relative_path(root, report_path))
+            finding_ids.add(finding_id)
             status = field_value(body, "status").lower()
             confidence = field_value(body, "confidence").lower()
             evidence_ids = ids_in(field_value(body, "evidence_ids"), EVIDENCE_ID)
@@ -221,6 +259,10 @@ def parse_reports(root, issues):
                     issue(issues, "error", "finding.field_missing", finding_id + " is missing " + field, relative_path(root, report_path))
             if status not in {"candidate", "validated", "false_positive", "accepted_risk", "superseded"}:
                 issue(issues, "error", "finding.status", finding_id + " has unsupported status", relative_path(root, report_path))
+            if field_value(body, "severity").lower() not in SEVERITIES:
+                issue(issues, "error", "finding.severity", finding_id + " has unsupported severity", relative_path(root, report_path))
+            if confidence not in {"high", "medium", "low"}:
+                issue(issues, "error", "finding.confidence", finding_id + " has unsupported confidence", relative_path(root, report_path))
             if status == "validated" and confidence == "low":
                 issue(issues, "error", "finding.confidence", finding_id + " is validated with low confidence", relative_path(root, report_path))
             if not evidence_ids:
@@ -229,6 +271,9 @@ def parse_reports(root, issues):
             finding_records.append({"id": finding_id, "status": status, "evidence_ids": evidence_ids, "path": relative_path(root, report_path)})
 
         for path_id, body in report_sections(text, PATH_HEADING):
+            if path_id in path_ids:
+                issue(issues, "error", "path.duplicate", "duplicate Path ID: " + path_id, relative_path(root, report_path))
+            path_ids.add(path_id)
             path_type = field_value(body, "path_type").lower()
             evidence_ids = ids_in(body, EVIDENCE_ID)
             if path_type not in PATH_TYPES:
@@ -236,7 +281,7 @@ def parse_reports(root, issues):
             if not evidence_ids:
                 issue(issues, "error", "path.evidence_missing", path_id + " has no evidence reference", relative_path(root, report_path))
             references.extend((evidence_id, relative_path(root, report_path)) for evidence_id in evidence_ids)
-            path_records.append({"id": path_id, "path_type": path_type, "evidence_ids": evidence_ids, "path": relative_path(root, report_path)})
+            path_records.append({"id": path_id, "path_type": path_type, "evidence_ids": evidence_ids, "finding_ids": ids_in(body, FINDING_ID), "path": relative_path(root, report_path)})
     return finding_records, path_records, references
 
 
@@ -278,7 +323,11 @@ def verify_artifact(root, artifact_path, expected_hash, issues, display_path):
     if not candidate.is_file():
         issue(issues, "error", "artifact.missing", "artifact_path does not exist", display_path)
         return
-    digest = sha256_file(candidate)
+    try:
+        digest = sha256_file(candidate)
+    except OSError as exc:
+        issue(issues, "error", "artifact.unreadable", "cannot read artifact: " + str(exc), display_path)
+        return
     if digest != expected_hash:
         issue(issues, "error", "artifact.hash_mismatch", "artifact SHA-256 does not match content_hash", display_path)
 
@@ -297,7 +346,7 @@ def parse_evidence(root, workitems, issues, verify_hashes):
 
     for path in evidence_files:
         evidence_id = path.stem
-        text = path.read_text(encoding="utf-8-sig")
+        text = structural_text(path.read_text(encoding="utf-8-sig"))
         heading = EVIDENCE_HEADING.search(text)
         if not heading:
             issue(issues, "error", "evidence.heading_missing", "Evidence record has no matching heading", relative_path(root, path))
@@ -313,6 +362,7 @@ def parse_evidence(root, workitems, issues, verify_hashes):
         linked_workitems = ids_in(field_value(text, "linked_workitem"), WORKITEM_ID)
         content_hash_value = field_value(text, "content_hash")
         artifact_path = field_value(text, "artifact_path")
+        references.extend((evidence_id, relative_path(root, path)) for evidence_id in ids_in(field_value(text, "supersedes"), EVIDENCE_ID))
         if severity not in SEVERITIES:
             issue(issues, "error", "evidence.severity", "unsupported severity: " + severity, relative_path(root, path))
         if status not in EVIDENCE_STATUSES:
@@ -342,7 +392,7 @@ def build_traceability(evidence_ids, references):
             graph[evidence_id]["workitems"] += 1
         elif source.startswith("timeline.md:"):
             graph[evidence_id]["timeline"] += 1
-        else:
+        elif not source.replace("\\", "/").startswith("evidence/"):
             graph[evidence_id]["reports"] += 1
     return graph
 
@@ -367,6 +417,11 @@ def review_case(case_root, strict=False, verify_hashes=False):
     evidence, evidence_refs = parse_evidence(root, workitems, issues, verify_hashes)
     findings, paths, report_refs = parse_reports(root, issues)
     references = workitem_refs + timeline_refs + evidence_refs + report_refs
+    finding_ids = {finding["id"] for finding in findings}
+    for path in paths:
+        for finding_id in path["finding_ids"]:
+            if finding_id not in finding_ids:
+                issue(issues, "error", "reference.unknown_finding", "reference points to missing Finding: " + finding_id, path["path"])
 
     for evidence_id, source in references:
         if evidence_id not in evidence:

@@ -1,0 +1,13 @@
+# Build-context excludes for docker/Dockerfile (issue #129)
+# Keep the image build context focused on package source + adapters.
+.git
+.github
+work
+**/.DS_Store
+**/__pycache__
+**/*.pyc
+reports
+examples
+burp-mcp-full
+CTF-Sandbox-Orchestrator/docs-generator
+plugins
