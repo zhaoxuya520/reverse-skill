@@ -6,9 +6,9 @@
 
 ## 统计
 
-- 真实项目数：24
+- 真实项目数：25
 - 种子参考数：17
-- 总条目数：41
+- 总条目数：42
 - 最近更新：2026-11-11
 
 ## 按场景分类
@@ -21,6 +21,7 @@
 
 ### 二进制 / 固件 / CTF
 
+- [2026-09-29 剥离符号的 Go EXE + rustc 原生 DLL 静态分诊（pclntab 恢复、PE 导出、Ghidra headless）](./2026-09-29_stripped-go-pclntab-rust-dll-triage.md)
 - [2026-10-16 Go+Wails 用量看板全逻辑还原（stripped 无符号：手工 pclntab/functab + 字节级字符串还原）](./2026-10-16_wails-go-usage-dashboard-stripped-re.md)
 - [2026-11-11 Windows 强壳 PE 静态测绘（虚拟节 / 满熵载荷 / 诱饵 IAT / 熵地图）](./2026-11-11_windows-pe-packed-entropy-map.md)
 - [2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor](./2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor.md)
@@ -89,6 +90,9 @@
 
 - [1 KiB 自带掩码 ROR/XOR、Cortex-M 向量 crib、跨固件验证](./2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor.md)
 
+### Go / Rust 剥离二进制分诊
+
+- [pclntab 恢复函数名（无 GoReSym）、`go version -m` 元数据、PE 导出表脚本解析、Ghidra headless Java postScript](./2026-09-29_stripped-go-pclntab-rust-dll-triage.md)
 ### Go stripped 符号恢复与逻辑还原
 
 - [手工 pclntab/functab 恢复（GoReSym 失败分支）、LEA+len 精确字符串配对、时间常量三角验证](./2026-10-16_wails-go-usage-dashboard-stripped-re.md)
@@ -115,6 +119,9 @@
 
 - [应用/驻留 bootloader 边界与虚拟磁盘写入链路](./2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor.md)
 
+### 剥离符号的 Go EXE + rustc 原生 DLL
+
+- [pclntab 函数名恢复、Ghidra 识别 rustc、原生导出 RVA/VA](./2026-09-29_stripped-go-pclntab-rust-dll-triage.md)
 ### 体育交易所 + 真人牌桌站点（Angular 前端、AES 信封 API、比分 socket）
 
 - [仅公开被动观察；自有品牌、虚拟筹码重建，后台实时可控](./2026-10-30_js-encrypted-envelope-exchange-playmoney-rebuild.md)
