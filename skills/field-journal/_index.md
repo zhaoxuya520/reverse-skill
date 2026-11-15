@@ -6,9 +6,9 @@
 
 ## 统计
 
-- 真实项目数：37
+- 真实项目数：38
 - 种子参考数：17
-- 总条目数：54
+- 总条目数：55
 - 最近更新：2026-11-11
 
 ## 按场景分类
@@ -30,6 +30,7 @@
 - [2026-10-16 Go+Wails 用量看板全逻辑还原（stripped 无符号：手工 pclntab/functab + 字节级字符串还原）](./2026-10-16_wails-go-usage-dashboard-stripped-re.md)
 - [2026-11-11 Windows 强壳 PE 静态测绘（虚拟节 / 满熵载荷 / 诱饵 IAT / 熵地图）](./2026-11-11_windows-pe-packed-entropy-map.md)
 - [2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor](./2026-08-06_cortex-m-msc-firmware-self-keyed-rotate-xor.md)
+- [2026-08-07_windows-pe-dispatch-return-semantics：Windows PE 调用旁路、callee-cleanup、case handled 返回协议、双状态回归、备份门禁](./2026-08-07_windows-pe-dispatch-return-semantics.md)
 - [2026-07-22 Electron Bytenode 特权更新链分析](./2026-07-22_electron-bytenode-privileged-update-chain.md)
 - [2026-07-14_android-arm64-self-extract-source-recovery](./2026-07-14_android-arm64-self-extract-source-recovery.md)
 - [2026-05-15_lumine-go-reverse](./2026-05-15_lumine-go-reverse.md)
