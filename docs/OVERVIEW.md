@@ -208,6 +208,10 @@ Keywords: AI Agent, Skill Router, Tool Orchestration, MCP, Workflow Automation, 
 - [ARCHITECTURE.md](ARCHITECTURE.md): architecture notes
 - [skills/routing.md](../skills/routing.md): routing matrix
 - [burp-mcp-full/README.md](../burp-mcp-full/README.md): BurpSuite MCP module
+- [RELEASE_NOTES_v1.0.0.md](RELEASE_NOTES_v1.0.0.md): v1.0.0 release notes
+- [reviews/2026-08-08-pr-43-37-36-23-integration-review.md](reviews/2026-08-08-pr-43-37-36-23-integration-review.md): PR #43/#37/#36/#23 integration review
+- [reviews/2026-08-08-pr-value-review.md](reviews/2026-08-08-pr-value-review.md): PR value review
+- [plans/2026-09-21-pwntools-kali-discovery.md](plans/2026-09-21-pwntools-kali-discovery.md): pwntools / Kali discovery design plan
 
 ## License
 

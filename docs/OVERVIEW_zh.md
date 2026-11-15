@@ -206,6 +206,10 @@ bash skills/scripts/refresh-tool-index.sh
 - [ARCHITECTURE.md](ARCHITECTURE.md)：架构说明
 - [skills/routing.md](../skills/routing.md)：路由矩阵
 - [burp-mcp-full/README.md](../burp-mcp-full/README.md)：BurpSuite MCP 模块
+- [RELEASE_NOTES_v1.0.0.md](RELEASE_NOTES_v1.0.0.md)：v1.0.0 发布说明
+- [reviews/2026-08-08-pr-43-37-36-23-integration-review.md](reviews/2026-08-08-pr-43-37-36-23-integration-review.md)：PR #43/#37/#36/#23 集成评审
+- [reviews/2026-08-08-pr-value-review.md](reviews/2026-08-08-pr-value-review.md)：PR 价值评审
+- [plans/2026-09-21-pwntools-kali-discovery.md](plans/2026-09-21-pwntools-kali-discovery.md)：pwntools / Kali 探测设计计划
 
 ## License
 
