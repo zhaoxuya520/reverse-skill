@@ -14,6 +14,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - **Optional Codex adapter plugin** — added `plugins/reverse-skill/` without changing the client-neutral core or auto-registering MCP servers.
 - **Benchmark coverage for R40 (case-evidence-review)** — the route had a single English case; added three cases covering its previously-untested branches (Chinese `证据链`/`证据图`/`可追溯性`/`案件审查`/`案例审计`, and English `evidence.?graph`/`fixity.?check`/`case.?audit`), each verified through both the PowerShell and Bash routers.
 - **Route↔benchmark coverage gate** — `verify-routing-coherence.ps1` now fails when any `routing.json` route has no `routing-benchmark.json` case, enforcing the benchmark meta's "add a case when you add a route" rule (the reverse of the existing ghost-expect check).
+- `ida-reverse` watchdog / scheduled-task installer / GUI launcher / supervisor wrapper (`watchdog.ps1`, `install-autostart.ps1`, `start-gui.ps1`, `run-supervisor.py`) plus portable `LOCAL-SETUP.md`.
 
 ### Fixed
 - **Duplicate skill name between the core router and the Codex adapter** - `skills/SKILL.md` and `plugins/reverse-skill/skills/reverse-skill-router/SKILL.md` both declared `name: reverse-skill-router`, so a client that discovered both under one skill root kept the first definition and skipped the other, leaving only one of them invocable as `/skill:reverse-skill-router`. The Codex adapter now declares `reverse-skill-adapter`; the core router keeps `reverse-skill-router`. Added `skills/scripts/test-skill-name-uniqueness.ps1`, wired into the `routing-tests` CI job, so a duplicate declared name, a duplicate skill directory name, a missing frontmatter name, or a non-portable name fails the build (closes #163).
@@ -33,9 +34,6 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - **IDA open** — lock files may force a temp copy; `.i64` / `.idb` are never deleted.
 - **IDA MCP keep-alive** — `start.ps1` reuses a healthy HTTP server, launches `idalib_supervisor` via windowless Python, never `taskkill`s `ida.exe` (no `/T`). A listening 13337 with `tools/list` timeout is treated as busy, not dead, so the 1-minute watchdog cannot kill a supervisor mid-`idb_open`. `open.ps1` talks ida-pro-mcp 2.x `idb_open`/`idb_list`.
 - **IDA discovery** — `ToolDiscovery.ps1` now catalogs `idalib-mcp`, `ida-pro-mcp`, and `ida` with Program Files + per-user Python fallbacks.
-
-### Added
-- `ida-reverse` watchdog / scheduled-task installer / GUI launcher / supervisor wrapper (`watchdog.ps1`, `install-autostart.ps1`, `start-gui.ps1`, `run-supervisor.py`) plus portable `LOCAL-SETUP.md`.
 
 ## [1.0.1] — 2026-08-08
 ### Added
