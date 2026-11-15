@@ -3,16 +3,12 @@ name: macOS Bash compatibility
 on:
   pull_request:
     paths:
-      - 'skills/scripts/**/*.sh'
-      - 'skills/scripts/*.sh'
-      - 'skills/apk-reverse/scripts/*.sh'
+      - '**/*.sh'
       - '.github/workflows/macos-bash-compat.yml'
   push:
     branches: [main]
     paths:
-      - 'skills/scripts/**/*.sh'
-      - 'skills/scripts/*.sh'
-      - 'skills/apk-reverse/scripts/*.sh'
+      - '**/*.sh'
       - '.github/workflows/macos-bash-compat.yml'
 
 permissions:
