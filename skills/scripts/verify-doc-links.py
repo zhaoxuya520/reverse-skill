@@ -64,10 +64,15 @@ def links_in(path):
         if in_fence:
             continue
         for m in LINK.finditer(INLINE_CODE.sub("", line)):
-            raw = m.group(1).strip().strip("<>")
+            raw = m.group(1).strip()
             if not raw:
                 continue
-            target = raw.split()[0].split("#")[0].split("?")[0]
+            # CommonMark permits spaces inside <...> angle-bracket link targets;
+            # take the whole inner span instead of splitting on whitespace.
+            if raw.startswith("<") and raw.endswith(">"):
+                target = raw[1:-1].split("#")[0].split("?")[0]
+            else:
+                target = raw.strip("<>").split()[0].split("#")[0].split("?")[0]
             if not target:
                 continue
             if target.lower().startswith(SKIP_PREFIX):
