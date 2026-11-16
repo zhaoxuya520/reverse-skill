@@ -53,6 +53,10 @@ jobs:
         shell: pwsh
         run: ./skills/scripts/test-workflow-title-safety.ps1
 
+      - name: Leak scanner regression (one-line files)
+        shell: pwsh
+        run: ./skills/scripts/test-scan-leaks.ps1
+
       - name: P0 friction regression (Windows PowerShell 5.1)
         if: runner.os == 'Windows'
         shell: powershell

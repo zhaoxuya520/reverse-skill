@@ -59,7 +59,9 @@ if (Test-Path $Path -PathType Container) {
 
 $findings = 0
 foreach ($t in $targets) {
-  $lines = Get-Content -Path $t.FullName -Encoding UTF8
+  # @() keeps a one-line file as a one-element array; a bare [string] would be
+  # indexed character by character below.
+  $lines = @(Get-Content -Path $t.FullName -Encoding UTF8)
   for ($i = 0; $i -lt $lines.Count; $i++) {
     $line = $lines[$i]
     foreach ($p in $patterns) {
