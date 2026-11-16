@@ -70,7 +70,9 @@ if ([string]::IsNullOrWhiteSpace($netMode)) {
 # Do NOT treat "- assets:" itself, ops_refs, or evidence_of_auth URLs as assets.
 $hasAsset = $false
 $inScopeSection = Get-ScopeSection -Text $scope -Name 'in_scope'
-if ($inScopeSection -and $inScopeSection -match '(?ms)-\s*assets:\s*\r?\n(?<body>(?:\s+.+\r?\n?|\s+\r?\n?)*)') {
+# Body = the indented (or blank) lines right after "- assets:". The next
+# top-level "- key:" (surfaces, activities, ...) ends it.
+if ($inScopeSection -and $inScopeSection -match '(?m)-[ \t]*assets:[ \t]*\r?\n(?<body>(?:[ \t]+[^\r\n]*(?:\r?\n|$)|[ \t]*\r?\n)*)') {
     $assetBody = $Matches['body']
     # Require indented list entries: "  - value" where value is not empty [] marker
     if ($assetBody -match '(?m)^\s+-\s+(?!\[\s*\])\S+') {
