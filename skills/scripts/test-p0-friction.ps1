@@ -307,6 +307,27 @@ Set-Content (Join-Path $ghostCase 'scope.md') $ghostScope -Encoding UTF8
 if ($LASTEXITCODE -eq 2) { Ok 'case-guard rejects empty assets despite ops_refs URLs' }
 else { Bad "case-guard should fail empty assets; exit=$LASTEXITCODE" }
 
+# 14d) Asset detection stops at the next "- key:" in ## in_scope: a block-list
+# surfaces:/activities: after empty assets must not count as in_scope assets.
+$blockCases = @(
+    @{ Name = 'surfaces'; Assets = '  []'; Expect = 2 },
+    @{ Name = 'activities'; Assets = '  []'; Expect = 2 },
+    @{ Name = 'surfaces'; Assets = '  - https://example.test/'; Expect = 0 }
+)
+foreach ($bc in $blockCases) {
+    $blockCase = Join-Path $ScratchDir ("case-guard-block-{0}-{1}" -f $bc.Name, $bc.Expect)
+    New-Item -ItemType Directory -Force -Path $blockCase | Out-Null
+    $blockScope = @(
+        '# Case Scope', '## auth', '- status: granted', '## in_scope', '- assets:', $bc.Assets,
+        ("- {0}:" -f $bc.Name), '  - web', '  - api',
+        '## network_profile', '- mode: authorized_target_only', '## signoff', '- ready_for_act: true'
+    ) -join "`n"
+    Set-Content (Join-Path $blockCase 'scope.md') $blockScope -Encoding UTF8
+    & $HostExe -NoProfile -ExecutionPolicy Bypass -File $cg -CaseRoot $blockCase 2>&1 | Out-Null
+    if ($LASTEXITCODE -eq $bc.Expect) { Ok ("case-guard block-list {0} (assets {1}) exit {2}" -f $bc.Name, $bc.Assets.Trim(), $bc.Expect) }
+    else { Bad ("case-guard block-list {0} (assets {1}): expected exit {2}, got {3}" -f $bc.Name, $bc.Assets.Trim(), $bc.Expect, $LASTEXITCODE) }
+}
+
 # 14a) Auth/signoff fields outside their contract sections must not satisfy gate.
 $sectionCase = Join-Path $ScratchDir 'case-guard-section-scope'
 New-Item -ItemType Directory -Force -Path $sectionCase | Out-Null

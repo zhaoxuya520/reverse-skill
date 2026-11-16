@@ -75,5 +75,50 @@ if bash "$SCRIPT_DIR/case-guard.sh" --case-root "$SCRATCH/work/test-bash-01" > /
     exit 1
 fi
 
-echo "TOTAL=5 PASS=5 FAIL=0"
+# Tests 6-8: asset detection must stop at the next "- key:" in ## in_scope.
+# A block-list surfaces:/activities: must not be counted as in_scope assets.
+write_block_list_scope() {
+    local case_dir="$1"
+    local assets="$2"
+    local sibling="$3"
+    mkdir -p "$case_dir"
+    cat > "$case_dir/scope.md" <<EOF
+# Case Scope
+## auth
+- status: granted
+## in_scope
+- assets:
+$assets
+- $sibling:
+  - web
+  - api
+## network_profile
+- mode: authorized_target_only
+## signoff
+- ready_for_act: true
+EOF
+}
+
+echo "[Test 6] case-guard.sh rejects empty assets followed by block-list surfaces"
+write_block_list_scope "$SCRATCH/work/block-surfaces" "  []" "surfaces"
+if bash "$SCRIPT_DIR/case-guard.sh" --case-root "$SCRATCH/work/block-surfaces" > /dev/null 2>&1; then
+    echo "FAIL: case-guard counted surfaces list items as in_scope assets"
+    exit 1
+fi
+
+echo "[Test 7] case-guard.sh rejects empty assets followed by block-list activities"
+write_block_list_scope "$SCRATCH/work/block-activities" "  []" "activities"
+if bash "$SCRIPT_DIR/case-guard.sh" --case-root "$SCRATCH/work/block-activities" > /dev/null 2>&1; then
+    echo "FAIL: case-guard counted activities list items as in_scope assets"
+    exit 1
+fi
+
+echo "[Test 8] case-guard.sh accepts a real asset followed by block-list surfaces"
+write_block_list_scope "$SCRATCH/work/block-real-asset" "  - https://example.test/" "surfaces"
+if ! bash "$SCRIPT_DIR/case-guard.sh" --case-root "$SCRATCH/work/block-real-asset" > /dev/null; then
+    echo "FAIL: case-guard rejected a real asset followed by a surfaces list"
+    exit 1
+fi
+
+echo "TOTAL=8 PASS=8 FAIL=0"
 echo "=== All Bash Workflow Tests Passed ==="

@@ -92,6 +92,8 @@ if printf '%s\n' "$SCOPE" | awk '
   /^##[[:space:]]*in_scope/ {inscope=1; inassets=0; next}
   /^##[[:space:]]/ {if(inscope){inscope=0; inassets=0}}
   inscope && /-[[:space:]]*assets:/ {inassets=1; next}
+  # The next top-level "- key:" (surfaces, activities, ...) ends the assets list.
+  inscope && /^-/ {inassets=0}
   inscope && inassets && /^[[:space:]]+-[[:space:]]+/ {
     line=$0
     sub(/^[[:space:]]+-[[:space:]]+/,"",line)
