@@ -157,6 +157,8 @@ sudo bash kali/scripts/quick-setup.sh --minimal
 
 ### 2.1 首次配置
 
+Kali 工具索引需要 `jq` 生成完整的 JSON。缺少 `jq` 时，刷新会报错并保留现有索引。
+
 ```bash
 # 1. 进入项目根目录
 cd /path/to/cybersecurity-skills-router
