@@ -5,6 +5,11 @@
 
 set -euo pipefail
 
+if ! command -v jq &>/dev/null; then
+    echo "ERR: 刷新 Kali 工具索引需要 jq。请安装 jq 后重试；现有索引未修改。" >&2
+    exit 1
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib/tool-discovery.sh"
 
@@ -148,52 +153,47 @@ GENERATED_AT=$(date '+%Y-%m-%d %H:%M:%S %z')
 
 # ─── 生成 JSON ─────────────────────────────────────────────────────────────────────
 
-if command -v jq &>/dev/null; then
-    # 使用 jq 生成结构化 JSON
-    json_tools="[]"
-    for entry in "${TOOL_CATALOG[@]}"; do
-        result=$(resolve_tool "$entry")
-        IFS='|' read -r name skill purpose available resolved_path version source <<< "$result"
-        refs="${SCRIPT_REFS[$name]:-}"
+# 使用 jq 生成结构化 JSON
+json_tools="[]"
+for entry in "${TOOL_CATALOG[@]}"; do
+    result=$(resolve_tool "$entry")
+    IFS='|' read -r name skill purpose available resolved_path version source <<< "$result"
+    refs="${SCRIPT_REFS[$name]:-}"
 
-        avail_bool="false"
-        [[ "$available" == "yes" ]] && avail_bool="true"
+    avail_bool="false"
+    [[ "$available" == "yes" ]] && avail_bool="true"
 
-        json_tools=$(echo "$json_tools" | jq \
-            --arg name "$name" \
-            --arg skill "$skill" \
-            --arg purpose "$purpose" \
-            --argjson available "$avail_bool" \
-            --arg resolved_path "$resolved_path" \
-            --arg version "$version" \
-            --arg source "$source" \
-            --arg script_refs "$refs" \
-            '. + [{
-                name: $name,
-                skill: $skill,
-                purpose: $purpose,
-                available: $available,
-                resolved_path: $resolved_path,
-                version: $version,
-                source: $source,
-                script_refs: ($script_refs | split(","))
-            }]')
-    done
+    json_tools=$(echo "$json_tools" | jq \
+        --arg name "$name" \
+        --arg skill "$skill" \
+        --arg purpose "$purpose" \
+        --argjson available "$avail_bool" \
+        --arg resolved_path "$resolved_path" \
+        --arg version "$version" \
+        --arg source "$source" \
+        --arg script_refs "$refs" \
+        '. + [{
+            name: $name,
+            skill: $skill,
+            purpose: $purpose,
+            available: $available,
+            resolved_path: $resolved_path,
+            version: $version,
+            source: $source,
+            script_refs: ($script_refs | split(","))
+        }]')
+done
 
-    jq -n \
-        --arg generated_at "$GENERATED_AT" \
-        --arg platform "kali-linux" \
-        --argjson tools "$json_tools" \
-        '{
-            generated_at: $generated_at,
-            platform: $platform,
-            routing_entry: ["SKILL.md", "routing.md"],
-            tools: $tools
-        }' > "$OUTPUT_JSON"
-else
-    # 无 jq 时生成简易 JSON
-    echo "{\"generated_at\": \"$GENERATED_AT\", \"platform\": \"kali-linux\", \"note\": \"install jq for full JSON output\"}" > "$OUTPUT_JSON"
-fi
+jq -n \
+    --arg generated_at "$GENERATED_AT" \
+    --arg platform "kali-linux" \
+    --argjson tools "$json_tools" \
+    '{
+        generated_at: $generated_at,
+        platform: $platform,
+        routing_entry: ["SKILL.md", "routing.md"],
+        tools: $tools
+    }' > "$OUTPUT_JSON"
 
 echo "✅ 工具索引已刷新"
 echo "  markdown=$OUTPUT_MD"
