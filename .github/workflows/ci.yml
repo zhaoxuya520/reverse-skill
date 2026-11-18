@@ -7,8 +7,12 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   routing-tests:
+    timeout-minutes: 20
     name: routing tests (${{ matrix.os }})
     strategy:
       fail-fast: false
@@ -141,6 +145,7 @@ jobs:
         run: ./skills/scripts/verify-doc-facts.ps1
 
   sh-syntax:
+    timeout-minutes: 15
     name: shell script syntax check
     runs-on: ubuntu-latest
     steps:
@@ -327,6 +332,7 @@ jobs:
           Write-Host 'All non-ASCII .ps1 carry a UTF-8 BOM'
 
   leak-scan:
+    timeout-minutes: 10
     name: field-journal leak scan
     runs-on: ubuntu-latest
     steps:
@@ -336,6 +342,7 @@ jobs:
         run: ./skills/scripts/scan-leaks.ps1 -Path skills/field-journal
 
   case-contract:
+    timeout-minutes: 10
     name: case contract test (ctf-demo)
     runs-on: ubuntu-latest
     steps:
@@ -361,6 +368,7 @@ jobs:
         run: python3 skills/scripts/verify-repository-security.py
 
   gradle-wrapper-validation:
+    timeout-minutes: 10
     name: Gradle wrapper validation
     runs-on: ubuntu-latest
     steps:
@@ -368,6 +376,7 @@ jobs:
       - uses: gradle/actions/wrapper-validation@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
 
   version-check:
+    timeout-minutes: 10
     name: version consistency
     runs-on: ubuntu-latest
     steps:
