@@ -11,6 +11,9 @@
 *.yaml text eol=lf
 *.toml text eol=lf
 
+# CTF 示例证据的 SHA-256 按文件字节校验。
+examples/ctf-demo/evidence/*.txt text eol=lf
+
 # 二进制
 *.jar binary
 *.zip binary
