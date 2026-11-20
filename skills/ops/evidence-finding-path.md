@@ -61,6 +61,12 @@ The review is read-only and checks scope fields, Evidence records, work item and
 
 **MUST**：`evidence_ids` 非空；`status=validated` 时 confidence 不得为 low（除非标注 residual risk）。
 
+### Evidence 合并的写入失败
+
+`skills/scripts/consolidate_evidence.py` 与 `consolidate-evidence.ps1` 会先在各目标文件的目录中暂存全部输出和原始备份，再发布 Finding 和 Evidence 状态。普通 I/O 失败会触发逆序恢复；原有文件的 UTF-8 BOM、行尾、POSIX 权限位和 Windows DACL 会保留。在 POSIX 系统中，如果暂存文件无法保持原有的用户和组归属，脚本会在发布前拒绝操作。只有全部发布成功后，Python 入口才输出成功消息。
+
+如果恢复本身也失败，错误会列出未恢复文件及保留原始字节的备份路径。先恢复这些 Evidence，再恢复报告；在 Evidence 尚未恢复时，新 Finding 会保留，避免留下悬空的 `superseded by` 引用。确认记录一致后再清理保留的备份。此恢复机制不提供多个写入进程之间的隔离，也不保证进程崩溃或断电时整个案例的原子性。
+
 ## 3. Path（攻击路径 / 调用路径 / 解题路径）
 
 统一叫 **Path**，按任务类型解释：
