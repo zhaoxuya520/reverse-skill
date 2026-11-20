@@ -75,39 +75,30 @@ def render_graphviz(src: Path, out: Path, fmt: str) -> None:
 def render_plantuml(src: Path, out: Path, fmt: str) -> None:
     plantuml = shutil.which("plantuml")
     java = shutil.which("java")
-    if plantuml:
-        with tempfile.TemporaryDirectory() as tmp:
-            tmp_path = Path(tmp)
-            temp_src = tmp_path / src.name
-            temp_src.write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
-            run([plantuml, f"-t{fmt}", str(temp_src)], cwd=tmp_path)
-            produced = temp_src.with_suffix("." + fmt)
-            if not produced.exists():
-                candidates = list(tmp_path.glob(f"*.{fmt}"))
-                if not candidates:
-                    raise RuntimeError("PlantUML completed but no output file was found")
-                produced = candidates[0]
-            shutil.copyfile(produced, out)
-            return
     jar = os.environ.get("PLANTUML_JAR")
-    if java and jar and Path(jar).exists():
-        with tempfile.TemporaryDirectory() as tmp:
-            tmp_path = Path(tmp)
-            temp_src = tmp_path / src.name
-            temp_src.write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
-            run([java, "-jar", jar, f"-t{fmt}", str(temp_src)], cwd=tmp_path)
-            produced = temp_src.with_suffix("." + fmt)
-            if not produced.exists():
-                candidates = list(tmp_path.glob(f"*.{fmt}"))
-                if not candidates:
-                    raise RuntimeError("PlantUML completed but no output file was found")
-                produced = candidates[0]
-            shutil.copyfile(produced, out)
-            return
-    raise RuntimeError(
-        "PlantUML rendering requires `plantuml` on PATH, or Java plus PLANTUML_JAR pointing to plantuml.jar. "
-        "Return the PlantUML source only if no renderer is available."
-    )
+    if plantuml:
+        command = [str(Path(plantuml).resolve())]
+    elif java and jar and Path(jar).exists():
+        command = [str(Path(java).resolve()), "-jar", str(Path(jar).resolve())]
+    else:
+        raise RuntimeError(
+            "PlantUML rendering requires `plantuml` on PATH, or Java plus PLANTUML_JAR pointing to plantuml.jar. "
+            "Return the PlantUML source only if no renderer is available."
+        )
+
+    src = src.resolve()
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp_path = Path(tmp).resolve()
+        # Preserve source-relative includes while keeping generated files away
+        # from the source tree. PlantUML's absolute -o applies to all outputs.
+        run(command + [f"-t{fmt}", "-o", str(tmp_path), str(src)], cwd=src.parent)
+        produced = tmp_path / src.with_suffix("." + fmt).name
+        if not produced.exists():
+            candidates = list(tmp_path.glob(f"*.{fmt}"))
+            if not candidates:
+                raise RuntimeError("PlantUML completed but no output file was found")
+            produced = candidates[0]
+        shutil.copyfile(produced, out)
 
 
 def render_svg_source(src: Path, out: Path, fmt: str) -> None:
