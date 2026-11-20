@@ -19,6 +19,14 @@ dependencies {
     compileOnly 'net.portswigger.burp.extensions:montoya-api:2025.5'
     implementation 'com.google.code.gson:gson:2.11.0'
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
+
+    testImplementation 'net.portswigger.burp.extensions:montoya-api:2025.5'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.4'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 jar {
