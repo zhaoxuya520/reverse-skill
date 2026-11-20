@@ -45,6 +45,10 @@ jobs:
         shell: pwsh
         run: ./skills/scripts/test-parse-contracts.ps1
 
+      - name: Frida launcher argument regression tests
+        shell: pwsh
+        run: python -m unittest discover -s skills/apk-reverse/tests -p 'test_*.py'
+
       - name: Skill name uniqueness (metadata contract)
         shell: pwsh
         run: ./skills/scripts/test-skill-name-uniqueness.ps1
