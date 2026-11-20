@@ -117,7 +117,7 @@ function Ensure-DebugKeystore {
     }
 
     $parent = Split-Path -Path $Path -Parent
-    if (-not (Test-Path -LiteralPath $parent)) {
+    if (-not [string]::IsNullOrWhiteSpace($parent) -and -not (Test-Path -LiteralPath $parent)) {
         New-Item -ItemType Directory -Path $parent -Force | Out-Null
     }
 
@@ -143,7 +143,10 @@ $apktool = Get-ToolPath -Name 'apktool'
 $zipalign = Get-ToolPath -Name 'zipalign'
 $apksigner = Get-ToolPath -Name 'apksigner'
 $keytool = Get-ToolPath -Name 'keytool'
-$adb = Get-ToolPath -Name 'adb'
+$adb = $null
+if ($Install) {
+    $adb = Get-ToolPath -Name 'adb'
+}
 
 Ensure-DebugKeystore -Path $KeystorePath -Keytool $keytool -Alias $KeyAlias -StorePassword $StorePass -KeyPassword $KeyPass
 

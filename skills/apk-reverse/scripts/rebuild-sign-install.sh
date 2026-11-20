@@ -86,6 +86,7 @@ ensure_tool "keytool"
 # ─── 生成 debug keystore（如果不存在） ─────────────────────────────────────────────
 
 if [[ ! -f "$KEYSTORE" ]]; then
+    mkdir -p "$(dirname "$KEYSTORE")"
     echo "INFO: 生成 debug keystore: $KEYSTORE"
     keytool -genkeypair -v \
         -keystore "$KEYSTORE" \
