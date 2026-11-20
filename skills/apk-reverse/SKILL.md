@@ -112,14 +112,20 @@ pwsh -File "<skill-root>\apk-reverse\scripts\rebuild-sign-install.ps1" -ProjectD
 
 - 抽取包名
 - 列权限
-- 列 activity/service/receiver/provider
-- 标出主启动 activity
+- 列 activity/activity-alias/service/receiver/provider
+- 标出声明了 MAIN + LAUNCHER 的启动组件（含 activity-alias）
 
 示例：
 
 ```powershell
 pwsh -File "<skill-root>\apk-reverse\scripts\manifest-summary.ps1" -ManifestPath "C:\work\apktool_out\AndroidManifest.xml"
 ```
+
+输出字段说明：
+
+- `main_activity` 是声明的启动组件名；若组件是 alias，保留 alias 的 `android:name`，不要把它当成实现类名。
+- `activity_alias_count` 是 alias 声明数量；`activity_alias` 行的制表符分隔字段依次为 `name`、`exported`、`enabled`、`targetActivity`，末列指出实现 activity。
+- 启动列表是静态声明摘要，不推断运行时可用性；仍保留 `enabled` / `exported` 原始属性，不额外过滤组件。
 
 如果要分析 `.so`、`lib/arm64-v8a/*.so`、`lib/armeabi-v7a/*.so`，再结合：
 
