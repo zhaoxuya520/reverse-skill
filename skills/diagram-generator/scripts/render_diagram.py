@@ -112,6 +112,9 @@ def render_plantuml(src: Path, out: Path, fmt: str) -> None:
 
 def render_svg_source(src: Path, out: Path, fmt: str) -> None:
     if fmt == "svg":
+        # The default SVG output is the source itself, which needs no copy.
+        if src.is_file() and out.exists() and src.samefile(out):
+            return
         shutil.copyfile(src, out)
         return
     rsvg = shutil.which("rsvg-convert")
