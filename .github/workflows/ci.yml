@@ -7,6 +7,9 @@ on:
   push:
   pull_request:
 
+env:
+  POWERSHELL_TELEMETRY_OPTOUT: 'true'
+
 jobs:
   routing-tests:
     name: routing tests (${{ matrix.os }})
@@ -72,6 +75,17 @@ jobs:
         if: runner.os == 'Windows'
         shell: powershell
         run: ./skills/scripts/test-consolidate-evidence.ps1
+
+      - name: Evidence consolidation write recovery (Python and PowerShell)
+        shell: pwsh
+        run: python -W error -m unittest discover -s skills/scripts/tests -p test_consolidate_writes.py
+
+      - name: Evidence consolidation write recovery (Windows PowerShell 5.1)
+        if: runner.os == 'Windows'
+        shell: powershell
+        env:
+          REVERSE_TEST_POWERSHELL: powershell
+        run: python -W error -m unittest discover -s skills/scripts/tests -p test_consolidate_writes.py
 
       - name: Offline sample case contract (Windows PowerShell 5.1)
         if: runner.os == 'Windows'
