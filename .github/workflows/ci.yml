@@ -7,6 +7,9 @@ on:
   push:
   pull_request:
 
+env:
+  POWERSHELL_TELEMETRY_OPTOUT: 'true'
+
 jobs:
   routing-tests:
     name: routing tests (${{ matrix.os }})
@@ -44,6 +47,10 @@ jobs:
       - name: Parse contracts (route-scope + IDA lock)
         shell: pwsh
         run: ./skills/scripts/test-parse-contracts.ps1
+
+      - name: Frida launcher argument regression tests
+        shell: pwsh
+        run: python -m unittest discover -s skills/apk-reverse/tests -p 'test_*.py'
 
       - name: Skill name uniqueness (metadata contract)
         shell: pwsh

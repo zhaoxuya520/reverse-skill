@@ -114,7 +114,7 @@ SO_COUNT=0
 
 echo ""
 echo "═══════════════════════════════════════════"
-echo "  APK 解包完成"
+echo "  APK 解包摘要"
 echo "═══════════════════════════════════════════"
 echo "  task_root=$TASK_ROOT"
 echo "  jadx_out=$JADX_OUT"
@@ -125,3 +125,7 @@ echo "  apktool_exit_code=$APKTOOL_EXIT"
 echo "  java_files=$JAVA_COUNT"
 echo "  smali_dirs=$SMALI_DIRS"
 echo "  so_files=$SO_COUNT"
+
+# Preserve the summary and any usable jadx output, but do not report a failed
+# apktool decode as a successful command. Skipping apktool keeps its status 0.
+exit "$APKTOOL_EXIT"
