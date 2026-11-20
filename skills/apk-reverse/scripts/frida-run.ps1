@@ -138,8 +138,8 @@ if ($Spawn) {
 $fridaArgs += $target
 $fridaArgs += '-l'
 $fridaArgs += $ScriptPath
-if (-not $Pause) {
-    $fridaArgs += '--no-pause'
+if ($Pause) {
+    $fridaArgs += '--pause'
 }
 
 & $frida @fridaArgs

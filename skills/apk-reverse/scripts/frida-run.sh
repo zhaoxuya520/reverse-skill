@@ -112,8 +112,8 @@ fi
 FRIDA_ARGS+=("$TARGET")
 FRIDA_ARGS+=("-l" "$SCRIPT_PATH")
 
-if [[ "$PAUSE" != "true" ]]; then
-    FRIDA_ARGS+=("--no-pause")
+if [[ "$PAUSE" == "true" ]]; then
+    FRIDA_ARGS+=("--pause")
 fi
 
 echo "=== Frida 注入 ==="
