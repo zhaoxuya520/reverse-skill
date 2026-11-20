@@ -47,6 +47,7 @@ async function fetchTools() {
     }, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
+      res.on('error', reject);
       res.on('end', () => {
         if (res.statusCode !== 200) {
           reject(new Error(`Cannot fetch tools: HTTP ${res.statusCode} ${data.slice(0, 200)}`));
@@ -96,6 +97,7 @@ async function callTool(toolName, params) {
     }, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
+      res.on('error', reject);
       res.on('end', () => {
         if (res.statusCode === 403) {
           reject(new Error('Burp MCP rejected the request: missing or invalid BURP_MCP_TOKEN. Set BURP_MCP_TOKEN to match the token in ~/.burp-mcp-token.'));
