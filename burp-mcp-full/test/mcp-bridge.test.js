@@ -139,3 +139,59 @@ test('reconnects after Burp starts and handles a later tool call', async () => {
     await childClosed.catch(() => {});
   }
 });
+
+test('preserves UTF-8 characters split across HTTP response chunks', async () => {
+  const values = ['caf\u00e9', '\u767b\u5f55\u6210\u529f', '\ud83d\ude80'];
+  let calls = 0;
+  const server = http.createServer((request, response) => {
+    if (request.method === 'GET' && request.url === '/tools') {
+      response.writeHead(200, { 'Content-Type': 'application/json' });
+      response.end(JSON.stringify(['proxy_detail']));
+      return;
+    }
+    request.resume();
+    request.on('end', () => {
+      const text = values[calls++];
+      const data = Buffer.from(JSON.stringify({ response: text }), 'utf8');
+      const split = data.findIndex(byte => byte >= 0x80) + 1;
+      response.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+      // Flush an incomplete two-, three- or four-byte character separately.
+      response.write(data.subarray(0, split));
+      setTimeout(() => response.end(data.subarray(split)), 20);
+    });
+  });
+  server.listen(0, '127.0.0.1');
+  await once(server, 'listening');
+  const bridge = spawn(process.execPath, [path.join(__dirname, '..', 'mcp-bridge.js')], {
+    env: {
+      ...process.env,
+      BURP_MCP_HOST: '127.0.0.1',
+      BURP_MCP_PORT: String(server.address().port),
+      BURP_MCP_TOKEN: 'test-token'
+    },
+    stdio: ['pipe', 'pipe', 'pipe']
+  });
+  const stdout = new LineReader(bridge.stdout);
+  const stderr = new LineReader(bridge.stderr);
+  try {
+    assert.match(await stderr.next(), /Connected to Burp/);
+    for (let index = 0; index < values.length; index++) {
+      bridge.stdin.write(JSON.stringify({
+        jsonrpc: '2.0', id: index + 1, method: 'tools/call',
+        params: { name: 'burp_proxy_detail', arguments: { index } }
+      }) + '\n');
+      const result = JSON.parse(await stdout.next());
+      assert.equal(result.id, index + 1);
+      assert.deepEqual(JSON.parse(result.result.content[0].text), { response: values[index] });
+    }
+    assert.equal(calls, values.length);
+  } finally {
+    const childClosed = bridge.exitCode === null && bridge.signalCode === null
+      ? once(bridge, 'close')
+      : Promise.resolve();
+    bridge.stdin.end();
+    bridge.kill();
+    await close(server);
+    await childClosed.catch(() => {});
+  }
+});

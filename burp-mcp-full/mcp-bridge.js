@@ -45,6 +45,7 @@ async function fetchTools() {
       hostname: BURP_HOST, port: BURP_PORT, path: '/tools', method: 'GET',
       headers: AUTH_HEADERS
     }, (res) => {
+      res.setEncoding('utf8');
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
@@ -94,6 +95,7 @@ async function callTool(toolName, params) {
       hostname: BURP_HOST, port: BURP_PORT, path: '/', method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body), ...AUTH_HEADERS }
     }, (res) => {
+      res.setEncoding('utf8');
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
