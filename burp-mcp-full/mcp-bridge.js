@@ -334,6 +334,15 @@ async function handleRequest(msg) {
   }
 }
 
+function isRequestMessage(msg) {
+  if (!msg || typeof msg !== 'object' || Array.isArray(msg) ||
+      msg.jsonrpc !== '2.0' || typeof msg.method !== 'string') return false;
+  if (Object.prototype.hasOwnProperty.call(msg, 'id') &&
+      typeof msg.id !== 'string' && !(typeof msg.id === 'number' && Number.isFinite(msg.id))) return false;
+  return !Object.prototype.hasOwnProperty.call(msg, 'params') ||
+    (msg.params !== null && typeof msg.params === 'object' && !Array.isArray(msg.params));
+}
+
 // Main stdio loop
 async function main() {
   try {
@@ -356,13 +365,18 @@ async function main() {
       return;
     }
 
+    if (!isRequestMessage(msg)) {
+      process.stdout.write(JSON.stringify({ jsonrpc: '2.0', id: null, error: { code: -32600, message: 'Invalid Request' } }) + '\n');
+      return;
+    }
+    const isNotification = !Object.prototype.hasOwnProperty.call(msg, 'id');
     pending++;
     handleRequest(msg)
       .then(response => {
-        if (response) process.stdout.write(JSON.stringify(response) + '\n');
+        if (!isNotification && response) process.stdout.write(JSON.stringify(response) + '\n');
       })
       .catch(err => {
-        process.stdout.write(JSON.stringify({ jsonrpc: '2.0', id: msg.id ?? null, error: { code: -1, message: err.message || 'Handler error' } }) + '\n');
+        if (!isNotification) process.stdout.write(JSON.stringify({ jsonrpc: '2.0', id: msg.id, error: { code: -1, message: err.message || 'Handler error' } }) + '\n');
       })
       .finally(() => {
         pending--;
