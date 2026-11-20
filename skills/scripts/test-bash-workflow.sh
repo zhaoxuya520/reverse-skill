@@ -75,5 +75,37 @@ if bash "$SCRIPT_DIR/case-guard.sh" --case-root "$SCRATCH/work/test-bash-01" > /
     exit 1
 fi
 
-echo "TOTAL=5 PASS=5 FAIL=0"
+# Test 6: reinitializing a case updates scope without erasing its work history.
+echo "[Test 6] case-init.sh preserves existing progress"
+case_root="$SCRATCH/work/test-bash-01"
+printf '\n## Prior analysis\n- evidence_ids: [E-001]\n' >> "$case_root/timeline.md"
+printf '\n| WI-002 | Retain completed analysis | cre | sample | binary | done | E-001 | |\n' >> "$case_root/workitems.md"
+printf 'immutable evidence\n' > "$case_root/evidence/E-001.md"
+cp "$case_root/timeline.md" "$SCRATCH/timeline-before.md"
+cp "$case_root/workitems.md" "$SCRATCH/workitems-before.md"
+bash "$SCRIPT_DIR/case-init.sh" --hint "authorized web review" \
+  --case-name "test-bash-01" --project-root "$SCRATCH" \
+  --auth-granted --target-url "https://changed.example.test/" \
+  --network-profile "authorized_target_only" > /dev/null
+if ! cmp -s "$case_root/workitems.md" "$SCRATCH/workitems-before.md"; then
+    echo "FAIL: case-init replaced existing work items"
+    exit 1
+fi
+old_bytes="$(wc -c < "$SCRATCH/timeline-before.md" | tr -d '[:space:]')"
+head -c "$old_bytes" "$case_root/timeline.md" > "$SCRATCH/timeline-prefix.md"
+if ! cmp -s "$SCRATCH/timeline-prefix.md" "$SCRATCH/timeline-before.md"; then
+    echo "FAIL: case-init rewrote existing timeline bytes"
+    exit 1
+fi
+if ! grep -Fq -- '- decision_delta: [scope_updated]' "$case_root/timeline.md"; then
+    echo "FAIL: case-init did not append a scope update event"
+    exit 1
+fi
+if ! grep -Fq 'https://changed.example.test/' "$case_root/scope.md" || \
+   ! grep -Fxq 'immutable evidence' "$case_root/evidence/E-001.md"; then
+    echo "FAIL: case-init did not update scope while retaining evidence"
+    exit 1
+fi
+
+echo "TOTAL=6 PASS=6 FAIL=0"
 echo "=== All Bash Workflow Tests Passed ==="

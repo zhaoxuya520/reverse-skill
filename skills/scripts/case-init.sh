@@ -299,20 +299,29 @@ $assets_block
 - skills/ops/IDENTITY.md
 EOF
 
-cat > "$CASE_ROOT/timeline.md" <<EOF
-# Timeline (append-only)
+timeline_action="init"
+timeline_delta="case_initialized"
+if [[ -f "$CASE_ROOT/timeline.md" ]]; then
+  timeline_action="scope-update"
+  timeline_delta="scope_updated"
+  timeline_summary="${timeline_summary/case directory created/case scope updated}"
+else
+  printf '# Timeline (append-only)\n' > "$CASE_ROOT/timeline.md"
+fi
+cat >> "$CASE_ROOT/timeline.md" <<EOF
 
-## $created | lead | init
+## $created | lead | $timeline_action
 - action: case-init
 - command_or_ref: skills/scripts/case-init.sh
 - result_summary: $timeline_summary
 - artifacts: [scope.md, workitems.md]
 - evidence_ids: []
-- decision_delta: [case_initialized]
+- decision_delta: [$timeline_delta]
 - carry_forward_refs: [scope.md]
 - next: $timeline_next
 EOF
 
+if [[ ! -e "$CASE_ROOT/workitems.md" ]]; then
 cat > "$CASE_ROOT/workitems.md" <<'EOF'
 # Work Items
 
@@ -333,6 +342,7 @@ cat > "$CASE_ROOT/workitems.md" <<'EOF'
 - skills/ops/timeline-workitem.md
 - skills/ops/evidence-finding-path.md
 EOF
+fi
 
 if [[ "$ready" == true ]]; then
   cat > "$CASE_ROOT/README.md" <<EOF
