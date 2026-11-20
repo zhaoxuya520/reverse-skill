@@ -7,6 +7,9 @@ on:
   push:
   pull_request:
 
+env:
+  POWERSHELL_TELEMETRY_OPTOUT: 'true'
+
 jobs:
   routing-tests:
     name: routing tests (${{ matrix.os }})
@@ -44,6 +47,17 @@ jobs:
       - name: Parse contracts (route-scope + IDA lock)
         shell: pwsh
         run: ./skills/scripts/test-parse-contracts.ps1
+
+      - name: PowerShell radare2 recon regressions
+        shell: pwsh
+        run: python -W error -m unittest discover -s skills/scripts/tests -p test_radare_recon.py
+
+      - name: PowerShell radare2 recon regressions (Windows PowerShell 5.1)
+        if: runner.os == 'Windows'
+        shell: powershell
+        env:
+          REVERSE_TEST_POWERSHELL: powershell
+        run: python -W error -m unittest discover -s skills/scripts/tests -p test_radare_recon.py
 
       - name: Skill name uniqueness (metadata contract)
         shell: pwsh
