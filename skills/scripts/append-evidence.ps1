@@ -51,7 +51,7 @@ $allowedStatus = @('observed', 'candidate', 'validated', 'false_positive', 'acce
 function ConvertTo-YamlBlock([string] $text) {
     if ([string]::IsNullOrEmpty($text)) { return '    n/a' }
     $clean = ($text -replace '[\x00-\x08\x0B\x0C\x0E-\x1F]', '')
-    $lines = $clean -split "`r?`n", -1
+    $lines = $clean -split "`r?`n"
     if ($lines.Count -eq 0) { return '    n/a' }
     return (($lines | ForEach-Object { '    ' + $_ }) -join [Environment]::NewLine)
 }
