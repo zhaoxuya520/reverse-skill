@@ -58,6 +58,20 @@ public class McpHttpServer extends NanoHTTPD {
         this.authToken = resolveAuthToken();
     }
 
+    @Override
+    public void stop() {
+        try {
+            super.stop();
+        } finally {
+            // NanoHTTPD stops its own handlers, not this server's tool workers.
+            // Tasks removed from the queue must also complete their Futures so
+            // a handler waiting in get() is not left waiting forever.
+            for (Runnable task : threadPool.shutdownNow()) {
+                if (task instanceof Future<?> future) future.cancel(true);
+            }
+        }
+    }
+
     private String resolveAuthToken() {
         String token = System.getProperty("burp.mcp.token");
         if (token == null || token.isBlank()) {
