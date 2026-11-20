@@ -46,6 +46,7 @@ foreach ($perm in $permissions) {
 
 $componentQueries = @(
     @{ Label = 'activity'; Path = 'application/activity' },
+    @{ Label = 'activity_alias'; Path = 'application/activity-alias' },
     @{ Label = 'service'; Path = 'application/service' },
     @{ Label = 'receiver'; Path = 'application/receiver' },
     @{ Label = 'provider'; Path = 'application/provider' }
@@ -58,12 +59,17 @@ foreach ($query in $componentQueries) {
         $name = Get-AndroidAttr -Node $node -Name 'name'
         $exported = Get-AndroidAttr -Node $node -Name 'exported'
         $enabled = Get-AndroidAttr -Node $node -Name 'enabled'
-        ($query.Label + '=' + $name + "`t" + $exported + "`t" + $enabled)
+        $line = $query.Label + '=' + $name + "`t" + $exported + "`t" + $enabled
+        if ($query.Label -eq 'activity_alias') {
+            $line += "`t" + (Get-AndroidAttr -Node $node -Name 'targetActivity')
+        }
+        $line
     }
 }
 
 $mainActivities = @()
-$activities = @($manifest.SelectNodes('application/activity'))
+# List declared launcher components; an alias name is not its implementation class.
+$activities = @($manifest.SelectNodes('application/activity | application/activity-alias'))
 foreach ($activity in $activities) {
     $filters = @($activity.SelectNodes('intent-filter'))
     foreach ($filter in $filters) {
