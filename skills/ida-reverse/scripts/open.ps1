@@ -230,24 +230,24 @@ $bodyObj = @{
 }
 $body = $bodyObj | ConvertTo-Json -Depth 12 -Compress
 
-Set-IdaMcpOpeningLock -Port $Port -TtlSeconds ($TimeoutSeconds + 60)
-
-$openJob = Start-Job -ScriptBlock {
-    param($RequestBody, $RequestPort)
-    try {
-        Invoke-RestMethod "http://127.0.0.1:$RequestPort/mcp" -Method Post -Body $RequestBody `
-            -ContentType 'application/json' -TimeoutSec 0 -ErrorAction Stop
-    } catch {
-        $_.Exception.Message
-    }
-} -ArgumentList $body, $Port
-
-$deadline = (Get-Date).AddSeconds($TimeoutSeconds)
-$openCompleted = $false
-$startTime = Get-Date
-$lastProgressAt = $startTime.AddSeconds(-$ProgressIntervalSeconds)
-
+$openingLease = Set-IdaMcpOpeningLock -Port $Port -TtlSeconds ($TimeoutSeconds + 60)
+$openJob = $null
 try {
+    $openJob = Start-Job -ScriptBlock {
+        param($RequestBody, $RequestPort)
+        try {
+            Invoke-RestMethod "http://127.0.0.1:$RequestPort/mcp" -Method Post -Body $RequestBody `
+                -ContentType 'application/json' -TimeoutSec 0 -ErrorAction Stop
+        } catch {
+            $_.Exception.Message
+        }
+    } -ArgumentList $body, $Port
+
+    $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+    $openCompleted = $false
+    $startTime = Get-Date
+    $lastProgressAt = $startTime.AddSeconds(-$ProgressIntervalSeconds)
+
     while ((Get-Date) -lt $deadline) {
         if (Wait-Job -Job $openJob -Timeout 1) {
             $openCompleted = $true
@@ -370,7 +370,7 @@ try {
     Write-Output "ERR:$err"
     exit 1
 } finally {
-    Clear-IdaMcpOpeningLock -Port $Port
+    Clear-IdaMcpOpeningLock -Port $Port -LeaseId $openingLease
     if ($openJob) {
         Stop-Job -Job $openJob -ErrorAction SilentlyContinue
         Remove-Job -Job $openJob -Force -ErrorAction SilentlyContinue

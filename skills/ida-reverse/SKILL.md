@@ -57,8 +57,8 @@ description: |
    - 第一次 `open.ps1` 超时后，idalib 的 python worker 子进程可能变成孤儿，咬着 `.id0`/`.id1`/`.nam` 不放
    - 后续任何工具或手动拖入 IDA GUI 都会报"权限不足"
    - **禁止** `taskkill /F /T` 杀进程树——`/T` 会把 GUI `ida.exe` 子进程一起干掉
-   - **解决办法**：`start.ps1` 只在端口无人监听、或 `tools/list` 快速返回但缺 `py_eval`（旧 supervisor）时替换 managed supervisor；RPC 超时且 13337 仍在听视为忙，不杀。开库时 `open.ps1` 写 `opening.lock`，watchdog 不得 `-Force`
-   - **死锁例外**：`tools/list` **连续失败超过 3 分钟**（按 last-healthy 时间戳，不是进程创建时间），且没有 in-flight `opening.lock`、不是 GUI 占端口时，才 `-Force` 替换 supervisor，仍不杀 `ida.exe`
+   - **解决办法**：`start.ps1` 只在端口无人监听、或 `tools/list` 快速返回但缺 `py_eval`（旧 supervisor）时替换 managed supervisor；RPC 超时且 13337 仍在听视为忙，不杀。每次 `open.ps1` 持有独立的 opening lease，任一打开操作仍在进行时 watchdog 不得 `-Force`
+   - **死锁例外**：`tools/list` **连续失败超过 3 分钟**（按 last-healthy 时间戳，不是进程创建时间），且没有有效的 opening lease、不是 GUI 占端口时，才 `-Force` 替换 supervisor，仍不杀 `ida.exe`
    - **兜底**：`open.ps1` 检测到旧库被锁自动复制到 Temp 并加 GUID 前缀
 
 8. **带自动分析打开看起来像卡死**
@@ -97,7 +97,7 @@ description: |
 - 优先用 IDA 自带 `Python314\python.exe -m ida_pro_mcp.idalib_supervisor`
 - 默认先探测 `http://127.0.0.1:13337/mcp`，健康则输出 `OK:<n>:reuse` 并退出
 - 13337 在听但 `tools/list` 超时 → `WARN:busy` / `OK:busy:reuse`，**不杀**（开库或 GUI 占用时无法回包）
-- `tools/list` **连续失败超过 3 分钟**（last-healthy 时间戳）且无 `opening.lock` → 视为死锁，输出 `INFO:deadlock` 并 `-Force` 替换 supervisor。进行中的 `idb_open` 和 GUI 不会走这条路径
+- `tools/list` **连续失败超过 3 分钟**（last-healthy 时间戳）且无有效的 opening lease → 视为死锁，输出 `INFO:deadlock` 并 `-Force` 替换 supervisor。进行中的 `idb_open` 和 GUI 不会走这条路径；并行打开时，先完成的操作只释放自己的 lease
 - 仅在端口无人监听、缺 `py_eval`、或上述死锁时替换 managed supervisor；**永不杀 `ida.exe`，不用 `taskkill /T`**
 - GUI 占用 13337 时输出 `WARN:gui_busy` 并退出，不另起 supervisor
 - 成功输出 `OK:<工具数>`（当前约 66），失败输出 `ERR:timeout`
