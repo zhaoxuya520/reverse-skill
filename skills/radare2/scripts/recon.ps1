@@ -30,8 +30,8 @@ function Get-RequiredToolSpec {
     if (-not $spec.Available) {
         # Attempt auto-bootstrap
         if (Test-Path -LiteralPath $bootstrapScript) {
-            Write-Output "INFO: $Name not found, attempting auto-bootstrap..."
-            & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $bootstrapScript -Capability @($Name) -SkipRefresh
+            Write-Host "INFO: $Name not found, attempting auto-bootstrap..."
+            & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $bootstrapScript -Capability @($Name) -SkipRefresh | Out-Host
             $spec = Resolve-ReverseToolSpec -Name $Name
         }
         if (-not $spec.Available) {
@@ -52,6 +52,27 @@ function Write-Section {
     "=== $Title ==="
 }
 
+function Invoke-ReconTool {
+    param(
+        [Parameter(Mandatory = $true)]
+        [pscustomobject]$Spec,
+        [Parameter(Mandatory = $true)]
+        [string[]]$Arguments,
+        [Nullable[int]]$OutputLimit = $null
+    )
+
+    if ($null -ne $OutputLimit) {
+        # Keep the display limit without stopping the producer before its real
+        # exit status is available. Do not buffer the complete tool output.
+        & $Spec.Command @($Spec.PrefixArgs + $Arguments) | Select-Object -First $OutputLimit -Wait
+    } else {
+        & $Spec.Command @($Spec.PrefixArgs + $Arguments)
+    }
+    if ($LASTEXITCODE -ne 0) {
+        throw ("{0} {1} failed with exit code {2}." -f $Spec.Name, $Arguments[0], $LASTEXITCODE)
+    }
+}
+
 $rabin2 = Get-RequiredToolSpec -Name 'rabin2'
 $r2 = $null
 if ($RunAnalysis) {
@@ -65,21 +86,21 @@ $target = $resolvedPath.Path
 "目标文件: $target"
 
 Write-Section -Title '基本信息'
-& $rabin2.Command @($rabin2.PrefixArgs + @('-I', '--', $target))
+Invoke-ReconTool -Spec $rabin2 -Arguments @('-I', '--', $target)
 
 Write-Section -Title '节区'
-& $rabin2.Command @($rabin2.PrefixArgs + @('-S', '--', $target))
+Invoke-ReconTool -Spec $rabin2 -Arguments @('-S', '--', $target)
 
 Write-Section -Title '导入'
-& $rabin2.Command @($rabin2.PrefixArgs + @('-i', '--', $target)) | Select-Object -First $ImportsLimit
+Invoke-ReconTool -Spec $rabin2 -Arguments @('-i', '--', $target) -OutputLimit $ImportsLimit
 
 Write-Section -Title '导出'
-& $rabin2.Command @($rabin2.PrefixArgs + @('-E', '--', $target))
+Invoke-ReconTool -Spec $rabin2 -Arguments @('-E', '--', $target)
 
 Write-Section -Title '字符串'
-& $rabin2.Command @($rabin2.PrefixArgs + @('-zz', '--', $target)) | Select-Object -First $StringsLimit
+Invoke-ReconTool -Spec $rabin2 -Arguments @('-zz', '--', $target) -OutputLimit $StringsLimit
 
 if ($RunAnalysis) {
     Write-Section -Title '函数与入口分析'
-    & $r2.Command @($r2.PrefixArgs + @('-A', '-q', '-c', 's entry0;afl;iz;ii;q', '--', $target))
+    Invoke-ReconTool -Spec $r2 -Arguments @('-A', '-q', '-c', 's entry0;afl;iz;ii;q', '--', $target)
 }

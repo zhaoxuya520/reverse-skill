@@ -75,6 +75,8 @@ powershell -File "<skill-root>\radare2\scripts\recon.ps1" -TargetPath "C:\path\t
 powershell -File "<skill-root>\radare2\scripts\recon.ps1" -TargetPath "C:\path\to\sample.exe" -RunAnalysis
 ```
 
+任一 `rabin2` / `r2` 命令返回非零退出码时，脚本会停止并返回失败。导入和字符串的数量参数只限制显示行数，命令仍会执行完毕以检查退出码；退出码为零的附带告警会继续显示。
+
 ### `references/cheatsheet.md`
 
 当需要更多命令细节、常见场景模板、或要快速回忆语法时，读取这个速查表，而不是凭记忆硬猜。
