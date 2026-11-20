@@ -7,6 +7,9 @@ on:
   push:
   pull_request:
 
+env:
+  POWERSHELL_TELEMETRY_OPTOUT: 'true'
+
 jobs:
   routing-tests:
     name: routing tests (${{ matrix.os }})
@@ -161,6 +164,10 @@ jobs:
       - name: Client-neutral bootstrap/discovery (Bash)
         shell: bash
         run: bash skills/scripts/test-client-neutral-bootstrap.sh
+
+      - name: Burp stdio request envelope regression tests
+        shell: bash
+        run: node --test burp-mcp-full/test/mcp-bridge-envelopes.test.js
 
       - name: Structured routing parity (Bash)
         shell: bash
