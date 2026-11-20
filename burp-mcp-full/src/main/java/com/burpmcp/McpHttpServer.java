@@ -269,30 +269,31 @@ public class McpHttpServer extends NanoHTTPD {
         String filterMethod = params.has("method_filter") ? params.get("method_filter").getAsString() : null;
         int filterStatus = params.has("status_filter") ? params.get("status_filter").getAsInt() : 0;
 
-        List<ProxyHttpRequestResponse> filtered = new ArrayList<>(history);
-        if (filterUrl != null) {
-            filtered = filtered.stream().filter(r -> r.finalRequest().url().contains(filterUrl)).collect(Collectors.toList());
+        // Detail, annotation and comparison tools address the original history
+        // list. Preserve those indexes while filtering and displaying newest first.
+        int[] filteredIndexes = new int[history.size()];
+        int filteredCount = 0;
+        for (int i = history.size() - 1; i >= 0; i--) {
+            ProxyHttpRequestResponse entry = history.get(i);
+            if (filterUrl != null && !entry.finalRequest().url().contains(filterUrl)) continue;
+            if (filterMethod != null && !entry.finalRequest().method().equalsIgnoreCase(filterMethod)) continue;
+            if (filterStatus > 0 && (entry.response() == null || entry.response().statusCode() != filterStatus)) continue;
+            filteredIndexes[filteredCount++] = i;
         }
-        if (filterMethod != null) {
-            filtered = filtered.stream().filter(r -> r.finalRequest().method().equalsIgnoreCase(filterMethod)).collect(Collectors.toList());
-        }
-        if (filterStatus > 0) {
-            filtered = filtered.stream().filter(r -> r.response() != null && r.response().statusCode() == filterStatus).collect(Collectors.toList());
-        }
-        Collections.reverse(filtered);
-        int end = Math.min(offset + limit, filtered.size());
+        int end = Math.min(offset + limit, filteredCount);
         JsonArray items = new JsonArray();
         for (int i = offset; i < end; i++) {
-            ProxyHttpRequestResponse entry = filtered.get(i);
+            int historyIndex = filteredIndexes[i];
+            ProxyHttpRequestResponse entry = history.get(historyIndex);
             JsonObject item = new JsonObject();
-            item.addProperty("index", i);
+            item.addProperty("index", historyIndex);
             item.addProperty("method", entry.finalRequest().method());
             item.addProperty("url", entry.finalRequest().url());
             item.addProperty("status", entry.response() != null ? entry.response().statusCode() : 0);
             item.addProperty("length", entry.response() != null ? entry.response().body().length() : 0);
             items.add(item);
         }
-        result.addProperty("total", filtered.size());
+        result.addProperty("total", filteredCount);
         result.add("items", items);
         return result;
     }
