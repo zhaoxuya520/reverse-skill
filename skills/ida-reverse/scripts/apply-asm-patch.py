@@ -101,6 +101,20 @@ def validate_plan(plan: dict[str, Any]) -> dict[str, Any]:
 
 def mcp_call(endpoint: str, tool_names: list[str], arguments: dict[str, Any], timeout: float) -> tuple[str, dict[str, Any]]:
     """Try tool name aliases (HTTP short vs idapro_* client prefix)."""
+    def unknown_tool(detail: str, tool: str) -> bool:
+        name = re.escape(tool)
+        named = "(?:" + name + "|'" + name + "'|\"" + name + '\")'
+        pattern = r"(?:(?i:unknown tool):?\s+" + named + r"|(?i:tool)\s+" + named + r"\s+(?i:not found))\.?"
+        return bool(re.fullmatch(pattern, detail.strip()))
+
+    def missing_tool_error(error: Any, tool: str) -> bool:
+        # JSON-RPC -32602 is the MCP unknown-tool error. Match only its current
+        # message, never nested diagnostics, a different tool, or an application
+        # error whose text happens to mention a previous missing tool.
+        return (isinstance(error, dict) and error.get("code") == -32602
+                and isinstance(error.get("message"), str)
+                and unknown_tool(error["message"], tool))
+
     last_err = ""
     for tool in tool_names:
         payload = {
@@ -121,8 +135,15 @@ def mcp_call(endpoint: str, tool_names: list[str], arguments: dict[str, Any], ti
         except urllib.error.HTTPError as exc:
             detail = exc.read().decode("utf-8", errors="replace")[:400]
             last_err = f"ida-pro-mcp HTTP {exc.code} for tool {tool}: {detail}"
-            # Unknown tool / method-not-found → try the next alias.
-            if exc.code in (400, 404, 422) or "not found" in detail.lower() or "unknown" in detail.lower():
+            # Only a missing tool justifies another name. A missing database or
+            # failed patch must not be retried as a different mutating call.
+            try:
+                envelope = json.loads(detail)
+            except json.JSONDecodeError:
+                missing = unknown_tool(detail, tool)
+            else:
+                missing = isinstance(envelope, dict) and missing_tool_error(envelope.get("error"), tool)
+            if missing:
                 continue
             fail(last_err)
         except urllib.error.URLError as exc:
@@ -131,10 +152,26 @@ def mcp_call(endpoint: str, tool_names: list[str], arguments: dict[str, Any], ti
             result = json.loads(body)
         except json.JSONDecodeError:
             fail(f"ida-pro-mcp returned non-JSON for {tool}: {body[:400]}")
+        if not isinstance(result, dict):
+            fail(f"ida-pro-mcp returned an invalid response for {tool}")
         err = result.get("error")
-        if err and "not found" in json.dumps(err).lower():
-            last_err = f"tool {tool} not found: {err}"
-            continue
+        if err is not None:
+            detail = json.dumps(err, ensure_ascii=False)
+            last_err = f"ida-pro-mcp error for {tool}: {detail}"
+            if missing_tool_error(err, tool):
+                continue
+            fail(last_err)
+        tool_result = result.get("result")
+        if not isinstance(tool_result, dict):
+            fail(f"ida-pro-mcp response has no tool result for {tool}")
+        if tool_result.get("isError"):
+            # The pinned ida-pro-mcp zeromcp backend wraps a missing registry
+            # method in this exact tool-error shape instead of JSON-RPC -32602.
+            missing = {"content": [{"type": "text", "text": f"Method '{tool}' not found"}], "isError": True}
+            if tool_result == missing:
+                last_err = f"ida-pro-mcp tool {tool} was not found"
+                continue
+            fail(f"ida-pro-mcp tool {tool} failed: {json.dumps(tool_result, ensure_ascii=False)}")
         return tool, result
     fail(last_err or f"no usable tool name among {tool_names}")
     raise AssertionError("unreachable")
