@@ -74,6 +74,27 @@ else {
     if ($timelineText -notmatch [regex]::Escape('https://app.example.invalid/')) { Ok 'timeline does not duplicate unchanged target context' } else { Bad 'timeline duplicated target context from scope' }
 }
 
+# 2c) rerunning case-init preserves progress and appends the scope change.
+$workitemsPath = Join-Path $caseRoot 'workitems.md'
+Add-Content -LiteralPath $timelinePath -Value "`r`n## Prior analysis`r`n- evidence_ids: [E-001]" -Encoding UTF8
+Add-Content -LiteralPath $workitemsPath -Value '| WI-002 | Retain analysis | cre | sample | binary | done | E-001 | |' -Encoding UTF8
+$priorTimeline = [System.IO.File]::ReadAllText($timelinePath)
+$priorWorkitems = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes($workitemsPath))
+& $HostExe -NoProfile -ExecutionPolicy Bypass -File $ci `
+    -CaseName $caseName -PackageRoot $PackageRoot -AuthGranted `
+    -TargetUrl 'https://changed.example.invalid/' -NetworkProfile 'authorized_target_only' 2>&1 | Out-Null
+if ($LASTEXITCODE -ne 0) { Bad 'case-init rerun failed' }
+$updatedTimeline = [System.IO.File]::ReadAllText($timelinePath)
+if ($updatedTimeline.StartsWith($priorTimeline) -and $updatedTimeline -match 'decision_delta: \[scope_updated\]') {
+    Ok 'case-init preserves the timeline and appends a scope update'
+} else { Bad 'case-init rewrote timeline or omitted scope update' }
+if ([Convert]::ToBase64String([System.IO.File]::ReadAllBytes($workitemsPath)) -eq $priorWorkitems) {
+    Ok 'case-init preserves work items byte for byte'
+} else { Bad 'case-init replaced existing work items' }
+if ([System.IO.File]::ReadAllText($scopePath) -match 'https://changed\.example\.invalid/') {
+    Ok 'case-init still updates the requested scope'
+} else { Bad 'case-init failed to update the scope' }
+
 # 3) bare case-init still pending defaults
 $bareName = 'p0-bare-' + (Get-Date -Format 'HHmmss')
 & $HostExe -NoProfile -ExecutionPolicy Bypass -File $ci -CaseName $bareName -PackageRoot $PackageRoot 2>&1 | Out-Null

@@ -296,16 +296,25 @@ $assetsBlock
 - skills/ops/IDENTITY.md
 "@
 
+$timelineAction = 'init'
+$timelineDelta = 'case_initialized'
+$timelinePath = Join-Path $caseRoot 'timeline.md'
+if (Test-Path -LiteralPath $timelinePath -PathType Leaf) {
+    $timelineAction = 'scope-update'
+    $timelineDelta = 'scope_updated'
+    $timelineSummary = $timelineSummary.Replace('case directory created', 'case scope updated')
+}
+
 $timeline = @"
 # Timeline (append-only)
 
-## $created | lead | init
+## $created | lead | $timelineAction
 - action: case-init
 - command_or_ref: skills/scripts/case-init.ps1
 - result_summary: $timelineSummary
 - artifacts: [scope.md, workitems.md]
 - evidence_ids: []
-- decision_delta: [case_initialized]
+- decision_delta: [$timelineDelta]
 - carry_forward_refs: [scope.md]
 - next: $timelineNext
 "@
@@ -333,8 +342,16 @@ $workitems = @"
 
 $utf8 = New-Object System.Text.UTF8Encoding $true
 [System.IO.File]::WriteAllText((Join-Path $caseRoot 'scope.md'), $scope, $utf8)
-[System.IO.File]::WriteAllText((Join-Path $caseRoot 'timeline.md'), $timeline, $utf8)
-[System.IO.File]::WriteAllText((Join-Path $caseRoot 'workitems.md'), $workitems, $utf8)
+if (Test-Path -LiteralPath $timelinePath -PathType Leaf) {
+    $event = $timeline -replace '(?s)^# Timeline \(append-only\)\s*', ''
+    [System.IO.File]::AppendAllText($timelinePath, "`r`n`r`n" + $event, $utf8)
+} else {
+    [System.IO.File]::WriteAllText($timelinePath, $timeline, $utf8)
+}
+$workitemsPath = Join-Path $caseRoot 'workitems.md'
+if (-not (Test-Path -LiteralPath $workitemsPath)) {
+    [System.IO.File]::WriteAllText($workitemsPath, $workitems, $utf8)
+}
 
 $readmeNext = if ($ready) {
     @"
