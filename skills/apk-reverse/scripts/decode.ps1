@@ -156,3 +156,7 @@ $resXmlCount = if ((Test-Path -LiteralPath $apktoolOut)) { (Get-ChildItem -Liter
 if (($jadxExitCode -ne $null) -and ($jadxExitCode -ne 0)) {
     "warning=jadx returned non-zero exit code; inspect output but treat exported sources as usable if present"
 }
+
+if (($apktoolExitCode -ne $null) -and ($apktoolExitCode -ne 0)) {
+    exit $apktoolExitCode
+}

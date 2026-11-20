@@ -62,6 +62,7 @@ description: 在 CLI 环境下做 Android APK 逆向时使用。适用于 APK �
 - 默认在原 APK 同目录创建任务输出目录
 - 输出 `package`、`java_files`、`smali_dirs`、`so_files` 等摘要
 - 兼容 `jadx` 部分反编译错误但仍然有可用产物的情况
+- `apktool` 解包失败时先输出摘要，再返回其非零退出码；`decode.sh` 遵循相同规则。已有 `jadx` 产物会保留，显式跳过 `apktool` 的行为不变。
 
 示例：
 
