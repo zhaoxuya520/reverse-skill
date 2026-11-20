@@ -88,7 +88,7 @@ $oldLocalAppData = $env:LOCALAPPDATA
 $keepaliveTmp = Join-Path $tmp 'keepalive-state'
 $env:LOCALAPPDATA = $keepaliveTmp
 try {
-    Set-IdaMcpOpeningLock -Port 13337 -TtlSeconds 60
+    $portLease = Set-IdaMcpOpeningLock -Port 13337 -TtlSeconds 60
     if ((Test-IdaMcpOpeningInFlight -Port 13337) -and -not (Test-IdaMcpOpeningInFlight -Port 13338)) {
         Ok 'opening lock is isolated per port'
     } else {
@@ -106,8 +106,104 @@ try {
     } else {
         Bad 'corrupt opening lock blocks recovery forever'
     }
+
+    foreach ($finishFirst in @('first', 'second')) {
+        $first = Set-IdaMcpOpeningLock -Port 13340 -TtlSeconds 600
+        $second = Set-IdaMcpOpeningLock -Port 13340 -TtlSeconds 600
+        if ($first -and $second -and $first -ne $second) {
+            Ok 'overlapping opens have distinct lease owners'
+        } else { Bad 'overlapping opens share a lease owner' }
+        $completed = if ($finishFirst -eq 'first') { $first } else { $second }
+        $remaining = if ($finishFirst -eq 'first') { $second } else { $first }
+        Clear-IdaMcpOpeningLock -Port 13340 -LeaseId $completed
+        $inFlight = Test-IdaMcpOpeningInFlight -Port 13340
+        $deadlock = Test-IdaMcpKeepaliveDeadlockFromFacts -OpeningInFlight $inFlight `
+            -LastHealthy $now.AddMinutes(-10) -Now $now
+        if ($inFlight -and -not $deadlock) {
+            Ok ("{0} open finishes without removing the other open's protection" -f $finishFirst)
+        } else { Bad ("{0} open exposed an active open to recovery" -f $finishFirst) }
+        Clear-IdaMcpOpeningLock -Port 13340 -LeaseId $remaining
+        if (-not (Test-IdaMcpOpeningInFlight -Port 13340)) {
+            Ok 'closing all opens releases recovery protection'
+        } else { Bad 'completed opens still block recovery' }
+
+        $next = Set-IdaMcpOpeningLock -Port 13340 -TtlSeconds 600
+        Clear-IdaMcpOpeningLock -Port 13340 -LeaseId $completed
+        if (Test-IdaMcpOpeningInFlight -Port 13340) {
+            Ok 'repeated cleanup cannot remove a newer open'
+        } else { Bad 'old cleanup removed a newer lease' }
+        Clear-IdaMcpOpeningLock -Port 13340 -LeaseId $next
+    }
+
+    $shortLease = Set-IdaMcpOpeningLock -Port 13341 -TtlSeconds 1
+    $longLease = Set-IdaMcpOpeningLock -Port 13341 -TtlSeconds 600
+    $later = (Get-Date).AddSeconds(2)
+    $shortPath = Get-IdaMcpOpeningLockPath -Port 13341 -LeaseId $shortLease
+    $longPath = Get-IdaMcpOpeningLockPath -Port 13341 -LeaseId $longLease
+    if ((Test-IdaMcpOpeningInFlight -Port 13341 -Now $later) -and
+        -not (Test-Path -LiteralPath $shortPath) -and (Test-Path -LiteralPath $longPath)) {
+        Ok 'an expired lease is cleaned without expiring another open'
+    } else { Bad 'one expired lease interfered with another open' }
+    Clear-IdaMcpOpeningLock -Port 13341 -LeaseId $longLease
+    if (-not (Test-IdaMcpOpeningInFlight -Port 13341 -Now $later)) {
+        Ok 'expired and completed leases do not block recovery'
+    } else { Bad 'stale lease prevented recovery' }
+
+    $badLease = Set-IdaMcpOpeningLock -Port 13342 -TtlSeconds 600
+    $goodLease = Set-IdaMcpOpeningLock -Port 13342 -TtlSeconds 600
+    $badPath = Get-IdaMcpOpeningLockPath -Port 13342 -LeaseId $badLease
+    Set-Content -LiteralPath $badPath -Value 'corrupt' -Encoding ASCII
+    if ((Test-IdaMcpOpeningInFlight -Port 13342) -and -not (Test-Path -LiteralPath $badPath)) {
+        Ok 'a corrupt lease is cleaned without hiding another open'
+    } else { Bad 'corrupt lease interfered with another open' }
+    Clear-IdaMcpOpeningLock -Port 13342 -LeaseId $goodLease
+
+    $legacyPath = Get-IdaMcpOpeningLockPath -Port 13343
+    Set-Content -LiteralPath $legacyPath -Value ((Get-Date).AddMinutes(10).ToString('o')) -Encoding ASCII
+    $newLease = Set-IdaMcpOpeningLock -Port 13343 -TtlSeconds 600
+    Clear-IdaMcpOpeningLock -Port 13343 -LeaseId $newLease
+    if (Test-IdaMcpOpeningInFlight -Port 13343) {
+        Ok 'owned cleanup preserves an older-process marker'
+    } else { Bad 'owned cleanup removed an older-process marker' }
+    $newLease = Set-IdaMcpOpeningLock -Port 13343 -TtlSeconds 600
+    # Simulate the older process removing its own shared-format marker.
+    Remove-Item -LiteralPath $legacyPath -Force
+    if (Test-IdaMcpOpeningInFlight -Port 13343) {
+        Ok 'legacy cleanup preserves a newer owned lease'
+    } else { Bad 'legacy cleanup removed a newer owned lease' }
+    Clear-IdaMcpOpeningLock -Port 13343 -LeaseId $newLease
+
+    $pendingPath = (Get-IdaMcpOpeningLockPath -Port 13344 -LeaseId ([guid]::NewGuid())) + '.tmp'
+    Set-Content -LiteralPath $pendingPath -Value '' -Encoding ASCII
+    if (-not (Test-IdaMcpOpeningInFlight -Port 13344) -and (Test-Path -LiteralPath $pendingPath)) {
+        Ok 'unpublished markers are ignored without deleting an in-progress write'
+    } else { Bad 'reader consumed an unpublished marker' }
+
+    $boundaryLease = Set-IdaMcpOpeningLock -Port 13345 -TtlSeconds 600
+    $boundaryPath = Get-IdaMcpOpeningLockPath -Port 13345 -LeaseId $boundaryLease
+    $expires = [datetime]::Parse((Get-Content -LiteralPath $boundaryPath -Raw).Trim(), $null,
+        [System.Globalization.DateTimeStyles]::RoundtripKind)
+    if ((Test-IdaMcpOpeningInFlight -Port 13345 -Now $expires) -and
+        -not (Test-IdaMcpOpeningInFlight -Port 13345 -Now $expires.AddTicks(1))) {
+        Ok 'lease retains the existing inclusive deadline boundary'
+    } else { Bad 'lease expiry boundary changed' }
+
+    & {
+        # A destination collision makes the actual filesystem rename fail.
+        # The temporary write must be removed and the failure must propagate.
+        $blockedPath = Join-Path $keepaliveTmp 'blocked.lock'
+        New-Item -ItemType Directory -Path $blockedPath -Force | Out-Null
+        function Get-IdaMcpOpeningLockPath { return $blockedPath }
+        $publishFailed = $false
+        try { $null = Set-IdaMcpOpeningLock -Port 13346 } catch { $publishFailed = $true }
+        if ($publishFailed -and -not (Test-Path -LiteralPath ($blockedPath + '.tmp'))) {
+            Ok 'failed lease publication removes the temporary marker and throws'
+        } else { Bad 'failed publication left a marker or hid the error' }
+    }
+    Clear-IdaMcpOpeningLock -Port 13337 -LeaseId $portLease
 } finally {
     $env:LOCALAPPDATA = $oldLocalAppData
+    Remove-Item -LiteralPath $keepaliveTmp -Recurse -Force -ErrorAction SilentlyContinue
 }
 
 $recover = Get-Content -LiteralPath $idaFiles['recover.ps1'] -Raw -ErrorAction SilentlyContinue
@@ -148,9 +244,9 @@ if ($watch -match 'CreationDate') {
 
 $open = Get-Content -LiteralPath (Join-Path $idaDir 'open.ps1') -Raw
 if ($open -match 'Set-IdaMcpOpeningLock' -and $open -match 'Clear-IdaMcpOpeningLock') {
-    Ok 'open.ps1 holds opening.lock during idb_open'
+    Ok 'open.ps1 holds an opening lease during idb_open'
 } else {
-    Bad 'open.ps1 must set and clear opening.lock'
+    Bad 'open.ps1 must set and clear its opening lease'
 }
 
 $py = Get-Content -LiteralPath $idaFiles['run-supervisor.py'] -Raw

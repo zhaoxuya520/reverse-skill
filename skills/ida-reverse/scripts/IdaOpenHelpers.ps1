@@ -41,7 +41,14 @@ function Get-IdaMcpLastHealthyPath {
 }
 
 function Get-IdaMcpOpeningLockPath {
-    param([int]$Port = 13337)
+    param(
+        [int]$Port = 13337,
+        [guid]$LeaseId = [guid]::Empty
+    )
+    if ($LeaseId -ne [guid]::Empty) {
+        return Join-Path (Get-IdaMcpKeepaliveDir) ("opening-{0}-{1}.lock" -f $Port, $LeaseId.ToString('N'))
+    }
+    # Keep recognizing the marker written by older open.ps1 processes.
     return Join-Path (Get-IdaMcpKeepaliveDir) ("opening-{0}.lock" -f $Port)
 }
 
@@ -64,12 +71,28 @@ function Set-IdaMcpOpeningLock {
     )
     $ttl = [Math]::Max(1, $TtlSeconds)
     $until = (Get-Date).AddSeconds($ttl).ToString('o')
-    Set-Content -LiteralPath (Get-IdaMcpOpeningLockPath -Port $Port) -Value $until -Encoding ASCII
+    $leaseId = [guid]::NewGuid()
+    $path = Get-IdaMcpOpeningLockPath -Port $Port -LeaseId $leaseId
+    $pendingPath = $path + '.tmp'
+    try {
+        # Publish a complete, immutable marker: readers must not remove a
+        # partially written deadline as corrupt while an open is starting.
+        [IO.File]::WriteAllText($pendingPath, $until, [Text.Encoding]::ASCII)
+        [IO.File]::Move($pendingPath, $path)
+    } finally {
+        Remove-Item -LiteralPath $pendingPath -Force -ErrorAction SilentlyContinue
+    }
+    return $leaseId
 }
 
 function Clear-IdaMcpOpeningLock {
-    param([int]$Port = 13337)
-    $path = Get-IdaMcpOpeningLockPath -Port $Port
+    param(
+        [int]$Port = 13337,
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({ $_ -ne [guid]::Empty })]
+        [guid]$LeaseId
+    )
+    $path = Get-IdaMcpOpeningLockPath -Port $Port -LeaseId $LeaseId
     if (Test-Path -LiteralPath $path) {
         Remove-Item -LiteralPath $path -Force -ErrorAction SilentlyContinue
     }
@@ -80,24 +103,30 @@ function Test-IdaMcpOpeningInFlight {
         [int]$Port = 13337,
         [datetime]$Now = (Get-Date)
     )
-    $path = Get-IdaMcpOpeningLockPath -Port $Port
-    if (-not (Test-Path -LiteralPath $path)) { return $false }
-    $raw = (Get-Content -LiteralPath $path -Raw -ErrorAction SilentlyContinue)
-    if ([string]::IsNullOrWhiteSpace($raw)) {
-        Remove-Item -LiteralPath $path -Force -ErrorAction SilentlyContinue
-        return $false
+    $legacyPath = Get-IdaMcpOpeningLockPath -Port $Port
+    $paths = @($legacyPath) + @(Get-ChildItem -LiteralPath (Split-Path -Parent $legacyPath) `
+        -Filter ("opening-{0}-*.lock" -f $Port) -File -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName)
+    $active = $false
+    foreach ($path in $paths) {
+        if (-not (Test-Path -LiteralPath $path)) { continue }
+        $raw = (Get-Content -LiteralPath $path -Raw -ErrorAction SilentlyContinue)
+        if ([string]::IsNullOrWhiteSpace($raw)) {
+            Remove-Item -LiteralPath $path -Force -ErrorAction SilentlyContinue
+            continue
+        }
+        try {
+            $until = [datetime]::Parse($raw.Trim(), $null, [System.Globalization.DateTimeStyles]::RoundtripKind)
+        } catch {
+            Remove-Item -LiteralPath $path -Force -ErrorAction SilentlyContinue
+            continue
+        }
+        if ($Now -gt $until) {
+            Remove-Item -LiteralPath $path -Force -ErrorAction SilentlyContinue
+            continue
+        }
+        $active = $true
     }
-    try {
-        $until = [datetime]::Parse($raw.Trim(), $null, [System.Globalization.DateTimeStyles]::RoundtripKind)
-    } catch {
-        Remove-Item -LiteralPath $path -Force -ErrorAction SilentlyContinue
-        return $false
-    }
-    if ($Now -gt $until) {
-        Remove-Item -LiteralPath $path -Force -ErrorAction SilentlyContinue
-        return $false
-    }
-    return $true
+    return $active
 }
 
 function Test-IdaMcpKeepaliveDeadlockFromFacts {

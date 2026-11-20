@@ -7,6 +7,9 @@ on:
   push:
   pull_request:
 
+env:
+  POWERSHELL_TELEMETRY_OPTOUT: 'true'
+
 jobs:
   routing-tests:
     name: routing tests (${{ matrix.os }})
