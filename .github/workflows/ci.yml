@@ -154,6 +154,10 @@ jobs:
             echo "syntax OK: $f"
           done < <(git ls-files '*.sh')
 
+      - name: Burp MCP bridge regression tests
+        shell: bash
+        run: node --test burp-mcp-full/test/mcp-bridge.test.js
+
       - name: Kali pwntools discovery regression
         shell: bash
         run: bash kali/scripts/test-pwntools-discovery.sh

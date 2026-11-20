@@ -335,12 +335,12 @@ async function handleRequest(msg) {
 }
 
 // Main stdio loop
-async function main() {
-  try {
-    await ensureTools();
-  } catch (e) {
+function main() {
+  // Initialization does not need the backend's tool list. Keep stdin responsive
+  // while discovery is pending; tool requests share the same in-flight promise.
+  ensureTools().catch(() => {
     process.stderr.write(`[burp-mcp-bridge] WARNING: Cannot connect to Burp at ${BURP_HOST}:${BURP_PORT}. Start Burp first.\n`);
-  }
+  });
 
   const rl = readline.createInterface({ input: process.stdin, terminal: false });
   let pending = 0;
