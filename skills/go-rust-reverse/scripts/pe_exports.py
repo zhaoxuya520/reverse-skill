@@ -13,7 +13,8 @@ import sys
 
 
 def read(path):
-    d = open(path, "rb").read()
+    with open(path, "rb") as source:
+        d = source.read()
     if len(d) < 0x40 or d[:2] != b"MZ":
         print(f"{path}: not a PE (missing MZ)")
         return 1
@@ -29,7 +30,7 @@ def read(path):
     pe32plus = magic == 0x20B
     dd_off = opt + (112 if pe32plus else 96)
     exp_rva, _exp_size = struct.unpack_from("<II", d, dd_off)
-    image_base = struct.unpack_from("<Q" if pe32plus else "<I", d, opt + 24)[0]
+    image_base = struct.unpack_from("<Q" if pe32plus else "<I", d, opt + (24 if pe32plus else 28))[0]
     sec = opt + opt_size
     secs = []
     for i in range(nsec):
@@ -52,7 +53,7 @@ def read(path):
         print("no export directory")
         return 0
     eo = rva_to_off(exp_rva)
-    nfunc, nname = struct.unpack_from("<II", d, eo + 20)
+    ordinal_base, nfunc, nname = struct.unpack_from("<III", d, eo + 16)
     addr_funcs = struct.unpack_from("<I", d, eo + 28)[0]
     addr_names = struct.unpack_from("<I", d, eo + 32)[0]
     addr_ords = struct.unpack_from("<I", d, eo + 36)[0]
@@ -64,7 +65,7 @@ def read(path):
         func_rva = struct.unpack_from("<I", d, ao + ordinal * 4)[0]
         so = rva_to_off(name_rva)
         end = d.index(b"\0", so)
-        print(f"  {d[so:end].decode('latin1'):40s} ord={ordinal:3d} RVA=0x{func_rva:08x} VA=0x{image_base + func_rva:x}")
+        print(f"  {d[so:end].decode('latin1'):40s} ord={ordinal_base + ordinal:3d} RVA=0x{func_rva:08x} VA=0x{image_base + func_rva:x}")
     return 0
 
 

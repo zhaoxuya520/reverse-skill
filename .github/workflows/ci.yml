@@ -348,6 +348,10 @@ jobs:
         shell: bash
         run: python3 skills/case-review/tests/test_review_case.py
 
+      - name: Go/Rust binary triage regression tests
+        shell: bash
+        run: python3 -m unittest discover -s skills/go-rust-reverse/tests -p 'test_*.py'
+
       - name: Markdown link validator regression tests
         shell: bash
         run: python3 -m unittest discover -s skills/scripts/tests -p test_verify_doc_links.py
