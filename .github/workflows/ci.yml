@@ -356,6 +356,10 @@ jobs:
         shell: bash
         run: python3 skills/scripts/verify-doc-links.py
 
+      - name: Diagram rendering regression tests
+        shell: bash
+        run: python3 -m unittest discover -s skills/diagram-generator/tests -p 'test_*.py'
+
       - name: Repository executable/reference boundaries
         shell: bash
         run: python3 skills/scripts/verify-repository-security.py
