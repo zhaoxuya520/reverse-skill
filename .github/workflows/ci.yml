@@ -118,6 +118,17 @@ jobs:
           if ($guardExit -eq 0) { throw '-Force bypassed auth.status hard gate' }
           $global:LASTEXITCODE = 0
 
+      # Authorization layer: guards the restored standing-grant semantics and
+      # the zero-friction case flow (12 tasks + 3 negative controls, offline only).
+      - name: Authorization layer regression
+        shell: pwsh
+        run: ./skills/scripts/test-auth-layer.ps1
+
+      - name: Authorization flow matrix (Windows PowerShell 5.1)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: ./skills/scripts/test-auth-flow.ps1
+
       - name: Smoke (verify + parse + quick route)
         shell: pwsh
         run: ./skills/scripts/smoke.ps1

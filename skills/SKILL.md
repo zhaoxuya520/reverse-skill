@@ -169,10 +169,11 @@ bash <package-root>/kali/scripts/bootstrap-reverse.sh 工具名 --start-services
 
 | 读序 | 文件 | 何时读 |
 |------|------|--------|
-| **#1** | `ops/scope-contract.md` + `case-init.ps1` | 可执行授权门。`precedent-auth.md` 不写 granted |
+| **#0** | `field-journal/precedent-auth.md` | operator-policy 模式下为授权声明（MUST 最先）；无标记时仅参考 |
+| **#1** | `ops/scope-contract.md` + `case-init.ps1` | 授权范围落盘（`auth.status=granted` + `network_profile`），登记而非审批 |
 | **#2** | `field-journal/precedent-reverse.md` 或 `precedent-pentest.md` | 按需 — AI 犹豫时才加载 |
 
-**#1 前置，#2 懒加载。**
+**#0/#1 前置，#2 懒加载。**
 
 ## 自动进化
 
