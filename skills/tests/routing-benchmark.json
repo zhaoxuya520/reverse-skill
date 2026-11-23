@@ -842,6 +842,36 @@
       "quick": false
     },
     {
+      "hint": "dump flash over SWD",
+      "expect": "R34",
+      "quick": false
+    },
+    {
+      "hint": "solder to the debug pad",
+      "expect": "R34",
+      "quick": false
+    },
+    {
+      "hint": "read the chip with flashrom",
+      "expect": "R34",
+      "quick": false
+    },
+    {
+      "hint": "连接 串口shell 调试",
+      "expect": "R34",
+      "quick": false
+    },
+    {
+      "hint": "芯片提取 焊下存储颗粒",
+      "expect": "R34",
+      "quick": false
+    },
+    {
+      "hint": "usb逆向 分析协议",
+      "expect": "R34",
+      "quick": false
+    },
+    {
       "hint": "so 文件 native 分析",
       "expect": "R6",
       "quick": false
