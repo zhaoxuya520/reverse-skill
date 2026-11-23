@@ -942,6 +942,51 @@
       "quick": false
     },
     {
+      "hint": "run plaso on this image",
+      "expect": "R25",
+      "quick": false
+    },
+    {
+      "hint": "open the case in timeline explorer",
+      "expect": "R25",
+      "quick": false
+    },
+    {
+      "hint": "analyze with autopsy",
+      "expect": "R25",
+      "quick": false
+    },
+    {
+      "hint": "carve with the sleuth kit",
+      "expect": "R25",
+      "quick": false
+    },
+    {
+      "hint": "process the encase e01 image",
+      "expect": "R25",
+      "quick": false
+    },
+    {
+      "hint": "做内存转储 分析进程",
+      "expect": "R25",
+      "quick": false
+    },
+    {
+      "hint": "做内存dump 找注入",
+      "expect": "R25",
+      "quick": false
+    },
+    {
+      "hint": "应急响应取证 排查主机",
+      "expect": "R25",
+      "quick": false
+    },
+    {
+      "hint": "incident response forensics triage",
+      "expect": "R25",
+      "quick": false
+    },
+    {
       "hint": "安全评估 报告",
       "expect": "R11",
       "quick": false
