@@ -1012,6 +1012,36 @@
       "quick": false
     },
     {
+      "hint": "reverse a grpc service",
+      "expect": "R21",
+      "quick": false
+    },
+    {
+      "hint": "parse this pcap protocol",
+      "expect": "R21",
+      "quick": false
+    },
+    {
+      "hint": "write a wireshark dissector",
+      "expect": "R21",
+      "quick": false
+    },
+    {
+      "hint": "逆向 自定义协议 的字段",
+      "expect": "R21",
+      "quick": false
+    },
+    {
+      "hint": "做流量逆向 还原指令",
+      "expect": "R21",
+      "quick": false
+    },
+    {
+      "hint": "对网络流量分析 还原协议格式",
+      "expect": "R21",
+      "quick": false
+    },
+    {
       "hint": "api.example.net graphql bola",
       "expect": "R12",
       "quick": false
