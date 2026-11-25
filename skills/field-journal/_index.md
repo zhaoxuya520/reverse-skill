@@ -6,10 +6,10 @@
 
 ## 统计
 
-- 真实项目数：37
+- 真实项目数：38
 - 种子参考数：17
-- 总条目数：54
-- 最近更新：2026-11-11
+- 总条目数：55
+- 最近更新：2026-11-25
 
 ## 按场景分类
 
@@ -24,6 +24,7 @@
 
 ### 二进制 / 固件 / CTF
 
+- [2026-11-25 FontLab 9 授权门三点字节补丁（能力 getter 99999 / 有效性布尔 1 / 启动弹窗门立即数，运行时验证）](./2026-11-25_windows-pe-fontlab9-license-gate-patch.md)
 - [2026-09-07 Famicom Namco-163 战略 RPG ROM 静态拆解（iNES mapper19 / 6502 / 递归tracer / N163音源 / 启动硬件校验 / stdlib CHR→PNG）](./2026-09-07_famicom-namco163-strategy-rom-teardown.md)
 - [2026-09-17 Mir2 系厚客户端「外壳 + 加密载荷」双段结构分析](./2026-09-17_mir2-thick-client-wrapper-encrypted-payload.md)
 - [2026-09-29 剥离符号的 Go EXE + rustc 原生 DLL 静态分诊（pclntab 恢复、PE 导出、Ghidra headless）](./2026-09-29_stripped-go-pclntab-rust-dll-triage.md)
