@@ -59,6 +59,7 @@ import re
 import sys
 
 config_path, skills_root_raw, project_root_raw, out_dir_raw, hint = sys.argv[1:]
+hint = re.sub(r"[\r\n]+", " ", hint).strip()
 skills_root = pathlib.Path(skills_root_raw)
 project_root = pathlib.Path(project_root_raw).resolve()
 out_dir = pathlib.Path(out_dir_raw)
