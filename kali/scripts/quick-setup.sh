@@ -41,6 +41,11 @@ ok() { echo -e "${GREEN}[✓]${RESET} $*"; }
 warn() { echo -e "${YELLOW}[!]${RESET} $*"; }
 info() { echo -e "${CYAN}[i]${RESET} $*"; }
 
+# dpkg -l exits 0 even for rc/un (removed, not purged) states; check the real status
+pkg_installed() {
+    dpkg-query -W -f='${db:Status-Status}' "$1" 2>/dev/null | grep -qx installed
+}
+
 # ─── 检查权限 ──────────────────────────────────────────────────────────────────────
 
 if [[ $EUID -ne 0 ]]; then
@@ -93,7 +98,7 @@ NEW_TOOLS_2025_4=(
 )
 
 for tool in "${NEW_TOOLS_2026_1[@]}" "${NEW_TOOLS_2025_4[@]}"; do
-    if dpkg -l "$tool" &>/dev/null 2>&1; then
+    if pkg_installed "$tool"; then
         ok "$tool 已安装"
     else
         info "安装 $tool ..."
@@ -108,7 +113,7 @@ banner "配置 Kali 原生 MCP"
 MCP_TOOLS=("mcp-kali-server" "metasploitmcp" "hexstrike-ai")
 
 for tool in "${MCP_TOOLS[@]}"; do
-    if dpkg -l "$tool" &>/dev/null 2>&1; then
+    if pkg_installed "$tool"; then
         ok "$tool 已安装"
     else
         info "安装 $tool ..."
@@ -124,7 +129,7 @@ if [[ "$MINIMAL" != "true" ]]; then
     AD_TOOLS=("coercer" "netexec" "responder" "bloodhound" "certipy-ad")
 
     for tool in "${AD_TOOLS[@]}"; do
-        if dpkg -l "$tool" &>/dev/null 2>&1; then
+        if pkg_installed "$tool"; then
             ok "$tool 已安装"
         else
             info "安装 $tool ..."
@@ -186,17 +191,23 @@ if command -v jq &>/dev/null; then
         echo '{"mcpServers":{}}' > "$MCP_CONFIG"
     fi
 
+    # 不使用可预测的 /tmp 固定路径（脚本以 root 运行，避免 symlink 抢占/并发踩踏）
+    MCP_TMP=$(mktemp) || exit 1
+    trap 'rm -f "$MCP_TMP"' EXIT
+
     # 注册 kali-server
-    jq '.mcpServers["kali-server"] = {"command": "kali-server-mcp", "args": ["--port", "5000"]}' "$MCP_CONFIG" > /tmp/mcp-tmp.json && mv /tmp/mcp-tmp.json "$MCP_CONFIG"
+    jq '.mcpServers["kali-server"] = {"command": "kali-server-mcp", "args": ["--port", "5000"]}' "$MCP_CONFIG" > "$MCP_TMP" && mv "$MCP_TMP" "$MCP_CONFIG"
 
     # 注册 metasploit-mcp
-    jq '.mcpServers["metasploit-mcp"] = {"command": "metasploitmcp", "args": ["--transport", "stdio"]}' "$MCP_CONFIG" > /tmp/mcp-tmp.json && mv /tmp/mcp-tmp.json "$MCP_CONFIG"
+    jq '.mcpServers["metasploit-mcp"] = {"command": "metasploitmcp", "args": ["--transport", "stdio"]}' "$MCP_CONFIG" > "$MCP_TMP" && mv "$MCP_TMP" "$MCP_CONFIG"
 
     # 注册 hexstrike
-    jq '.mcpServers["hexstrike"] = {"command": "hexstrike-ai", "args": []}' "$MCP_CONFIG" > /tmp/mcp-tmp.json && mv /tmp/mcp-tmp.json "$MCP_CONFIG"
+    jq '.mcpServers["hexstrike"] = {"command": "hexstrike-ai", "args": []}' "$MCP_CONFIG" > "$MCP_TMP" && mv "$MCP_TMP" "$MCP_CONFIG"
 
     # 注册 jshook
-    jq '.mcpServers["jshook"] = {"command": "npx", "args": ["-y", "@jshookmcp/jshook@0.3.4"], "env": {"JSHOOK_BASE_PROFILE": "search"}}' "$MCP_CONFIG" > /tmp/mcp-tmp.json && mv /tmp/mcp-tmp.json "$MCP_CONFIG"
+    jq '.mcpServers["jshook"] = {"command": "npx", "args": ["-y", "@jshookmcp/jshook@0.3.4"], "env": {"JSHOOK_BASE_PROFILE": "search"}}' "$MCP_CONFIG" > "$MCP_TMP" && mv "$MCP_TMP" "$MCP_CONFIG"
+
+    trap - EXIT
 
     chown "$REAL_USER:$REAL_USER" "$MCP_CONFIG" "$MCP_CONFIG_DIR"
     ok "MCP 配置已写入: $MCP_CONFIG"
@@ -230,7 +241,7 @@ command -v hexstrike-ai &>/dev/null && echo "    ✓ hexstrike-ai" || echo "    
 echo ""
 echo "  2026.1 新工具:"
 for tool in "${NEW_TOOLS_2026_1[@]}"; do
-    if dpkg -l "$tool" &>/dev/null 2>&1; then
+    if pkg_installed "$tool"; then
         echo "    ✓ $tool"
     else
         echo "    ✗ $tool"
