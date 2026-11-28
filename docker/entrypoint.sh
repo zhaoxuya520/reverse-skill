@@ -10,7 +10,7 @@ if [ -d "$ROOT/skills" ] && [ -d "$ROOT/kali" ]; then
   echo "tools index: bash skills/scripts/refresh-tool-index.sh  (or kali/scripts/refresh-tool-index.sh)"
   echo "router:      bash skills/scripts/master-route.sh --hint \"<task>\""
   echo "case gate:   bash skills/scripts/case-init.sh --hint \"<task>\" --case-name <case>"
-  echo "workdirs:    /home/analyst/work  (mounts to ./work on host via compose)"
+  echo "workdirs:    /opt/reverse-skill/work  (host ./work via repo bind mount); /home/analyst/work is a named volume"
 else
   echo "WARN: package not mounted at $ROOT — mount the repo: -v \"\$PWD\":/opt/reverse-skill" >&2
 fi

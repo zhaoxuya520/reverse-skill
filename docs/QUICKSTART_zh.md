@@ -39,7 +39,7 @@ AI 的安全策略不會因為提示中加入「我已授權」就必然允許�
 專案依賴則使用隔離環境：
 
     uv venv
-    uv pip install -r requirements.txt
+    uv pip install -r requirements.txt   # 若目標專案有提供 requirements.txt
 
 不要機械式把所有 `pip` 字串替換為 `uv pip`；`python -m pip`、`pipx` bootstrap 與已存在的虛擬環境各有不同用途。若尚未安裝 `uv`，請使用作業系統套件管理器或明確建立的虛擬環境，不要把安全工具直接安裝到系統全域 Python。
 

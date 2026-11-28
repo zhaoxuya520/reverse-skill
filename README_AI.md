@@ -303,10 +303,10 @@ After success, check:
 
 ```powershell
 # Start the IDA MCP HTTP service
-powershell -File "<SKILL_ROOT>\ida-reverse\scripts\start.ps1"
+powershell -File "<SKILL_ROOT>\skills\ida-reverse\scripts\start.ps1"
 
 # Open a sample
-powershell -File "<SKILL_ROOT>\ida-reverse\scripts\open.ps1" -Path "C:\path\to\sample.exe" -TimeoutSeconds 600
+powershell -File "<SKILL_ROOT>\skills\ida-reverse\scripts\open.ps1" -Path "C:\path\to\sample.exe" -TimeoutSeconds 600
 ```
 
 ### anything-analyzer
@@ -457,7 +457,7 @@ Linux / macOS / Kali:
 
 IDA chain on Windows:
 ```powershell
-powershell -File "<your skill root>\ida-reverse\scripts\start.ps1"
+powershell -File "<your skill root>\skills\ida-reverse\scripts\start.ps1"
 ```
 
 Tool index:
@@ -600,7 +600,7 @@ If the AI keeps re-confirming in an authorized lab, or stalls at disclaimers:
 9. `field-journal/precedent-pentest.md` — Security-testing operation precedents
 
 If adding a new skill:
-9. `CONTRIBUTING.md`
+10. `CONTRIBUTING.md`
 
 ---
 

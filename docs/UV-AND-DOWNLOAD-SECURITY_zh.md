@@ -5,7 +5,7 @@
 獨立的命令列工具可使用 `uv tool install <package>` 安裝 。專案依賴則先建立虛擬環境：
 
     uv venv
-    uv pip install -r requirements.txt
+    uv pip install -r requirements.txt   # 若目標專案有提供 requirements.txt
 
 不要機械式替換所有 `pip` 指令。`uv pip` 適合已建立的虛擬環境，而獨立 CLI 工具通常更適合使用 `uv tool install`。為了提升可重現性，請儘量固定依賴版本或提交 lock file。
 
