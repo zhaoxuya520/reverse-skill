@@ -167,6 +167,7 @@ git clone https://github.com/zhaoxuya520/reverse-skill.git
 - **Kali Linux** → [kali/README-kali.md](kali/README-kali.md)
 - **Ubuntu/Debian** → [docs/platforms/linux.md](docs/platforms/linux.md)
 - **macOS** → [docs/platforms/macos.md](docs/platforms/macos.md)
+- **All-in-one Docker** → [docker/README.md](docker/README.md) (`docker compose -f docker/docker-compose.yml run --rm reverse-skill`)
 
 <p align="right">(<a href="#快速开始">返回顶部</a>)</p>
 

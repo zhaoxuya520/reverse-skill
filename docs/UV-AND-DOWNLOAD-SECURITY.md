@@ -5,7 +5,7 @@
 Use `uv tool install <package>` for isolated command-line tools. For project dependencies, create a virtual environment first:
 
     uv venv
-    uv pip install -r requirements.txt
+    uv pip install -r requirements.txt   # if the target project provides one
 
 Do not mechanically replace every `pip` command. `uv pip` is intended for an existing virtual environment, while `uv tool install` is generally more suitable for standalone CLI tools. Prefer pinned dependency versions or a lock file for reproducible environments.
 

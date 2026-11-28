@@ -165,7 +165,7 @@ Then refresh the tool index per platform:
 | Linux / macOS | `bash skills/scripts/refresh-tool-index.sh` |
 | Kali Linux | `bash kali/scripts/refresh-tool-index.sh` |
 
-Check [skills/tool-index.md](skills/tool-index.md) to see detected tools.
+Check [skills/tool-index.md](skills/tool-index.md) to see detected tools. This file is generated locally by the refresh commands above — it does not exist in a fresh clone until you run one.
 
 Platform-specific docs:
 - **Kali Linux** → [kali/README-kali.md](kali/README-kali.md)
